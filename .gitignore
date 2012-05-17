@@ -1,0 +1,5 @@
+.depend
+nebula
+*.o
+*~
+config.mk
