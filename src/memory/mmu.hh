@@ -11,37 +11,39 @@
 
 # include "mbcs/mbc.hh"
 # include "mbcs/mbc1.hh"
-
 # include "mbcs/romonly.hh"
+# include "../logging.hh"
 
 class MMU
 {
     class Register
     {
     public:
-        Register(uint8_t& reg)
+        Register()
+            : reg_ (0)
+        {}
+
+        Register(uint8_t* reg)
             : reg_ (reg)
+        {}
+
+        Register(Register& other)
+            : reg_ (other.reg_)
         {}
 
         Register& operator= (uint8_t val)
         {
-            this->reg_ = val;
-            return *this;
-        }
-
-        Register& operator= (Register& val)
-        {
-            this->reg_ = val.reg_;
+            *this->reg_ = val;
             return *this;
         }
 
         operator uint8_t ()
         {
-            return this->reg_;
+            return (*this->reg_);
         }
 
     private:
-        uint8_t&    reg_;
+        uint8_t*    reg_;
     };
 
 public:
@@ -52,34 +54,10 @@ public:
     template<typename T> T read(uint16_t addr);
     template<typename T> void write(uint16_t addr, T value);
 
-    Register IE;
-    Register LY;
-    Register LYC;
-    Register NR10;
-    Register NR11;
-    Register NR12;
-    Register NR14;
-    Register NR21;
-    Register NR22;
-    Register NR24;
-    Register NR30;
-    Register NR31;
-    Register NR32;
-    Register NR33;
-    Register NR41;
-    Register NR42;
-    Register NR43;
-    Register NR44;
-    Register NR50;
-    Register NR51;
-    Register NR52;
-    Register SCX;
-    Register SCY;
-    Register TAC;
-    Register TIMA;
-    Register TMA;
-    Register WX;
-    Register WY;
+# define X(Reg, Addr, Value)    \
+    Register Reg;
+# include "registers.hh"
+# undef X
 
 private:
     bool load_mbc(uint8_t ct_type);

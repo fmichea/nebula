@@ -1,5 +1,14 @@
 #include "mmu.hh"
 
+MMU::MMU()
+{}
+
+MMU::~MMU()
+{
+    if (this->rom_ != 0)
+        munmap(this->rom_, this->size_);
+}
+
 bool MMU::load_rom(std::string filename)
 {
     struct stat stat;
@@ -21,12 +30,16 @@ bool MMU::load_rom(std::string filename)
         "\x00\x08\x11\x1f\x88\x89\x00\x0e\xdc\xcc\x6e\xe6\xdd\xdd\xd9\x99"
         "\xbb\xbb\x67\x63\x6e\x0e\xec\xcc\xdd\xdc\x99\x9f\xbb\xb9\x33\x3e";
     if (memcmp(nintendo_logo, this->rom_ + 0x104, 0x30))
+    {
+        print_debug("Nintendo logo doesn't match!\n");
         return false;
+    }
 
     // ROM Title
     char title[0x11];
     strncpy(title, this->rom_ + 0x134, 0x10);
     this->title_ = title;
+    print_debug("ROM Title: %s.\n", title);
 
     // Cartridge Type
     if (!this->load_cartridge_type(this->rom_[0x147]))
@@ -46,15 +59,20 @@ bool MMU::load_rom(std::string filename)
 
     // Target country
     this->target_ = this->rom_[0x14a] ? "Non-Japanese" : "Japanese";
+    print_debug("Target: %s\n", this->target_.c_str());
 
     // Header checksum
-    uint8_t x = 0;
+    int8_t x = 0;
     for (int it = 0x134; it < 0x14d; ++it)
     {
         x = x - this->rom_[it] - 1;
     }
     if (this->rom_[0x14d] != x)
+    {
+        print_debug("Cartridge header checksum failure: %x (expected %x).\n",
+                    x, this->rom_[0x14d]);
         return false;
+    }
 
     // Global checksum.
     // Not done: GameBoy doesn't do it either...
@@ -101,39 +119,12 @@ bool MMU::load_mbc(uint8_t val)
     return false;
 }
 
-#define R(Reg, Addr, Value)                                     \
-    this->Reg = Register((uint8_t&) this->rom_[Addr]);          \
-    this->Reg = Value;
-
 bool MMU::reset_registers()
 {
-    R(IE, 0xffff, 0x00)
-    R(LY, 0xff44, 0x00)
-    R(LYC, 0xff45, 0x00)
-    R(NR10, 0xff10, 0x80)
-    R(NR11, 0xff11, 0xbf)
-    R(NR12, 0xff12, 0xf3)
-    R(NR14, 0xff14, 0xbf)
-    R(NR21, 0xff16, 0x3f)
-    R(NR22, 0xff17, 0x00)
-    R(NR24, 0xff19, 0xbf)
-    R(NR30, 0xff1a, 0x7f)
-    R(NR31, 0xff1b, 0xff)
-    R(NR32, 0xff1c, 0x9f)
-    R(NR33, 0xff1e, 0xbf)
-    R(NR41, 0xff20, 0xff)
-    R(NR42, 0xff21, 0x00)
-    R(NR43, 0xff22, 0x00)
-    R(NR44, 0xff23, 0xbf)
-    R(NR50, 0xff24, 0x77)
-    R(NR51, 0xff25, 0xf3)
-    R(NR52, 0xff26, 0xf1)
-    R(SCX, 0xff43, 0x00)
-    R(SCY, 0xff42, 0x00)
-    R(TAC, 0xff07, 0x00)
-    R(TIMA, 0xff05, 0x00)
-    R(TMA, 0xff06, 0x00)
-    R(WX, 0xff4b, 0x00)
-    R(WY, 0xff4a, 0x00)
+#define X(Reg, Addr, Value)                                     \
+    this->Reg = Register((uint8_t*) (this->rom_ + Addr));      \
+    this->Reg = Value;
+#include "registers.hh"
+#undef X
     return true;
 }
