@@ -3,7 +3,7 @@
 include config.mk
 
 SRCS = src/main.cc src/memory/mbcs/mbc.cc src/memory/mbcs/mbc1.cc
-SRCS += src/memory/mmu.cc src/memory/mbcs/romonly.cc
+SRCS += src/memory/mmu.cc src/memory/mbcs/romonly.cc src/logging.cc
 
 OBJS = $(SRCS:%.cc=%.o)
 
