@@ -7,6 +7,8 @@ MMU::~MMU()
 {
     if (this->rom_ != 0)
         munmap(this->rom_, this->size_);
+    if (this->mbc_ != 0)
+        delete this->mbc_;
 }
 
 bool MMU::load_rom(std::string filename)
