@@ -1,5 +1,5 @@
 #include <iostream>
-#include "memory/mmu.hh"
+#include "z80/z80.hh"
 
 int main(int argc, char** argv)
 {
@@ -8,8 +8,8 @@ int main(int argc, char** argv)
         std::cerr << "usage: " << argv[0] << " ROM_FILE" << std::endl;
         return 1;
     }
-    MMU mmu;
-    if (!mmu.load_rom(argv[1]))
+    Z80 z80(argv[1]);
+    if (!z80.execute())
         return 1;
     return 0;
 }

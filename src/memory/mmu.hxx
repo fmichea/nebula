@@ -6,7 +6,7 @@
 template<typename T>
 T MMU::read(uint16_t addr)
 {
-    return this->mbc_->write<T>(addr);
+    return this->mbc_->read<T>(addr);
 }
 
 template<typename T>
