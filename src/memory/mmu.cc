@@ -1,6 +1,7 @@
 #include "mmu.hh"
 
 MMU::MMU()
+    : fd_ (0), mbc_ (0)
 {}
 
 MMU::~MMU()
@@ -9,6 +10,8 @@ MMU::~MMU()
         munmap(this->rom_, this->size_);
     if (this->mbc_ != 0)
         delete this->mbc_;
+    if (this->fd_ != 0)
+        close(this->fd_);
 }
 
 bool MMU::load_rom(std::string filename)
@@ -21,10 +24,13 @@ bool MMU::load_rom(std::string filename)
         return false;
     fstat(this->fd_, &stat);
     this->size_ = stat.st_size < 0x10000 ? 0x10000 : stat.st_size;
-    this->rom_ = (char*) mmap(0, this->size_, PROT_READ | PROT_WRITE,
-                              MAP_PRIVATE, this->fd_, 0);
+    char* mapped = (char*) mmap(0, stat.st_size, PROT_READ, MAP_PRIVATE,
+                                this->fd_, 0);
+    this->rom_ = (uint8_t*) malloc(this->size_ * sizeof (uint8_t));
     if (this->rom_ == MAP_FAILED)
         return false;
+    memcpy(this->rom_, mapped, stat.st_size);
+    munmap(mapped, stat.st_size);
 
     // Checking that ROM was correctly loaded.
     const char* nintendo_logo =
@@ -38,10 +44,8 @@ bool MMU::load_rom(std::string filename)
     }
 
     // ROM Title
-    char title[0x11];
-    strncpy(title, this->rom_ + 0x134, 0x10);
-    this->title_ = title;
-    print_debug("ROM Title: %s.\n", title);
+    strncpy(this->title_, (const char*) (this->rom_ + 0x134), 0x10);
+    print_debug("ROM Title: %s.\n", this->title_);
 
     // Cartridge Type
     if (!this->load_cartridge_type(this->rom_[0x147]))
@@ -123,8 +127,8 @@ bool MMU::load_mbc(uint8_t val)
 
 bool MMU::reset_registers()
 {
-#define X(Reg, Addr, Value)                                     \
-    this->Reg = Register((uint8_t*) (this->rom_ + Addr));      \
+#define X(Reg, Addr, Value)                         \
+    this->Reg = Register(this->rom_ + Addr);        \
     this->Reg = Value;
 #include "registers.hh"
 #undef X

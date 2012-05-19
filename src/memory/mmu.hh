@@ -68,9 +68,9 @@ private:
 
     int             fd_;
     size_t          size_;
-    char*           rom_;
+    uint8_t*        rom_;
     MBC*            mbc_;
-    std::string     title_;
+    char            title_[0x15];
     std::string     target_;
 };
 
