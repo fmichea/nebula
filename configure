@@ -3,7 +3,9 @@
 TARGET="nebula"
 
 CXX="g++"
-CXXFLAGS="-Wall -Wextra -Werror -std=c++11"
+CXXFLAGS="-Wall -Wextra -Werror -std=c++11 `sdl-config --cflags`"
+
+LDFLAGS="`sdl-config --libs`"
 
 if [ "$1" == "--debug" ]; then
 	CXXFLAGS+=" -ggdb -DDEBUG"
@@ -18,6 +20,8 @@ TARGET = $TARGET
 
 CXX = $CXX
 CXXFLAGS = $CXXFLAGS
+
+LDFLAGS = $LDFLAGS
 
 # EOF
 EOF

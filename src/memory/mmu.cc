@@ -7,7 +7,7 @@ MMU::MMU()
 MMU::~MMU()
 {
     if (this->rom_ != 0)
-        munmap(this->rom_, this->size_);
+        free(this->rom_);
     if (this->mbc_ != 0)
         delete this->mbc_;
     if (this->fd_ != 0)
@@ -68,7 +68,7 @@ bool MMU::load_rom(std::string filename)
     print_debug("Target: %s\n", this->target_.c_str());
 
     // Header checksum
-    int8_t x = 0;
+    uint8_t x = 0;
     for (int it = 0x134; it < 0x14d; ++it)
     {
         x = x - this->rom_[it] - 1;
@@ -83,8 +83,8 @@ bool MMU::load_rom(std::string filename)
     // Global checksum.
     // Not done: GameBoy doesn't do it either...
 
-	// Reset all registers.
-	this->reset_registers();
+    // Reset all registers.
+    this->reset_registers();
     return true;
 }
 
@@ -132,5 +132,14 @@ bool MMU::reset_registers()
     this->Reg = Value;
 #include "registers.hh"
 #undef X
+    this->LCDC = LCDCProxy(this->rom_ + 0xff40);
+    this->rom_[0xff40] = 0x91;
+    this->STAT = STATProxy(this->rom_ + 0xff41);
+    this->BGP = PaletteProxy(this->rom_ + 0xff47);
+    this->rom_[0xff47] = 0xFC;
+    this->OBP[0] = PaletteProxy(this->rom_ + 0xff48);
+    this->rom_[0xff48] = 0xFF;
+    this->OBP[1] = PaletteProxy(this->rom_ + 0xff49);
+    this->rom_[0xff49] = 0xFF;
     return true;
 }

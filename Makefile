@@ -4,7 +4,8 @@ include config.mk
 
 SRCS = src/main.cc src/memory/mbcs/mbc.cc src/memory/mbcs/mbc1.cc
 SRCS += src/memory/mmu.cc src/memory/mbcs/romonly.cc src/logging.cc
-SRCS += src/z80/z80opcodes.cc src/z80/z80.cc
+SRCS += src/z80/z80opcodes.cc src/z80/z80.cc src/graphics/gpu.cc
+SRCS += src/graphics/bgwtile.cc src/graphics/timer.cc
 
 OBJS = $(SRCS:%.cc=%.o)
 
@@ -13,7 +14,7 @@ OBJS = $(SRCS:%.cc=%.o)
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CXX) -o $@ $^
+	$(CXX) -o $@ $^ $(LDFLAGS)
 
 clean:
 	rm -f $(OBJS)

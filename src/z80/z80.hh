@@ -3,6 +3,7 @@
 
 # include <stdio.h>
 # include "z80opcodes.hh"
+# include "../graphics/gpu.hh"
 
 class Z80
 {
@@ -15,6 +16,7 @@ private:
     std::string     filename_;
     Z80Registers    regs_;
     MMU             mmu_;
+    GPU             gpu_;
 };
 
 #endif // !Z___HH_

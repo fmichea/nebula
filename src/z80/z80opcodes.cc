@@ -133,7 +133,7 @@ uint16_t xor_a_1B_reg(MMU& mmu, Z80Registers& regs, uint8_t& reg)
 
 uint16_t adc_a_1B_reg(MMU& mmu, Z80Registers& regs, uint8_t& reg)
 {
-    uint16_t tmp = regs.A + reg + regs.F.cy;
+    uint16_t tmp = regs.A + reg + (uint8_t) regs.F.cy;
 
     (void) mmu;
     regs.A = (uint8_t) tmp;
@@ -158,7 +158,7 @@ uint16_t sub_a_1B_reg(MMU& mmu, Z80Registers& regs, uint8_t& reg)
 
 uint16_t sbc_a_1B_reg(MMU& mmu, Z80Registers& regs, uint8_t& reg)
 {
-    uint16_t tmp = regs.A - reg - regs.F.cy;
+    uint16_t tmp = regs.A - reg - (uint8_t) regs.F.cy;
 
     (void) mmu;
     regs.A = (uint8_t) tmp;
@@ -316,7 +316,7 @@ uint16_t ccf(MMU& mmu, Z80Registers& regs)
     (void) mmu;
     regs.F.n = 1;
     regs.F.h = 1;
-    regs.F.cy = regs.F.cy ^ 0x1;
+    regs.F.cy = ((uint8_t) regs.F.cy) ^ 0x1;
     return P(1, 4);
 }
 
@@ -384,7 +384,7 @@ uint16_t jr_if(MMU& mmu, Z80Registers& regs, uint8_t val)
 {
     if (val)
     {
-        regs.PC += mmu.read<uint8_t>(regs.PC + 1);
+        regs.PC += mmu.read<int8_t>(regs.PC + 1);
         return P(2, 12);
     }
     return P(2, 8);
@@ -491,18 +491,18 @@ uint16_t daa(MMU& mmu, Z80Registers& regs)
     uint16_t a = regs.A;
 
     (void) mmu;
-    if (regs.F.n)
+    if ((uint8_t) regs.F.n)
     {
-        if (regs.F.h)
+        if ((uint8_t) regs.F.h)
             a -= 0x06;
-        if (regs.F.cy)
+        if ((uint8_t) regs.F.cy)
             a -= 0x60;
     }
     else
     {
-        if (regs.F.h || 9 < (a & 0xf))
+        if ((uint8_t) regs.F.h || 9 < (a & 0xf))
             a += 0x06;
-        if (regs.F.cy || 0x9f < a)
+        if ((uint8_t) regs.F.cy || 0x9f < a)
             a += 0x60;
     }
     regs.F.h = 0;
@@ -568,7 +568,7 @@ uint16_t add_a_mhl(MMU& mmu, Z80Registers& regs)
 
 uint16_t adc_a_mhl(MMU& mmu, Z80Registers& regs)
 {
-    uint16_t tmp = regs.A + mmu.read<uint8_t>(regs.HL) + regs.F.cy;
+    uint16_t tmp = regs.A + mmu.read<uint8_t>(regs.HL) + (uint8_t) regs.F.cy;
 
     regs.A = tmp;
     regs.F.zf = (regs.A == 0 ? 0x1 : 0x0);
@@ -592,7 +592,7 @@ uint16_t sub_a_mhl(MMU& mmu, Z80Registers& regs)
 
 uint16_t sbc_a_mhl(MMU& mmu, Z80Registers& regs)
 {
-    uint16_t tmp = regs.A - mmu.read<uint8_t>(regs.HL) - regs.F.cy;
+    uint16_t tmp = regs.A - mmu.read<uint8_t>(regs.HL) - (uint8_t) regs.F.cy;
 
     regs.A = tmp;
     regs.F.n = 1;
@@ -659,7 +659,7 @@ uint16_t ret(MMU& mmu, Z80Registers& regs)
 
 uint16_t adc_a_d8(MMU& mmu, Z80Registers& regs)
 {
-    uint16_t tmp = regs.A + mmu.read<uint8_t>(regs.PC + 1) + regs.F.cy;
+    uint16_t tmp = regs.A + mmu.read<uint8_t>(regs.PC + 1) + (uint8_t) regs.F.cy;
 
     regs.A = (uint8_t) tmp;
     regs.F.zf = (regs.A == 0 ? 0x1 : 0x0);
@@ -682,7 +682,7 @@ uint16_t sub_a_d8(MMU& mmu, Z80Registers& regs)
 
 uint16_t sbc_a_d8(MMU& mmu, Z80Registers& regs)
 {
-    uint8_t tmp = regs.A - mmu.read<uint8_t>(regs.PC + 1) - regs.F.cy;
+    uint8_t tmp = regs.A - mmu.read<uint8_t>(regs.PC + 1) - (uint8_t) regs.F.cy;
 
     regs.A = tmp;
     regs.F.n = 1;

@@ -42,9 +42,9 @@ public:
 
             Z80Flag& operator= (uint8_t val)
             {
-                uint8_t bit = (val & 0x1) << this->bit_;
+                uint8_t bit = 0x1 << this->bit_;
 
-                if (bit) this->reg_ |= bit;
+                if (val) this->reg_ |= bit;
                 else this->reg_ &= (~0 ^ bit);
                 return *this;
             }

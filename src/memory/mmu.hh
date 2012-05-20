@@ -12,6 +12,9 @@
 # include "mbcs/mbc.hh"
 # include "mbcs/mbc1.hh"
 # include "mbcs/romonly.hh"
+# include "registers/stat.hh"
+# include "registers/palette.hh"
+# include "registers/lcdc.hh"
 # include "../logging.hh"
 
 class MMU
@@ -25,10 +28,6 @@ class MMU
 
         Register(uint8_t* reg)
             : reg_ (reg)
-        {}
-
-        Register(Register& other)
-            : reg_ (other.reg_)
         {}
 
         Register& operator= (uint8_t val)
@@ -58,6 +57,10 @@ public:
     Register Reg;
 # include "registers.hh"
 # undef X
+    STATProxy STAT;
+    LCDCProxy LCDC;
+    PaletteProxy BGP;
+    PaletteProxy OBP[2];
 
 private:
     bool load_mbc(uint8_t ct_type);
