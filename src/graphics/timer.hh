@@ -3,7 +3,7 @@
 
 # include <SDL/SDL.h>
 
-# define ELAPSED_FRAME 16667
+# define ELAPSED_FRAME 16
 
 class Timer
 {

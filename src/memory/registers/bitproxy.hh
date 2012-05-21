@@ -14,18 +14,17 @@ public:
         : reg_ (reg), bit_ (bit), mask_ (mask)
     {}
 
-    operator uint8_t ()
+    uint8_t get()
     {
         return (*this->reg_ >> this->bit_) & this->mask_;
     }
 
-    BitProxy& operator= (uint8_t val)
+    void set(uint8_t val)
     {
         uint8_t value = (val & this->mask_) << this->bit_;
 
-        if (value) *this->reg_ |= value;
-        else *this->reg_ &= (~0 ^ value);
-        return *this;
+        *this->reg_ &= (~0 ^ (this->mask_ << this->bit_));
+        *this->reg_ |= value;
     }
 
 private:

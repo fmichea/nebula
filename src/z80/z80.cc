@@ -21,6 +21,7 @@ bool Z80::execute()
 
         uint16_t res = OPCODES[opcode](this->mmu_, this->regs_);
 
+#if 0
         print_debug("\r\tR1  R2\tV1  V2\n");
         print_debug("\t%2s  %2s\t%02X  %02X\n", "A", "A", regs_.A, regs_.A);
         print_debug("\t%2s  %2s\t%02X  %02X\n", "B", "C", regs_.B, regs_.C);
@@ -29,8 +30,9 @@ bool Z80::execute()
         print_debug("\t%2s = %04X\n", "SP", regs_.SP);
         print_debug("\t%2s = %04X\n", "PC", regs_.PC);
         print_debug("\tFlags: Z (%u), N (%u), H (%u), C (%u)\n",
-                    (uint8_t) regs_.F.zf, (uint8_t) regs_.F.n,
-                    (uint8_t) regs_.F.h, (uint8_t) regs_.F.cy);
+                    regs_.F.zf.get(), regs_.F.n.get(),
+                    regs_.F.h.get(), regs_.F.cy.get());
+#endif
 
         this->regs_.PC += (res >> 8) & 0xff;
         gpu_.do_cycle(res & 0xff);

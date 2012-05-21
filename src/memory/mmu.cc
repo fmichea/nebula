@@ -129,7 +129,7 @@ bool MMU::reset_registers()
 {
 #define X(Reg, Addr, Value)                         \
     this->Reg = Register(this->rom_ + Addr);        \
-    this->Reg = Value;
+    this->Reg.set(Value);
 #include "registers.hh"
 #undef X
     this->LCDC = LCDCProxy(this->rom_ + 0xff40);

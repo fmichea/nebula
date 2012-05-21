@@ -30,15 +30,14 @@ class MMU
             : reg_ (reg)
         {}
 
-        Register& operator= (uint8_t val)
+        void set(uint8_t val)
         {
             *this->reg_ = val;
-            return *this;
         }
 
-        operator uint8_t ()
+        uint8_t get()
         {
-            return (*this->reg_);
+            return *this->reg_;
         }
 
     private:

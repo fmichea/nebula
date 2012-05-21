@@ -3,6 +3,8 @@
 
 # include <stdint.h>
 
+# include "../memory/registers/bitproxy.hh"
+
 class WordRegProxy
 {
 public:
@@ -10,14 +12,13 @@ public:
         : msb_ (msb), lsb_ (lsb)
     {}
 
-    WordRegProxy& operator= (uint16_t val)
+    void set(uint16_t val)
     {
         this->msb_ = (val >> 8) & 0xff;
         this->lsb_ = val & 0xff;
-        return *this;
     }
 
-    operator uint16_t ()
+    uint16_t get()
     {
         return (this->msb_ << 8) + this->lsb_;
     }
@@ -33,59 +34,32 @@ public:
     class Z80Flags
     {
     public:
-        class Z80Flag
-        {
-        public:
-            Z80Flag(uint8_t& reg, uint8_t bit)
-                : reg_ (reg), bit_ (bit)
-            {}
-
-            Z80Flag& operator= (uint8_t val)
-            {
-                uint8_t bit = 0x1 << this->bit_;
-
-                if (val) this->reg_ |= bit;
-                else this->reg_ &= (~0 ^ bit);
-                return *this;
-            }
-
-            operator uint8_t ()
-            {
-                return (this->reg_ >> this->bit_) & 0x1;
-            }
-
-        private:
-            uint8_t&    reg_;
-            uint8_t     bit_;
-        };
-
-        Z80Flags(uint8_t& reg)
-            : zf (reg, 7), n (reg, 6), h (reg, 5), cy (reg, 4), reg_ (reg)
+        Z80Flags(uint8_t* reg)
+            : zf (reg, 7, 1), n (reg, 6, 1), h (reg, 5, 1), cy (reg, 4, 1),
+              reg_ (reg)
         {}
 
-        Z80Flags& operator= (uint8_t val)
+        void set(uint8_t val)
         {
-            this->reg_ = val;
-            return *this;
+            *this->reg_ = val;
         }
 
-        Z80Flag zf;
-        Z80Flag n;
-        Z80Flag h;
-        Z80Flag cy;
+        BitProxy zf;
+        BitProxy n;
+        BitProxy h;
+        BitProxy cy;
 
     private:
-        uint8_t&    reg_;
+        uint8_t*    reg_;
     };
 
-
     Z80Registers()
-        : F (flags_), AF (A, flags_), BC (B, C), DE (D, E), HL (H, L)
+        : F (&flags_), AF (A, flags_), BC (B, C), DE (D, E), HL (H, L)
     {
-        this->AF = 0x11b0;
-        this->BC = 0x0013;
-        this->DE = 0x00d8;
-        this->HL = 0x0140;
+        this->AF.set(0x11b0);
+        this->BC.set(0x0013);
+        this->DE.set(0x00d8);
+        this->HL.set(0x0140);
         this->SP = 0xfffe;
         this->PC = 0x0100;
     }

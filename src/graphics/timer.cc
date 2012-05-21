@@ -12,7 +12,7 @@ void Timer::adjust()
     printf("Displayed frame in %d milliseconds.\n", delta);
     if (delta < ELAPSED_FRAME)
     {
-        SDL_Delay(ELAPSED_FRAME / 1000 - delta);
+        SDL_Delay(ELAPSED_FRAME - delta);
     }
     this->last_ = SDL_GetTicks();
 }

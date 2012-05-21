@@ -55,7 +55,7 @@ for func in ['pop', 'push']:
 for func in ['ret_%s', 'jump_%s_a16', 'call_%s_a16', 'jr_%s']:
     for flag in flags:
         cond = flag.replace('n', '! ').split()
-        cond[-1] = '(uint8_t) regs.F.' + cond[-1]
+        cond[-1] = 'regs.F.' + cond[-1] + '.get()'
         cond = ' '.join(cond)
         write_x1_(func % flag, func % 'if', cond)
 
