@@ -786,6 +786,12 @@ uint16_t reti(MMU& mmu, Z80Registers& regs)
     return P(0, 16);
 }
 
+uint16_t cb(MMU& mmu, Z80Registers& regs)
+{
+    uint8_t op = mmu.read<uint8_t>(regs.PC + 1);
+    return (P(1, 4) + CBOPCODES[op](mmu, regs));
+}
+
 #define X1(FuncName, OpName, Reg)                               \
     uint16_t FuncName(MMU& mmu, Z80Registers& regs)             \
     {                                                           \
@@ -794,9 +800,9 @@ uint16_t reti(MMU& mmu, Z80Registers& regs)
 #define X2(FuncName, OpName, Reg1, Reg2)                        \
     uint16_t FuncName(MMU& mmu, Z80Registers& regs)             \
     {                                                           \
-        return OpName(mmu, regs, regs.Reg1, regs.Reg2);         \
+        return OpName(mmu, regs, Reg1, Reg2);                   \
     }
-#include "genOpcodes.hh"
+#include "opcodes.def"
 #undef X2
 #undef X1
 
@@ -839,7 +845,7 @@ op OPCODES[0x100] = {
     cp_a_b, cp_a_c, cp_a_d, cp_a_e, cp_a_h, cp_a_l, cp_mhl, cp_a_a,
     // 0xCx
     ret_nzf, pop_bc, jump_nzf_a16, jump_a16, call_nzf_a16, push_bc, add_a_d8, rst_00h,
-    ret_zf, ret, jump_zf_a16, 0, call_zf_a16, call_a16, adc_a_d8, rst_08h,
+    ret_zf, ret, jump_zf_a16, cb, call_zf_a16, call_a16, adc_a_d8, rst_08h,
     // 0xDx
     ret_ncy, pop_de, jump_ncy_a16, 0, call_ncy_a16, push_de, sub_a_d8, rst_10h,
     ret_cy, reti, jump_cy_a16, 0, call_cy_a16, 0, sbc_a_d8, rst_18h,

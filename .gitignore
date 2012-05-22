@@ -3,3 +3,4 @@ nebula
 *.o
 *~
 config.mk
+*.def

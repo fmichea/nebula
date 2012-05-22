@@ -67,7 +67,7 @@ void GPU::do_cycle(uint8_t cycles)
 
 void GPU::draw_line()
 {
-    uint8_t background[WIDTH] = {0};
+    uint8_t bkg[WIDTH] = {0};
     uint8_t real_y = this->mmu_.LY.get() + this->mmu_.SCY.get();
     uint8_t scx = this->mmu_.SCX.get();
 
@@ -82,7 +82,7 @@ void GPU::draw_line()
             uint8_t real_x = scx + x;
             if (real_x % 8 == 0)
                 bg_tile = BGWTile(this->mmu_, real_x, real_y);
-            background[x] = this->mmu_.BGP.C[bg_tile.color(real_x % 8)].get();
+            bkg[x] = this->mmu_.BGP.C[bg_tile.color(real_x % 8)].get();
         }
     }
 
@@ -95,21 +95,37 @@ void GPU::draw_line()
         {
             if (x % 8 == 0)
                 win_tile = BGWTile(this->mmu_, x, real_y);
-            background[x] = this->mmu_.BGP.C[win_tile.color(x % 8)].get();
+            bkg[x] = this->mmu_.BGP.C[win_tile.color(x % 8)].get();
         }
     }
 
-    // FIXME: Draw objects.
+    // Draw objects.
+    uint8_t objs[WIDTH] = {0xff};
 
-    // Drawing of the finale background.
+    if (this->mmu_.LCDC.OBJSDE.get())
+    {
+        std::list<Sprite> sprites = SpriteManager::get_sprites(
+            this->mmu_, this->mmu_.LY.get()
+        );
+        for (auto sprite = sprites.begin(); sprite != sprites.end(); ++sprite)
+        {
+            for (int it = 0; it < 8; ++it)
+            {
+                if (sprite->is_displayed(it, bkg[sprite->x_base() + it]))
+                    objs[sprite->x_base() + it] = sprite->color(it);
+            }
+        }
+    }
+
+    // Drawing of the finale background and objects.
     for (uint8_t x = 0; x < WIDTH; x++)
     {
         SDL_Rect rect = {
             (Sint16) (x *COEF), (Sint16) (this->mmu_.LY.get() * COEF),
             COEF, COEF
         };
-        SDL_FillRect(this->screen_, &rect, this->colors_[background[x]]);
+        SDL_FillRect(this->screen_, &rect,
+                     this->colors_[(objs[x] != 0xff ? objs[x] : bkg[x])]);
     }
-
     SDL_UnlockSurface(this->screen_);
 }

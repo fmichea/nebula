@@ -2,10 +2,12 @@
 # define GPU_HH_
 
 # include <SDL/SDL.h>
+# include <list>
 
 # include "timer.hh"
 # include "bgwtile.hh"
 # include "../memory/mmu.hh"
+# include "sprites.hh"
 
 # define COEF 2
 
