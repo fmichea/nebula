@@ -5,7 +5,7 @@ uint16_t inc_1B_reg(MMU& mmu, Z80Registers& regs, uint8_t& reg)
     (void) mmu;
     reg += 1;
     regs.F.zf.set(reg == 0 ? 0x1 : 0x0);
-    regs.F.h.set(0xf < reg ? 0x1 : 0x0);
+    regs.F.h.set(!reg || (reg & 0xf) == 0 ? 0x1 : 0x0);
     regs.F.n.set(0);
     return P(1, 4);
 }
@@ -15,7 +15,7 @@ uint16_t inc_2B_reg(MMU& mmu, Z80Registers& regs, WordRegProxy& reg)
     (void) mmu;
     (void) regs;
     reg.set(reg.get() + 1);
-    return P(1, 4);
+    return P(1, 8);
 }
 
 uint16_t inc_2B_reg(MMU& mmu, Z80Registers& regs, uint16_t& reg)
@@ -23,7 +23,7 @@ uint16_t inc_2B_reg(MMU& mmu, Z80Registers& regs, uint16_t& reg)
     (void) mmu;
     (void) regs;
     reg = reg + 1;
-    return P(1, 4);
+    return P(1, 8);
 }
 
 uint16_t dec_1B_reg(MMU& mmu, Z80Registers& regs, uint8_t& reg)
@@ -32,7 +32,7 @@ uint16_t dec_1B_reg(MMU& mmu, Z80Registers& regs, uint8_t& reg)
     reg -= 1;
     regs.F.n.set(1);
     regs.F.zf.set(reg == 0 ? 0x1 : 0x0);
-    regs.F.h.set(reg == 0xFF ? 0x1 : 0x0);
+    regs.F.h.set((reg & 0xf) == 0xf ? 0x1 : 0x0);
     return P(1, 4);
 }
 
@@ -61,13 +61,13 @@ uint16_t ld_1B_reg_d8(MMU& mmu, Z80Registers& regs, uint8_t& reg)
 uint16_t ld_2B_reg_d16(MMU& mmu, Z80Registers& regs, WordRegProxy& reg)
 {
     reg.set(mmu.read<uint16_t>(regs.PC + 1));
-    return P(3, 8);
+    return P(3, 12);
 }
 
 uint16_t ld_2B_reg_d16(MMU& mmu, Z80Registers& regs, uint16_t& reg)
 {
     reg = mmu.read<uint16_t>(regs.PC + 1);
-    return P(3, 8);
+    return P(3, 12);
 }
 
 uint16_t ld_1B_reg_1B_reg(MMU& mmu, Z80Registers& regs, uint8_t& a, uint8_t& b)
@@ -180,14 +180,14 @@ uint16_t pop_2B_reg(MMU& mmu, Z80Registers& regs, WordRegProxy& reg)
 {
     reg.set(mmu.read<uint16_t>(regs.SP));
     regs.SP += 2;
-    return P(1, 16);
+    return P(1, 12);
 }
 
 uint16_t pop_2B_reg(MMU& mmu, Z80Registers& regs, uint16_t& reg)
 {
     reg = mmu.read<uint16_t>(regs.SP);
     regs.SP += 2;
-    return P(1, 16);
+    return P(1, 12);
 }
 
 uint16_t push_2B_reg(MMU& mmu, Z80Registers& regs, WordRegProxy& reg)
@@ -208,16 +208,17 @@ uint16_t rst_nn(MMU& mmu, Z80Registers& regs, uint16_t a)
 {
     uint16_t addr = mmu.read<uint16_t>(a);
     regs.SP -= 2;
-    mmu.write<uint16_t>(regs.SP, regs.PC);
+    mmu.write<uint16_t>(regs.SP, regs.PC + 1);
     regs.PC = addr;
     return P(0, 16);
 }
 
 uint16_t ret_if(MMU& mmu, Z80Registers& regs, uint8_t a)
 {
-    if (a) {
-        regs.SP -= 2;
-        mmu.write<uint16_t>(regs.SP, regs.PC);
+    if (a)
+    {
+        regs.PC = mmu.read<uint16_t>(regs.SP);
+        regs.SP += 2;
         return P(0, 20);
     }
     return P(1, 8);
@@ -386,7 +387,7 @@ uint16_t jr_if(MMU& mmu, Z80Registers& regs, uint8_t val)
 {
     if (val)
     {
-        regs.PC += mmu.read<int8_t>(regs.PC + 1);
+        regs.PC += (int8_t) mmu.read<uint8_t>(regs.PC + 1);
         return P(2, 12);
     }
     return P(2, 8);
@@ -772,9 +773,9 @@ uint16_t cp_a_d8(MMU& mmu, Z80Registers& regs)
 {
     uint8_t tmp = regs.A - mmu.read<uint8_t>(regs.PC + 1);
 
-    regs.F.zf.set(regs.A == 0 ? 0x1 : 0x0);
+    regs.F.zf.set(tmp == 0 ? 0x1 : 0x0);
     regs.F.n.set(1);
-    regs.F.h.set(regs.A < tmp ? 0x1 : 0x0);
+    regs.F.h.set((tmp & 0x4) != (regs.A & 0x4) ? 0x1 : 0x0);
     regs.F.cy.set(regs.A < tmp ? 0x1 : 0x0);
     return P(2, 8);
 }
@@ -789,7 +790,7 @@ uint16_t reti(MMU& mmu, Z80Registers& regs)
 uint16_t cb(MMU& mmu, Z80Registers& regs)
 {
     uint8_t op = mmu.read<uint8_t>(regs.PC + 1);
-    return (P(1, 4) + CBOPCODES[op](mmu, regs));
+    return (P(0, 4) + CBOPCODES[op](mmu, regs));
 }
 
 #define X1(FuncName, OpName, Reg)                               \

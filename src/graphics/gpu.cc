@@ -1,7 +1,7 @@
 #include "gpu.hh"
 
 GPU::GPU(MMU& mmu)
-    : mmu_ (mmu)
+    : mmu_ (mmu), wait_count (456)
 {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_EVENTTHREAD);
     this->screen_ = SDL_SetVideoMode(WIDTH * COEF, HEIGHT * COEF, 32,
@@ -38,7 +38,7 @@ void GPU::do_cycle(uint8_t cycles)
                 this->mmu_.STAT.coin_int.set(0);
             if (this->mmu_.LCDC.LDE.get() && this->mmu_.LY.get() < 144)
                 this->draw_line();
-            this->wait_count = 207;
+            this->wait_count += 207;
             this->mmu_.LY.set(this->mmu_.LY.get() + 1);
             if (this->mmu_.LY.get() < 160)
                 this->mmu_.STAT.mode.set(LCDC_MODE_2);
@@ -46,19 +46,19 @@ void GPU::do_cycle(uint8_t cycles)
                 this->mmu_.STAT.mode.set(LCDC_MODE_1);
             break;
         case LCDC_MODE_1: // V-Blank
-            this->mmu_.STAT.mode.set(LCDC_MODE_1);
-            this->wait_count = 4560; // Cycles for V-Blank.
+            this->mmu_.STAT.mode.set(LCDC_MODE_2);
+            this->wait_count += 4560; // Cycles for V-Blank.
             this->timer_.adjust();
             this->mmu_.IF.set(this->mmu_.IF.get() | 0x1);
             this->mmu_.LY.set(0);
             SDL_Flip(this->screen_);
             break;
         case LCDC_MODE_2:
-            this->wait_count = 83;
+            this->wait_count += 80;
             this->mmu_.STAT.mode.set(LCDC_MODE_3);
             break;
         case LCDC_MODE_3:
-            this->wait_count = 175;
+            this->wait_count += 171;
             this->mmu_.STAT.mode.set(LCDC_MODE_0);
             break;
         };
@@ -87,7 +87,7 @@ void GPU::draw_line()
     }
 
     // Window on background.
-    if ((uint8_t) this->mmu_.LCDC.WDE.get() && this->mmu_.WY.get() <= real_y)
+    if (this->mmu_.LCDC.WDE.get() && this->mmu_.WY.get() <= real_y)
     {
         uint8_t tmp = this->mmu_.WX.get() - 7;
         BGWTile win_tile(this->mmu_, tmp - (tmp % 8), real_y);
@@ -107,6 +107,7 @@ void GPU::draw_line()
         std::list<Sprite> sprites = SpriteManager::get_sprites(
             this->mmu_, this->mmu_.LY.get()
         );
+        printf("List size : %zu\n", sprites.size());
         for (auto sprite = sprites.begin(); sprite != sprites.end(); ++sprite)
         {
             for (int it = 0; it < 8; ++it)

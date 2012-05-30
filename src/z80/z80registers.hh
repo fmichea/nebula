@@ -59,7 +59,7 @@ public:
         this->AF.set(0x11b0);
         this->BC.set(0x0013);
         this->DE.set(0x00d8);
-        this->HL.set(0x0140);
+        this->HL.set(0x014d);
         this->SP = 0xfffe;
         this->PC = 0x0100;
     }

@@ -135,6 +135,7 @@ bool MMU::reset_registers()
     this->LCDC = LCDCProxy(this->rom_ + 0xff40);
     this->rom_[0xff40] = 0x91;
     this->STAT = STATProxy(this->rom_ + 0xff41);
+    this->STAT.mode.set(0);
     this->BGP = PaletteProxy(this->rom_ + 0xff47);
     this->rom_[0xff47] = 0xFC;
     this->OBP[0] = PaletteProxy(this->rom_ + 0xff48);

@@ -5,9 +5,7 @@
 # include "z80registers.hh"
 # include "z80cbopcodes.hh"
 
-//# define P(Size, Clock) ((Size << 8) + Clock)
-
-//typedef uint16_t (*op) (MMU&, Z80Registers&);
+uint16_t rst_nn(MMU& mmu, Z80Registers& regs, uint16_t a);
 
 extern op OPCODES[0x100];
 

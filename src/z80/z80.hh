@@ -4,6 +4,7 @@
 # include <stdio.h>
 # include "z80opcodes.hh"
 # include "../graphics/gpu.hh"
+# include "interrupts.hh"
 
 class Z80
 {
@@ -17,6 +18,7 @@ private:
     Z80Registers    regs_;
     MMU             mmu_;
     GPU             gpu_;
+    Interrupts      int_;
 };
 
 #endif // !Z___HH_
