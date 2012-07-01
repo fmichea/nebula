@@ -458,13 +458,6 @@ uint16_t ld_mhlm_a(MMU& mmu, Z80Registers& regs)
     return res;
 }
 
-uint16_t jr_if(MMU& mmu, Z80Registers& regs, uint8_t& value)
-{
-    if (value)
-        regs.PC += mmu.read<uint8_t>(regs.PC + 1);
-    return P(2, value ? 12 : 8);
-}
-
 uint16_t scf(MMU& mmu, Z80Registers& regs)
 {
     (void) mmu;
@@ -825,7 +818,7 @@ op OPCODES[0x100] = {
     ld_c_b, ld_c_c, ld_c_d, ld_c_e, ld_c_h, ld_c_l, ld_c_mhl, ld_c_a,
     // 0x5x
     ld_d_b, ld_d_c, ld_d_d, ld_d_e, ld_d_h, ld_d_l, ld_d_mhl, ld_d_a,
-    ld_e_b, ld_e_c, ld_e_d, ld_e_d, ld_e_h, ld_e_l, ld_e_mhl, ld_e_a,
+    ld_e_b, ld_e_c, ld_e_d, ld_e_e, ld_e_h, ld_e_l, ld_e_mhl, ld_e_a,
     // 0x6x
     ld_h_b, ld_h_c, ld_h_d, ld_h_e, ld_h_h, ld_h_l, ld_h_mhl, ld_h_a,
     ld_l_b, ld_l_c, ld_l_d, ld_l_e, ld_l_h, ld_l_l, ld_l_mhl, ld_l_a,

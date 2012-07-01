@@ -17,6 +17,8 @@ for arg in $@; do
         CXXFLAGS+=" -ggdb"
     elif [ "$arg" == "--optim" ]; then
         CXXFLAGS+=" -O3"
+    elif [ "$arg" == "--disass" ]; then
+        CXXFLAGS+=" -DDISASSEMBLER"
     fi
 done
 

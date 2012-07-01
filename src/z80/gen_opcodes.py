@@ -16,6 +16,7 @@ class DefMacro(object):
         'x3': 'X2(%s, %s, regs.%s, %s)\n',
         'h1': 'H1(%s, %s)\n',
         'h2': 'H2(%s, %s, %s)\n',
+        'h3': 'H3(%s, %s, %s, %s)\n',
     }
 
     def __init__(self, name):
@@ -84,3 +85,64 @@ for func in ['bit_%s_%s', 'set_%s_%s', 'res_%s_%s']:
             cb.write('x3', func % (bit, reg.lower()), func % ('nb', '1B_reg'), reg, bit)
     for bit in xrange(8):
         cb.write('h2', func % (bit, 'mhl'), func % ('nb', '1B_reg'), bit)
+
+# Disassembly
+dis = DefMacro('disass.def')
+
+for op in ['inc', 'dec']:
+    for reg in ALL_regs:
+        reg = reg.lower()
+        dis.write('h2', '%s_%s_reg' % (op, reg), '%s_reg' % op, '"%%%s"' % reg)
+
+for op in ['push', 'pop']:
+    for reg in list(W_regs[:-1] + ['af']):
+        reg = reg.lower()
+        dis.write('h2', '%s_%s' % (op, reg), '%s_reg' % op, '"%%%s"' % reg)
+
+for op in ['ld_a_m%s', 'ld_m%s_a']:
+    for reg in ['bc', 'de', 'hl+', 'hl-']:
+        regn = reg.replace('+', 'p').replace('-', 'm')
+        dis.write('h2', op % regn, op % 'reg', '"%%%s"' % reg)
+
+tmp = map(lambda a: ('8', a.lower()), B_regs)
+tmp += map(lambda a: ('16', a.lower()), W_regs)
+for (size, reg) in tmp:
+    dis.write('h2', 'ld_%s_d%s' % (reg, size), 'ld_reg_val<uint%s_t>' % size,
+              '"%%%s"' % reg)
+
+for op in ['add', 'sub', 'and', 'or', 'adc', 'sbc', 'xor', 'cp']:
+    dis.write('h2', '%s_a_d8' % op, 'op_a_d8', '"%s"' % op)
+    dis.write('h3', '%s_a_mhl' % op, 'op_a_reg', '"%s"' % op, '"(%hl)"')
+
+    for reg in B_regs:
+        reg = reg.lower()
+        dis.write('h3', '%s_a_%s' % (op, reg), 'op_a_reg', '"%s"' % op,
+                  '"%%%s"' % reg)
+
+for op in ['inc', 'dec', 'jump']:
+    dis.write('h2', '%s_mhl' % op, 'op_mhl', '"%op"')
+
+for op in ['nop', 'stop', 'rlca', 'rla', 'daa', 'scf', 'rrca', 'rra', 'cpl',
+           'ccf', 'ei', 'di', 'halt', 'ret', 'reti']:
+    dis.write('h2', op, 'uniq_operation', '"%s"' % op)
+
+for reg in B_regs:
+    reg = reg.lower()
+    dis.write('h3', 'ld_%s_mhl' % reg, 'ld_reg_reg', '"%s"' % reg, '"(hl)"')
+    dis.write('h3', 'ld_mhl_%s' % reg, 'ld_reg_reg', '"(hl)"', '"%s"' % reg)
+
+for flag in ['zf', 'nzf', 'cy', 'ncy']:
+    for op in ['call', 'jump', 'jr']:
+        dis.write('h2', '%s_%s_a16' % (op, flag), '%s_if_a16' % op, '"%s"' % flag)
+    dis.write('h2', 'ret_%s' % flag, 'ret_if', '"%s"' % flag)
+
+for a in [0, 8, 10, 18, 20, 28, 30, 38]:
+    dis.write('h2', 'rst_%02dh' % a, 'rst_nn', a)
+
+for a in ['bc', 'de', 'hl']:
+    dis.write('h2', 'add_hl_%s' % a, 'add_hl_reg', '"%%%s"' % reg)
+
+for (r1, r2) in itertools.product(B_regs, B_regs):
+    r1, r2 = r1.lower(), r2.lower()
+    dis.write('h3', 'ld_%s_%s' % (r1, r2), 'ld_reg_reg',
+              '"%%%s"' % r1, '"%%%s"' % r2)

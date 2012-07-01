@@ -3,6 +3,7 @@
 
 # include <stdio.h>
 # include "z80opcodes.hh"
+# include "z80disassembler.hh"
 # include "../graphics/gpu.hh"
 # include "interrupts.hh"
 
