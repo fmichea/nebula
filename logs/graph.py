@@ -122,7 +122,7 @@ class Block(object):
         return True
 
     def is_motherless(self):
-        return len(self.from_) == 1 and len(self.to) == 1
+        return len(self.from_) == 1
 
     def merge(self, block):
         self.opcodes.extend(block.opcodes)
