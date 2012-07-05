@@ -22,20 +22,22 @@ bool Z80::execute()
 
         uint16_t res = OPCODES[opcode](this->mmu_, this->regs_);
 
+        this->regs_.PC += (res >> 8) & 0xff;
+        gpu_.do_cycle(res & 0xff);
+        int_.manage_interrupts();
+        count += 1;
+
+        print_debug("\tState after execution:\n");
         print_debug("\r\tR1  R2\tV1  V2\n");
         print_debug("\t%2s  %2s\t%02X  %02X\n", "A", "A", regs_.A, regs_.A);
         print_debug("\t%2s  %2s\t%02X  %02X\n", "B", "C", regs_.B, regs_.C);
         print_debug("\t%2s  %2s\t%02X  %02X\n", "D", "E", regs_.D, regs_.E);
         print_debug("\t%2s  %2s\t%02X  %02X\n", "H", "L", regs_.H, regs_.L);
+        print_debug("\t%2s = %04X\n", "PC", regs_.PC);
         print_debug("\t%2s = %04X\n", "SP", regs_.SP);
         print_debug("\tFlags: Z (%u), N (%u), H (%u), C (%u)\n",
                     regs_.F.zf.get(), regs_.F.n.get(),
                     regs_.F.h.get(), regs_.F.cy.get());
-
-        this->regs_.PC += (res >> 8) & 0xff;
-        gpu_.do_cycle(res & 0xff);
-        int_.manage_interrupts();
-        count += 1;
     }
     return true;
 }

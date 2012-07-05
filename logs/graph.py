@@ -4,11 +4,10 @@
 # ease the debug of the program.
 
 import argparse
-import hashlib
 import os
+import pickle
 import re
 import sys
-import pickle
 
 CALL_OPCODES = [0xC4, 0xCC, 0xCD, 0xD4, 0xDC]
 JUMP_OPCODES = [0xC2, 0xC3, 0xCA, 0xD2, 0xDA, 0x18, 0x28, 0x38, 0x20, 0x30]
@@ -44,6 +43,20 @@ class DotWriter(object):
                 addr2 = link.to_,
                 color = link.color()
             ))
+
+class AsciiWriter(object):
+    def __init__(self, output_file = None):
+        if output_file is None: self.f = sys.stdout
+        else: self.f = open(output_file, 'w')
+
+    def __del__(self):
+        self.f.close()
+
+    def generate(self, graph):
+        addrs = sorted(graph.nodes.keys())
+        for addr in addrs:
+            self.f.write(str(graph.nodes[addr]))
+            self.f.write('\n')
 
 class SerializedGraph(object):
     def __init__(self, serialize, filename):
@@ -148,10 +161,13 @@ class Block(object):
         return ('sub' if self.is_sub else 'loc') + '_%04X' % self.addr
 
     def sumary(self):
-        print 'Block name: %s' % self.name()
-        print 'Opcodes: %s' % ', '.join(map(lambda a: '%02X' % a, self.opcodes))
-        print 'From: %s' % ', '.join(map(lambda a: '%04X' % a, self.from_))
-        print 'To: %s' % ', '.join(map(lambda a: '%04X' % a, self.to))
+        print 'From: %s\n' % ', '.join(
+            map(lambda a: '%04X' % a, sorted(self.from_))
+        )
+        print self
+        print '\nTo: %s' % ', '.join(
+            map(lambda a: '%04X' % a, sorted(self.to))
+        )
 
 class Graph(object):
     def __init__(self):
@@ -164,7 +180,7 @@ class Graph(object):
         self.nodes[0].is_sub = True
 
         # Last node is a END node.
-        self.nodes[1] = Block(self, 1, 1)
+        self.nodes[1] = Block(self, 1, 0)
         self.nodes[1].disassembly = ['END']
         self.nodes[1].from_.add(0)
         self.nodes[1].to.add(0)
@@ -183,8 +199,12 @@ class Graph(object):
             if match is not None:
                 addr, opcode = int(match.group(3), 16), int(match.group(2), 16)
                 try:
-                    if self.nodes[addr].opcodes[-1] == 0:
-                        sys.exit('Found different opcodes for the same address...')
+                    if self.nodes[addr].opcodes[-1] != opcode:
+                        msg = 'Found different opcodes for the same address...'
+                        msg += '\nAddr = %04X - opcodes: %02X - %02X' % (
+                            addr, self.nodes[addr].opcodes[-1], opcode
+                        )
+                        sys.exit(msg)
                 except KeyError: # First time we encounter this address.
                     self.nodes[addr] = Block(self, addr, opcode)
                 self.nodes[last_addr].link_to(addr)
@@ -228,22 +248,28 @@ class Graph(object):
         self.links = set(res)
 
 def compare_graphs(graph1, graph2):
-    addr_checked, stack = [], [0]
+    addr_checked, stack, blocks_diff = [], [0], 0
     while stack:
         addr = stack.pop()
         if addr in addr_checked:
             continue
         addr_checked.append(addr)
-        block1 = graph1.nodes[addr]
-        block2 = graph2.nodes[addr]
+        try:
+            block1 = graph1.nodes[addr]
+            block2 = graph2.nodes[addr]
+        except KeyError:
+            print 'One of the graphs doesn\'t contain %04X addr.' % addr
+            print '=' * 40
+            blocks_diff += 1
+            continue
         if not (block1 == block2):
-            print 'Found two blocks differents!'
             block1.sumary()
             print '- ' * 20
             block2.sumary()
-            return
+            print '=' * 40
+            blocks_diff += 1
         stack.extend(list(block1.to))
-    print 'Graphs are the same!'
+    print 'Found %d differences.' % blocks_diff
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Some debugging tool.')
@@ -253,6 +279,8 @@ if __name__ == '__main__':
                         metavar='filename', help='Output file (default: prints on stdout).')
     parser.add_argument('-d', '--dotify', action='store_true', default=False,
                         help='Translates graph to dot.')
+    parser.add_argument('-a', '--ascii', action='store_true', default=False,
+                        help='Prints program in ascii.')
     parser.add_argument('-c', '--compare', action='store_true', default=False,
                         help='Compares two graphs (needs two inputs).')
     parser.add_argument('-s', '--serialize', action='store_true', default=False,
@@ -272,9 +300,10 @@ if __name__ == '__main__':
             ser.write(graph)
         graphs.append(graph)
 
-    if args.dotify:
+    if args.dotify or args.ascii:
         output_filename = args.output if args.output else None
-        DotWriter(output_filename).generate(graphs[0])
+        if args.dotify: DotWriter(output_filename).generate(graphs[0])
+        else: AsciiWriter(output_filename).generate(graphs[0])
     elif args.compare:
         if len(graphs) < 2:
             sys.exit('Need two graphs to compare them.')

@@ -120,7 +120,7 @@ for op in ['add', 'sub', 'and', 'or', 'adc', 'sbc', 'xor', 'cp']:
                   '"%%%s"' % reg)
 
 for op in ['inc', 'dec', 'jump']:
-    dis.write('h2', '%s_mhl' % op, 'op_mhl', '"%op"')
+    dis.write('h2', '%s_mhl' % op, 'op_mhl', '"%s"' % op)
 
 for op in ['nop', 'stop', 'rlca', 'rla', 'daa', 'scf', 'rrca', 'rra', 'cpl',
            'ccf', 'ei', 'di', 'halt', 'ret', 'reti']:

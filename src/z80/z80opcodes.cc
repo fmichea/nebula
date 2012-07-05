@@ -92,15 +92,15 @@ uint16_t ld_mhl_1B_reg(MMU& mmu, Z80Registers& regs, uint8_t& a)
 
 uint16_t add_a_1B_reg(MMU& mmu, Z80Registers& regs, uint8_t& reg)
 {
-    (void) mmu;
-    uint16_t tmp;
+    uint16_t tmp = regs.A + reg;
+    uint8_t tmp_ = (regs.A & 0xf) + (reg & 0xf);
 
-    tmp = regs.A + reg;
-    regs.A = (uint8_t) tmp;
+    (void) mmu;
+    regs.A = tmp;
     regs.F.n.set(0);
     regs.F.zf.set(regs.A == 0 ? 0x1 : 0x0);
-    regs.F.h.set(0xf < tmp ? 0x1 : 0x0);
-    regs.F.cy.set(0xff < tmp ? 0x1 : 0x0);
+    regs.F.h.set((tmp_ & 0xf) ^ tmp_ ? 0x1 : 0x0);
+    regs.F.cy.set((tmp & 0xff) ^ tmp ? 0x1 : 0x0);
     return P(1, 4);
 }
 
@@ -134,37 +134,40 @@ uint16_t xor_a_1B_reg(MMU& mmu, Z80Registers& regs, uint8_t& reg)
 uint16_t adc_a_1B_reg(MMU& mmu, Z80Registers& regs, uint8_t& reg)
 {
     uint16_t tmp = regs.A + reg + regs.F.cy.get();
+    uint8_t tmp_ = (regs.A & 0xf) + (reg & 0xf) + regs.F.cy.get();
 
     (void) mmu;
     regs.A = tmp;
     regs.F.n.set(0);
     regs.F.zf.set(regs.A == 0 ? 0x1 : 0x0);
-    regs.F.h.set(0xf < tmp ? 0x1 : 0x0);
-    regs.F.cy.set(0xff < tmp ? 0x1 : 0x0);
+    regs.F.h.set((tmp_ & 0xf) ^ tmp_ ? 0x1 : 0x0);
+    regs.F.cy.set((tmp & 0xff) ^ tmp ? 0x1 : 0x0);
     return P(1, 4);
 }
 
 uint16_t sub_a_1B_reg(MMU& mmu, Z80Registers& regs, uint8_t& reg)
 {
     uint16_t tmp = regs.A - reg;
+    uint8_t tmp_ = (regs.A & 0xf) - (reg & 0xf);
 
     (void) mmu;
-    regs.A = (uint8_t) tmp;
+    regs.A = tmp;
     regs.F.zf.set(regs.A == 0 ? 0x1 : 0x0);
-    regs.F.h.set(0xf < tmp ? 0x1 : 0x0);
-    regs.F.cy.set(0xff < tmp ? 0x1 : 0x0);
+    regs.F.h.set((0xf & tmp_) ^ tmp_ ? 0x1 : 0x0);
+    regs.F.cy.set((0xff & tmp) ^ tmp ? 0x1 : 0x0);
     return P(1, 4);
 }
 
 uint16_t sbc_a_1B_reg(MMU& mmu, Z80Registers& regs, uint8_t& reg)
 {
     uint16_t tmp = regs.A - reg - regs.F.cy.get();
+    uint8_t tmp_ = (regs.A & 0xf) - (reg & 0xf) - regs.F.cy.get();
 
     (void) mmu;
-    regs.A = (uint8_t) tmp;
+    regs.A = tmp;
     regs.F.zf.set(regs.A == 0 ? 0x1 : 0x0);
-    regs.F.h.set(0xf < tmp ? 0x1 : 0x0);
-    regs.F.cy.set(0xff < tmp ? 0x1 : 0x0);
+    regs.F.h.set((0xf & tmp_) ^ tmp_ ? 0x1 : 0x0);
+    regs.F.cy.set((0xff & tmp) ^ tmp ? 0x1 : 0x0);
     return P(1, 4);
 }
 
@@ -227,24 +230,26 @@ uint16_t ret_if(MMU& mmu, Z80Registers& regs, uint8_t a)
 uint16_t add_hl_2B_reg(MMU& mmu, Z80Registers& regs, WordRegProxy& reg)
 {
     uint32_t tmp = regs.HL.get() + reg.get();
+    uint16_t tmp_ = (regs.HL.get() & 0xff) + (reg.get() & 0xff);
 
     (void) mmu;
     regs.HL.set(tmp);
     regs.F.n.set(0x0);
-    regs.F.h.set(0xff < tmp ? 0x1 : 0x0);
-    regs.F.cy.set(0xffff < tmp ? 0x1 : 0x0);
+    regs.F.h.set((0xff & tmp_) ^ tmp_ ? 0x1 : 0x0);
+    regs.F.cy.set((0xffff & tmp) ^ tmp ? 0x1 : 0x0);
     return P(1, 8);
 }
 
 uint16_t add_hl_2B_reg(MMU& mmu, Z80Registers& regs, uint16_t& reg)
 {
     uint32_t tmp = regs.HL.get() + reg;
+    uint16_t tmp_ = (regs.HL.get() & 0xff) + (reg & 0xff);
 
     (void) mmu;
     regs.HL.set(tmp);
     regs.F.n.set(0x0);
-    regs.F.h.set(0xff < tmp ? 0x1 : 0x0);
-    regs.F.cy.set(0xffff < tmp ? 0x1 : 0x0);
+    regs.F.h.set((0xff & tmp_) ^ tmp_ ? 0x1 : 0x0);
+    regs.F.cy.set((0xffff & tmp) ^ tmp ? 0x1 : 0x0);
     return P(1, 8);
 }
 
@@ -259,7 +264,7 @@ uint16_t rlca(MMU& mmu, Z80Registers& regs)
 {
     (void) mmu;
     regs.F.set(0x00);
-    regs.F.cy.set(regs.A >> 7);
+    regs.F.cy.set((regs.A >> 7) & 0x1);
     regs.A <<= 1;
     return P(1, 4);
 }
@@ -379,7 +384,8 @@ uint16_t jump_a16(MMU& mmu, Z80Registers& regs)
 
 uint16_t jump_mhl(MMU& mmu, Z80Registers& regs)
 {
-    regs.PC = mmu.read<uint16_t>(regs.HL.get());
+    (void) mmu;
+    regs.PC = regs.HL.get(); //mmu.read<uint16_t>(regs.HL.get());
     return P(0, 4);
 }
 
@@ -510,22 +516,22 @@ uint16_t daa(MMU& mmu, Z80Registers& regs)
 
 uint16_t inc_mhl(MMU& mmu, Z80Registers& regs)
 {
-    uint8_t tmp = mmu.read<uint8_t>(regs.HL.get()) + 1;
+    uint8_t tmp = mmu.read<uint8_t>(regs.HL.get());
 
-    mmu.write<uint8_t>(regs.HL.get(), tmp);
+    mmu.write<uint8_t>(regs.HL.get(), tmp + 1);
     regs.F.n.set(0);
-    regs.F.h.set(0xf < tmp ? 0x1 : 0x0);
-    regs.F.zf.set(tmp == 0x00 ? 0x1 : 0x0);
+    regs.F.h.set((0xf & tmp) == 0xf ? 0x1 : 0x0);
+    regs.F.zf.set(tmp == 0xff ? 0x1 : 0x0);
     return P(1, 12);
 }
 
 uint16_t dec_mhl(MMU& mmu, Z80Registers& regs)
 {
-    uint8_t tmp = mmu.read<uint8_t>(regs.HL.get()) - 1;
+    uint8_t tmp = mmu.read<uint8_t>(regs.HL.get());
 
-    mmu.write<uint8_t>(regs.HL.get(), tmp);
+    mmu.write<uint8_t>(regs.HL.get(), tmp - 1);
     regs.F.n.set(1);
-    regs.F.h.set(tmp == 0xff ? 0x1 : 0x0);
+    regs.F.h.set((tmp & 0x1f) ^ 0x1f ? 0x0 : 0x1);
     regs.F.zf.set(tmp == 0x00 ? 0x1 : 0x0);
     return P(1, 12);
 }
@@ -551,25 +557,29 @@ uint16_t ld_ma16_sp(MMU& mmu, Z80Registers& regs)
 
 uint16_t add_a_mhl(MMU& mmu, Z80Registers& regs)
 {
-    uint16_t tmp = regs.A + mmu.read<uint8_t>(regs.HL.get());
+    uint8_t val = mmu.read<uint8_t>(regs.HL.get());
+    uint16_t tmp = regs.A + val;
+    uint8_t tmp_ = (regs.A & 0xf) + (val & 0xf);
 
     regs.A = tmp;
     regs.F.zf.set(regs.A == 0 ? 0x1 : 0x0);
     regs.F.n.set(0);
-    regs.F.h.set(0xf < tmp ? 0x1 : 0x0);
-    regs.F.cy.set(0xff < tmp ? 0x1 : 0x0);
+    regs.F.h.set((tmp_ & 0xf) ^ tmp_ ? 0x1 : 0x0);
+    regs.F.cy.set((tmp & 0xff) ^ tmp ? 0x1 : 0x0);
     return P(1, 8);
 }
 
 uint16_t adc_a_mhl(MMU& mmu, Z80Registers& regs)
 {
-    uint16_t tmp = regs.A + mmu.read<uint8_t>(regs.HL.get()) + regs.F.cy.get();
+    uint8_t val = mmu.read<uint8_t>(regs.HL.get());
+    uint16_t tmp = regs.A + val + regs.F.cy.get();
+    uint8_t tmp_ = (regs.A & 0xf) + (val & 0xf) + regs.F.cy.get();
 
     regs.A = tmp;
     regs.F.zf.set(regs.A == 0 ? 0x1 : 0x0);
     regs.F.n.set(0);
-    regs.F.h.set(0xf < tmp ? 0x1 : 0x0);
-    regs.F.cy.set(0xff < tmp ? 0x1 : 0x0);
+    regs.F.h.set((tmp_ & 0xf) ^ tmp_ ? 0x1 : 0x0);
+    regs.F.cy.set((tmp & 0xff) ^ tmp ? 0x1 : 0x0);
     return P(1, 8);
 }
 
@@ -587,13 +597,15 @@ uint16_t sub_a_mhl(MMU& mmu, Z80Registers& regs)
 
 uint16_t sbc_a_mhl(MMU& mmu, Z80Registers& regs)
 {
-    uint16_t tmp = regs.A - mmu.read<uint8_t>(regs.HL.get()) - regs.F.cy.get();
+    uint8_t val = mmu.read<uint8_t>(regs.HL.get());
+    uint16_t tmp = regs.A - val - regs.F.cy.get();
+    uint8_t tmp_ = (regs.A & 0xf) - (val & 0xf) - regs.F.cy.get();
 
     regs.A = tmp;
     regs.F.n.set(1);
     regs.F.zf.set(regs.A == 0 ? 0x1 : 0x0);
-    regs.F.h.set(0xff < tmp ? 0x1 : 0x0);
-    regs.F.cy.set(0xff < tmp ? 0x1 : 0x0);
+    regs.F.h.set((tmp_ & 0xf) ^ tmp_ ? 0x1 : 0x0);
+    regs.F.cy.set((tmp & 0xff) ^ tmp ? 0x1 : 0x0);
     return P(1, 8);
 }
 
@@ -623,25 +635,29 @@ uint16_t or_a_mhl(MMU& mmu, Z80Registers& regs)
 
 uint16_t cp_mhl(MMU& mmu, Z80Registers& regs)
 {
-    uint16_t tmp = regs.A - mmu.read<uint8_t>(regs.HL.get());
+    uint8_t val = mmu.read<uint8_t>(regs.HL.get());
+    uint16_t tmp = regs.A - val;
+    uint8_t tmp_ = (regs.A & 0xf) - (val & 0xf);
 
-    regs.A = (uint8_t) tmp;
+    //regs.A = (uint8_t) tmp; TODO: check this....
     regs.F.n.set(1);
-    regs.F.zf.set(regs.A == 0 ? 0x1 : 0x0);
-    regs.F.h.set(regs.A == 0xff ? 0x1 : 0x0);
-    regs.F.cy.set(regs.A == 0xff ? 0x1 : 0x0);
+    regs.F.zf.set((tmp & 0xff) == 0 ? 0x1 : 0x0);
+    regs.F.h.set((tmp_ & 0xf) ^ tmp_ ? 0x1 : 0x0);
+    regs.F.cy.set((tmp & 0xff) ^ tmp ? 0x1 : 0x0);
     return P(1, 8);
 }
 
 uint16_t add_a_d8(MMU& mmu, Z80Registers& regs)
 {
-    uint16_t tmp = regs.A + mmu.read<uint8_t>(regs.HL.get());
+    uint8_t val = mmu.read<uint8_t>(regs.PC + 1);
+    uint16_t tmp = regs.A + val;
+    uint8_t tmp_ = (regs.A & 0xf) + (val & 0xf);
 
     regs.A = tmp;
     regs.F.zf.set(regs.A == 0 ? 0x1 : 0x0);
     regs.F.n.set(0);
-    regs.F.h.set(0xf < tmp ? 0x1 : 0x0);
-    regs.F.cy.set(0xff < tmp ? 0x1 : 0x0);
+    regs.F.h.set((tmp_ & 0xf) ^ tmp_ ? 0x1 : 0x0);
+    regs.F.cy.set((tmp & 0xff) ^ tmp ? 0x1 : 0x0);
     return P(2, 8);
 }
 
@@ -654,25 +670,30 @@ uint16_t ret(MMU& mmu, Z80Registers& regs)
 
 uint16_t adc_a_d8(MMU& mmu, Z80Registers& regs)
 {
-    uint16_t tmp = regs.A + mmu.read<uint8_t>(regs.PC + 1) + regs.F.cy.get();
+    uint8_t val = mmu.read<uint8_t>(regs.PC + 1);
+    uint16_t tmp = regs.A + val + regs.F.cy.get();
+    uint8_t tmp_ = (regs.A & 0xf) + (val & 0xf) + regs.F.cy.get();
 
-    regs.A = (uint8_t) tmp;
+    regs.A = tmp;
     regs.F.zf.set(regs.A == 0 ? 0x1 : 0x0);
     regs.F.n.set(0);
-    regs.F.h.set(0xf < tmp ? 0x1 : 0x0);
-    regs.F.cy.set(0xff < tmp ? 0x1 : 0x0);
+    regs.F.h.set((tmp_ & 0xf) ^ tmp_ ? 0x1 : 0x0);
+    regs.F.cy.set((tmp & 0xff) ^ tmp ? 0x1 : 0x0);
     return P(2, 8);
 }
 
 uint16_t sub_a_d8(MMU& mmu, Z80Registers& regs)
 {
-    uint8_t tmp = regs.A - mmu.read<uint8_t>(regs.PC + 1);
+    uint8_t val = mmu.read<uint8_t>(regs.PC + 1);
+    uint16_t tmp = regs.A - val;
+    uint8_t tmp_ = (regs.A & 0xf) - (val & 0xf);
 
-    regs.F.zf.set(tmp == 0 ? 0x1 : 0x0);
+    regs.A = tmp;
+    regs.F.zf.set(regs.A == 0 ? 0x1 : 0x0);
     regs.F.n.set(1);
-    regs.F.h.set(regs.A < tmp ? 0x1 : 0x0);
-    regs.F.cy.set(regs.A < tmp ? 0x1 : 0x0);
-    return P(2, 0);
+    regs.F.h.set((0xf & tmp_) ^ tmp_ ? 0x1 : 0x0);
+    regs.F.cy.set(tmp ^ (tmp & 0xff) ? 0x1 : 0x0);
+    return P(2, 8);
 }
 
 uint16_t sbc_a_d8(MMU& mmu, Z80Registers& regs)
@@ -718,12 +739,14 @@ uint16_t and_a_d8(MMU& mmu, Z80Registers& regs)
 
 uint16_t add_sp_r8(MMU& mmu, Z80Registers& regs)
 {
-    uint32_t tmp = regs.SP + mmu.read<uint8_t>(regs.PC + 1);
+    int8_t val = mmu.read<uint8_t>(regs.PC + 1);
+    uint32_t tmp = regs.SP + val;
+    uint16_t tmp_ = (regs.SP & 0xff) + val;
 
     regs.SP = tmp;
     regs.F.set(0);
-    regs.F.h.set(0xff < tmp ? 0x1 : 0x0);
-    regs.F.cy.set(0xffff < tmp ? 0x1 : 0x0);
+    regs.F.h.set((0xff & tmp_) ^ tmp_ ? 0x1 : 0x0);
+    regs.F.cy.set((0xffff & tmp) ^ tmp ? 0x1 : 0x0);
     return P(2, 16);
 }
 
@@ -738,7 +761,7 @@ uint16_t xor_a_d8(MMU& mmu, Z80Registers& regs)
     regs.F.set(0);
     regs.A ^= mmu.read<uint8_t>(regs.PC + 1);
     regs.F.zf.set(regs.A == 0 ? 0x1 : 0x0);
-    return P(1, 8);
+    return P(2, 8);
 }
 
 uint16_t or_a_d8(MMU& mmu, Z80Registers& regs)
@@ -746,7 +769,7 @@ uint16_t or_a_d8(MMU& mmu, Z80Registers& regs)
     regs.F.set(0);
     regs.A |= mmu.read<uint8_t>(regs.PC + 1);
     regs.F.zf.set(regs.A == 0 ? 0x1 : 0x0);
-    return P(1, 8);
+    return P(2, 8);
 }
 
 uint16_t ld_hl_sppr8(MMU& mmu, Z80Registers& regs)
@@ -764,12 +787,14 @@ uint16_t ld_sp_hl(MMU& mmu, Z80Registers& regs)
 
 uint16_t cp_a_d8(MMU& mmu, Z80Registers& regs)
 {
-    uint8_t tmp = regs.A - mmu.read<uint8_t>(regs.PC + 1);
+    uint8_t val = mmu.read<uint8_t>(regs.PC + 1);
+    uint16_t tmp = regs.A - val;
+    uint8_t tmp_ = (regs.A & 0xf) - (val & 0xf);
 
-    regs.F.zf.set(tmp == 0 ? 0x1 : 0x0);
+    regs.F.zf.set((tmp & 0xff) == 0 ? 0x1 : 0x0);
     regs.F.n.set(1);
-    regs.F.h.set((tmp & 0x4) != (regs.A & 0x4) ? 0x1 : 0x0);
-    regs.F.cy.set(regs.A < tmp ? 0x1 : 0x0);
+    regs.F.h.set((tmp_ & 0xf) ^ tmp_ ? 0x1 : 0x0);
+    regs.F.cy.set((tmp & 0xff) ^ tmp ? 0x1 : 0x0);
     return P(2, 8);
 }
 

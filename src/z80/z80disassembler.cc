@@ -62,9 +62,10 @@ void ld_reg_val(MMU& mmu, Z80Registers& regs, const char* reg)
 
 void op_mhl(MMU& mmu, Z80Registers& regs, const char* op)
 {
+    uint16_t hl = regs.HL.get();
+
     (void) mmu;
-    (void) regs;
-    sprintf(disass_line + 7, "%s (hl)", op);
+    sprintf(disass_line + 7, "%s (%%hl)  ::  %s ($0x%04X)", op, op, hl);
 }
 
 void op_a_d8(MMU& mmu, Z80Registers& regs, const char* op)
@@ -116,7 +117,7 @@ void op_a_reg(MMU& mmu, Z80Registers& regs, const char* op, const char* reg)
 {
     (void) mmu;
     (void) regs;
-    sprintf(disass_line + 7, "%s a, %s", op, reg);
+    sprintf(disass_line + 7, "%s %%a, %s", op, reg);
 }
 
 void rst_nn(MMU& mmu, Z80Registers& regs, uint8_t nn)

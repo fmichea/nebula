@@ -1,4 +1,5 @@
 #include "gpu.hh"
+#include <iostream>
 
 GPU::GPU(MMU& mmu)
     : mmu_ (mmu), wait_count (456)
@@ -76,14 +77,18 @@ void GPU::draw_line()
     // Real background.
     if (this->mmu_.LCDC.BGD.get())
     {
-        BGWTile bg_tile(this->mmu_, scx - (scx % 8), real_y);
+        printf("bkg: ");
+        BGWTile bg_tile(this->mmu_, scx - (scx % 8 ? 8 - scx % 8 : 0), real_y);
         for (uint8_t x = 0; x < WIDTH; ++x)
         {
             uint8_t real_x = scx + x;
             if (real_x % 8 == 0)
                 bg_tile = BGWTile(this->mmu_, real_x, real_y);
             bkg[x] = this->mmu_.BGP.C[bg_tile.color(real_x % 8)].get();
+            printf("%c", (bkg[x] == 0 ? ' ' : (bkg[x] == 1 ? '.' : (
+                bkg[x] == 2 ? 'o' : 'X'))));
         }
+        printf("\n");
     }
 
     // Window on background.
@@ -118,15 +123,18 @@ void GPU::draw_line()
         }
     }
 
-    // Drawing of the finale background and objects.
+    // Drawing of the final background and objects.
     for (uint8_t x = 0; x < WIDTH; x++)
     {
-        SDL_Rect rect = {
-            (Sint16) (x *COEF), (Sint16) (this->mmu_.LY.get() * COEF),
-            COEF, COEF
-        };
-        SDL_FillRect(this->screen_, &rect,
+        SDL_Rect rect;
+        rect.x = x * COEF;
+        rect.y = this->mmu_.LY.get() * COEF;
+        rect.w = COEF;
+        rect.h = COEF;
+        int res = SDL_FillRect(this->screen_, &rect,
                      this->colors_[(objs[x] != 0xff ? objs[x] : bkg[x])]);
+        if (res < 0)
+            printf("SDL_FillRect failed: %s\n", SDL_GetError());
     }
     SDL_UnlockSurface(this->screen_);
 }
