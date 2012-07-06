@@ -1,14 +1,13 @@
 #include "gpu.hh"
-#include <iostream>
 
 GPU::GPU(MMU& mmu)
     : mmu_ (mmu), wait_count (456)
 {
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_EVENTTHREAD);
+    SDL_Init(SDL_INIT_EVERYTHING);
     this->screen_ = SDL_SetVideoMode(WIDTH * COEF, HEIGHT * COEF, 32,
-                                     SDL_DOUBLEBUF | SDL_HWSURFACE);
+                                     SDL_SWSURFACE);
     SDL_WM_SetCaption("nebula", 0);
-    SDL_FillRect(this->screen_, 0, SDL_MapRGB(this->screen_->format, 0, 0, 0));
+    SDL_FillRect(this->screen_, 0, SDL_MapRGB(this->screen_->format, 255, 255, 255));
 
     // Colors
     this->colors_[0] = SDL_MapRGB(this->screen_->format, 255, 255, 255);
@@ -68,7 +67,7 @@ void GPU::do_cycle(uint8_t cycles)
 
 void GPU::draw_line()
 {
-    uint8_t bkg[WIDTH] = {0};
+    uint8_t bkg[WIDTH];
     uint8_t real_y = this->mmu_.LY.get() + this->mmu_.SCY.get();
     uint8_t scx = this->mmu_.SCX.get();
 
@@ -77,18 +76,19 @@ void GPU::draw_line()
     // Real background.
     if (this->mmu_.LCDC.BGD.get())
     {
-        printf("bkg: ");
-        BGWTile bg_tile(this->mmu_, scx - (scx % 8 ? 8 - scx % 8 : 0), real_y);
-        for (uint8_t x = 0; x < WIDTH; ++x)
+        //printf("Color: ");
+        BGWTile bg_tile(this->mmu_, scx - scx % 8, real_y);
+        uint8_t x;
+        for (x = 0; x < WIDTH; ++x)
         {
             uint8_t real_x = scx + x;
             if (real_x % 8 == 0)
                 bg_tile = BGWTile(this->mmu_, real_x, real_y);
             bkg[x] = this->mmu_.BGP.C[bg_tile.color(real_x % 8)].get();
-            printf("%c", (bkg[x] == 0 ? ' ' : (bkg[x] == 1 ? '.' : (
-                bkg[x] == 2 ? 'o' : 'X'))));
+            //printf("%c", (bkg[x] == 0 ? ' ' : (bkg[x] == 1 ? '.' : (
+            //    bkg[x] == 2 ? 'o' : 'X'))));
         }
-        printf("\n");
+        //printf(" (%d)\n", x);
     }
 
     // Window on background.
@@ -105,14 +105,15 @@ void GPU::draw_line()
     }
 
     // Draw objects.
-    uint8_t objs[WIDTH] = {0xff};
-
+    uint8_t objs[WIDTH];
+    for (uint8_t x = 0; x < WIDTH; ++x)
+        objs[x] = 0xff;
     if (this->mmu_.LCDC.OBJSDE.get())
     {
         std::list<Sprite> sprites = SpriteManager::get_sprites(
             this->mmu_, this->mmu_.LY.get()
         );
-        printf("List size : %zu\n", sprites.size());
+        print_debug("List size : %zu\n", sprites.size());
         for (auto sprite = sprites.begin(); sprite != sprites.end(); ++sprite)
         {
             for (int it = 0; it < 8; ++it)
@@ -124,13 +125,13 @@ void GPU::draw_line()
     }
 
     // Drawing of the final background and objects.
+    SDL_Rect rect;
+    rect.y = this->mmu_.LY.get() * COEF;
+    rect.w = COEF;
+    rect.h = COEF;
     for (uint8_t x = 0; x < WIDTH; x++)
     {
-        SDL_Rect rect;
         rect.x = x * COEF;
-        rect.y = this->mmu_.LY.get() * COEF;
-        rect.w = COEF;
-        rect.h = COEF;
         int res = SDL_FillRect(this->screen_, &rect,
                      this->colors_[(objs[x] != 0xff ? objs[x] : bkg[x])]);
         if (res < 0)
