@@ -67,6 +67,7 @@ public:
         this->HL.set(0x014d);
         this->SP = 0xfffe;
         this->PC = 0x0100;
+        this->halt_mode = false;
     }
 
     uint8_t         A;
@@ -83,6 +84,9 @@ public:
     WordRegProxy    HL;
     uint16_t        PC;
     uint16_t        SP;
+
+    bool            IME; // Interrupt Master Enable Flag (Write Only)
+    bool            halt_mode; // Waits an interrupt.
 
 private:
     uint8_t flags_;

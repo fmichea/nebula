@@ -7,27 +7,27 @@ Z80::Z80(std::string filename)
 bool Z80::execute()
 {
     uint32_t count = 0;
-    uint8_t last_scy = 0;
 
     if (!this->mmu_.load_rom(filename_))
         return false;
     while (true)
     {
-        uint8_t opcode = this->mmu_.read<uint8_t>(this->regs_.PC);
-        if (OPCODES[opcode] == 0) {
-            fprintf(stderr, "Unknown opcodes %02X...", opcode);
-            return false;
+        uint16_t res = 0x4;
+        if (!this->regs_.halt_mode)
+        {
+            uint8_t opcode = this->mmu_.read<uint8_t>(this->regs_.PC);
+            if (OPCODES[opcode] == 0) {
+                fprintf(stderr, "Unknown opcodes %02X...", opcode);
+                return false;
+            }
+            print_debug("[%x] Opcode : %02X, PC : %04X\n", count, opcode, this->regs_.PC);
+            print_disassembly(this->mmu_, this->regs_);
+            res = OPCODES[opcode](this->mmu_, this->regs_);
         }
-        print_debug("[%x] Opcode : %02X, PC : %04X\n", count, opcode, this->regs_.PC);
-        print_disassembly(this->mmu_, this->regs_);
-        if (last_scy != this->mmu_.SCY.get())
-            print_debug("SCY changed\n");
-        last_scy = this->mmu_.SCY.get();
-
-        uint16_t res = OPCODES[opcode](this->mmu_, this->regs_);
 
         this->regs_.PC += (res >> 8) & 0xff;
         gpu_.do_cycle(res & 0xff);
+        int_.manage_timer(res & 0xff);
         int_.manage_interrupts();
         count += 1;
 

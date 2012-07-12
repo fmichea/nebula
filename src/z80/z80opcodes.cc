@@ -214,9 +214,8 @@ uint16_t push_2B_reg(MMU& mmu, Z80Registers& regs, uint16_t& reg)
     return P(1, 16);
 }
 
-uint16_t rst_nn(MMU& mmu, Z80Registers& regs, uint16_t a)
+uint16_t rst_nn(MMU& mmu, Z80Registers& regs, uint16_t addr)
 {
-    uint16_t addr = mmu.read<uint16_t>(a);
     regs.SP -= 2;
     mmu.write<uint16_t>(regs.SP, regs.PC + 1);
     regs.PC = addr;
@@ -484,15 +483,15 @@ uint16_t scf(MMU& mmu, Z80Registers& regs)
 
 uint16_t di(MMU& mmu, Z80Registers& regs)
 {
-    (void) regs;
-    mmu.write<uint8_t>(0xffff, 0);
+    (void) mmu;
+    regs.IME = false;
     return P(1, 4);
 }
 
 uint16_t ei(MMU& mmu, Z80Registers& regs)
 {
-    (void) regs;
-    mmu.write<uint8_t>(0xffff, 31);
+    (void) mmu;
+    regs.IME = true;
     return P(1, 4);
 }
 
@@ -553,8 +552,8 @@ uint16_t ld_mhl_d8(MMU& mmu, Z80Registers& regs)
 
 uint16_t halt(MMU& mmu, Z80Registers& regs)
 {
-    ei(mmu, regs);
-    // FIXME
+    (void) mmu;
+    regs.halt_mode = true;
     return P(1, 4);
 }
 
@@ -790,7 +789,7 @@ uint16_t or_a_d8(MMU& mmu, Z80Registers& regs)
 
 uint16_t ld_hl_sppr8(MMU& mmu, Z80Registers& regs)
 {
-    regs.HL.set(regs.SP + mmu.read<uint8_t>(regs.PC + 1));
+    regs.HL.set(regs.SP + (int8_t) mmu.read<uint8_t>(regs.PC + 1));
     return P(2, 12);
 }
 

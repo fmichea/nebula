@@ -153,7 +153,7 @@ bool MMU::reset_registers()
     this->io_[0xff48 - 0xff00] = 0xFF;
     this->OBP[1] = PaletteProxy(this->io_ + 0xff49 - 0xff00);
     this->io_[0xff49 - 0xff00] = 0xFF;
-    this->IE = Register(this->hram_ + 0xffff - 0xff00);
+    this->IE = Register(this->hram_ + 0xffff - 0xff80);
     this->IE.set(0x00);
     return true;
 }
