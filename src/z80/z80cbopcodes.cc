@@ -110,7 +110,7 @@ uint16_t bit_nb_1B_reg(MMU& mmu, Z80Registers& regs, uint8_t& reg, uint8_t bit)
 {
     (void) mmu;
     (void) regs;
-    regs.F.zf.set((reg >> bit) & 0x1);
+    regs.F.zf.set((reg >> bit) & 0x1 ? 0x0 : 0x1);
     regs.F.n.set(0);
     regs.F.h.set(1);
     return P(2, 8);
