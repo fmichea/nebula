@@ -205,7 +205,8 @@ class Graph(object):
                         msg += '\nAddr = %04X - opcodes: %02X - %02X' % (
                             addr, self.nodes[addr].opcodes[-1], opcode
                         )
-                        sys.exit(msg)
+                        print >> sys.stderr, msg
+                        break
                 except KeyError: # First time we encounter this address.
                     self.nodes[addr] = Block(self, addr, opcode)
                 self.nodes[last_addr].link_to(addr)
