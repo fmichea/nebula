@@ -235,12 +235,12 @@ uint16_t ret_if(MMU& mmu, Z80Registers& regs, uint8_t a)
 uint16_t add_hl_2B_reg(MMU& mmu, Z80Registers& regs, WordRegProxy& reg)
 {
     uint32_t tmp = regs.HL.get() + reg.get();
-    uint16_t tmp_ = (regs.HL.get() & 0xff) + (reg.get() & 0xff);
+    uint32_t tmp_ = (regs.HL.get() & 0xfff) + (reg.get() & 0xfff);
 
     (void) mmu;
     regs.HL.set(tmp);
     regs.F.n.set(0x0);
-    regs.F.h.set((0xff & tmp_) ^ tmp_ ? 0x1 : 0x0);
+    regs.F.h.set((0xfff & tmp_) ^ tmp_ ? 0x1 : 0x0);
     regs.F.cy.set((0xffff & tmp) ^ tmp ? 0x1 : 0x0);
     return P(1, 8);
 }
@@ -248,12 +248,12 @@ uint16_t add_hl_2B_reg(MMU& mmu, Z80Registers& regs, WordRegProxy& reg)
 uint16_t add_hl_2B_reg(MMU& mmu, Z80Registers& regs, uint16_t& reg)
 {
     uint32_t tmp = regs.HL.get() + reg;
-    uint16_t tmp_ = (regs.HL.get() & 0xff) + (reg & 0xff);
+    uint32_t tmp_ = (regs.HL.get() & 0xfff) + (reg & 0xfff);
 
     (void) mmu;
     regs.HL.set(tmp);
     regs.F.n.set(0x0);
-    regs.F.h.set((0xff & tmp_) ^ tmp_ ? 0x1 : 0x0);
+    regs.F.h.set((0xfff & tmp_) ^ tmp_ ? 0x1 : 0x0);
     regs.F.cy.set((0xffff & tmp) ^ tmp ? 0x1 : 0x0);
     return P(1, 8);
 }
