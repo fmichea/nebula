@@ -559,7 +559,7 @@ uint16_t halt(MMU& mmu, Z80Registers& regs)
 
 uint16_t ld_ma16_sp(MMU& mmu, Z80Registers& regs)
 {
-    mmu.write<uint8_t>(mmu.read<uint16_t>(regs.PC + 1), regs.SP);
+    mmu.write<uint16_t>(mmu.read<uint16_t>(regs.PC + 1), regs.SP);
     return P(3, 20);
 }
 
@@ -755,13 +755,12 @@ uint16_t and_a_d8(MMU& mmu, Z80Registers& regs)
 uint16_t add_sp_r8(MMU& mmu, Z80Registers& regs)
 {
     int8_t val = mmu.read<uint8_t>(regs.PC + 1);
-    uint32_t tmp = regs.SP + val;
-    uint16_t tmp_ = (regs.SP & 0xff) + val;
+    uint16_t res = regs.SP + val;
 
-    regs.SP = tmp;
     regs.F.set(0);
-    regs.F.h.set((0xff & tmp_) ^ tmp_ ? 0x1 : 0x0);
-    regs.F.cy.set((0xffff & tmp) ^ tmp ? 0x1 : 0x0);
+    regs.F.h.set((res & 0xf) < (regs.SP & 0xf) ? 0x1 : 0x0);
+    regs.F.cy.set((res & 0xff) < (regs.SP & 0xff) ? 0x1 : 0x0);
+    regs.SP = res;
     return P(2, 16);
 }
 
@@ -789,7 +788,13 @@ uint16_t or_a_d8(MMU& mmu, Z80Registers& regs)
 
 uint16_t ld_hl_sppr8(MMU& mmu, Z80Registers& regs)
 {
-    regs.HL.set(regs.SP + (int8_t) mmu.read<uint8_t>(regs.PC + 1));
+    int8_t val = mmu.read<uint8_t>(regs.PC + 1);
+    uint16_t res = regs.SP + val;
+
+    regs.F.set(0);
+    regs.F.h.set((res & 0xf) < (regs.SP & 0xf) ? 0x1 : 0x0);
+    regs.F.cy.set((res & 0xff) < (regs.SP & 0xff) ? 0x1 : 0x0);
+    regs.HL.set(res);
     return P(2, 12);
 }
 
