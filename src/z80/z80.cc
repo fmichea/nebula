@@ -7,6 +7,7 @@ Z80::Z80(std::string filename)
 bool Z80::execute()
 {
     uint32_t count = 0;
+    uint8_t last_scy = 0;
 
     if (!this->mmu_.load_rom(filename_))
         return false;
@@ -19,6 +20,9 @@ bool Z80::execute()
         }
         print_debug("[%x] Opcode : %02X, PC : %04X\n", count, opcode, this->regs_.PC);
         print_disassembly(this->mmu_, this->regs_);
+        if (last_scy != this->mmu_.SCY.get())
+            print_debug("SCY changed\n");
+        last_scy = this->mmu_.SCY.get();
 
         uint16_t res = OPCODES[opcode](this->mmu_, this->regs_);
 

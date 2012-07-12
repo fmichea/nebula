@@ -73,22 +73,19 @@ void GPU::draw_line()
 
     SDL_LockSurface(this->screen_);
 
+    printf("SCX = %02X; SCY = %02X\n", scx, (uint8_t) (real_y - this->mmu_.LY.get()));
     // Real background.
     if (this->mmu_.LCDC.BGD.get())
     {
         //printf("Color: ");
-        BGWTile bg_tile(this->mmu_, scx - scx % 8, real_y);
-        uint8_t x;
-        for (x = 0; x < WIDTH; ++x)
+        BGWTile bg_tile(this->mmu_, scx, real_y);
+        for (uint8_t x = 0; x < WIDTH; ++x)
         {
             uint8_t real_x = scx + x;
             if (real_x % 8 == 0)
                 bg_tile = BGWTile(this->mmu_, real_x, real_y);
             bkg[x] = this->mmu_.BGP.C[bg_tile.color(real_x % 8)].get();
-            //printf("%c", (bkg[x] == 0 ? ' ' : (bkg[x] == 1 ? '.' : (
-            //    bkg[x] == 2 ? 'o' : 'X'))));
         }
-        //printf(" (%d)\n", x);
     }
 
     // Window on background.

@@ -165,7 +165,7 @@ class Block(object):
             map(lambda a: '%04X' % a, sorted(self.from_))
         )
         print self
-        print '\nTo: %s' % ', '.join(
+        print 'To: %s' % ', '.join(
             map(lambda a: '%04X' % a, sorted(self.to))
         )
 
@@ -194,7 +194,8 @@ class Graph(object):
     def create_graph(self, filename):
         f = open(filename)
         backtrace, last_addr = [], 0
-        for line in f.readlines():
+        line = f.readline()
+        while line:
             match, line = OPCODE_LINE.match(line), line[:-1]
             if match is not None:
                 addr, opcode = int(match.group(3), 16), int(match.group(2), 16)
@@ -221,6 +222,7 @@ class Graph(object):
                     self.nodes[addr].disassembly = [disass]
                 except KeyError:
                     print ('Unknow disass at %x (can be ret)' % addr)
+            line = f.readline()
         self.nodes[last_addr].link_to(1)
 
     def merge_blocks(self):
@@ -250,15 +252,24 @@ class Graph(object):
 def compare_graphs(graph1, graph2):
     addr_checked, stack, blocks_diff = [], [0], 0
     while stack:
-        addr = stack.pop()
+        addr, block1, block2 = stack.pop(), None, None
         if addr in addr_checked:
             continue
         addr_checked.append(addr)
-        try:
-            block1 = graph1.nodes[addr]
-            block2 = graph2.nodes[addr]
-        except KeyError:
+        try: block1 = graph1.nodes[addr]
+        except KeyError: pass
+        try: block2 = graph2.nodes[addr]
+        except KeyError: pass
+        if block1 is None or block2 is None:
             print 'One of the graphs doesn\'t contain %04X addr.' % addr
+            if block1 is not None:
+                print 'In graph 1:'
+                block1.sumary()
+                stack.extend(list(block1.to))
+            if block2 is not None:
+                print 'In graph 2:'
+                block2.sumary()
+                stack.extend(list(block2.to))
             print '=' * 40
             blocks_diff += 1
             continue
@@ -268,7 +279,7 @@ def compare_graphs(graph1, graph2):
             block2.sumary()
             print '=' * 40
             blocks_diff += 1
-        stack.extend(list(block1.to))
+        stack.extend(list(block1.to | block2.to))
     print 'Found %d differences.' % blocks_diff
 
 if __name__ == '__main__':

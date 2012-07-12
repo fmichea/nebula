@@ -173,9 +173,14 @@ uint16_t sbc_a_1B_reg(MMU& mmu, Z80Registers& regs, uint8_t& reg)
 
 uint16_t cp_a_1B_reg(MMU& mmu, Z80Registers& regs, uint8_t& reg)
 {
+    uint16_t tmp = regs.A - reg;
+    uint8_t tmp_ = (regs.A & 0xf) - (reg & 0xf);
+
     (void) mmu;
-    regs.A -= reg;
+    regs.F.zf.set((tmp & 0xff) == 0 ? 0x1 : 0x0);
     regs.F.n.set(0x1);
+    regs.F.h.set((tmp_ & 0xf) ^ tmp_ ? 0x1 : 0x0);
+    regs.F.cy.set((tmp & 0xff) ^ tmp ? 0x1 : 0x0);
     return P(1, 4);
 }
 
@@ -385,7 +390,7 @@ uint16_t jump_a16(MMU& mmu, Z80Registers& regs)
 uint16_t jump_mhl(MMU& mmu, Z80Registers& regs)
 {
     (void) mmu;
-    regs.PC = regs.HL.get(); //mmu.read<uint16_t>(regs.HL.get());
+    regs.PC = regs.HL.get();
     return P(0, 4);
 }
 
@@ -460,7 +465,7 @@ uint16_t ld_mhlp_a(MMU& mmu, Z80Registers& regs)
 uint16_t ld_mhlm_a(MMU& mmu, Z80Registers& regs)
 {
     uint16_t res = ld_maddr_a(mmu, regs, regs.HL.get());
-    regs.HL.set(regs.HL.get() + 1);
+    regs.HL.set(regs.HL.get() - 1);
     return res;
 }
 
@@ -495,7 +500,7 @@ uint16_t daa(MMU& mmu, Z80Registers& regs)
     if (regs.F.n.get())
     {
         if (regs.F.h.get())
-            a -= 0x06;
+            a = (a - 6) & 0xff;
         if (regs.F.cy.get())
             a -= 0x60;
     }

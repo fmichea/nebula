@@ -9,13 +9,17 @@ class WordRegProxy
 {
 public:
     WordRegProxy(uint8_t& msb, uint8_t& lsb)
-        : msb_ (msb), lsb_ (lsb)
+        : msb_ (msb), lsb_ (lsb), lsb_mask_ (0xff)
+    {}
+
+    WordRegProxy(uint8_t& msb, uint8_t& lsb, uint8_t mask)
+        : msb_ (msb), lsb_ (lsb), lsb_mask_ (mask)
     {}
 
     void set(uint16_t val)
     {
         this->msb_ = (val >> 8) & 0xff;
-        this->lsb_ = val & 0xff;
+        this->lsb_ = val & this->lsb_mask_;
     }
 
     uint16_t get()
@@ -26,6 +30,7 @@ public:
 private:
     uint8_t&    msb_;
     uint8_t&    lsb_;
+    uint8_t     lsb_mask_;
 };
 
 class Z80Registers
@@ -41,7 +46,7 @@ public:
 
         void set(uint8_t val)
         {
-            *this->reg_ = val;
+            *this->reg_ = (val & 0xf0);
         }
 
         BitProxy zf;
@@ -54,7 +59,7 @@ public:
     };
 
     Z80Registers()
-        : F (&flags_), AF (A, flags_), BC (B, C), DE (D, E), HL (H, L)
+        : F (&flags_), AF (A, flags_, 0xf0), BC (B, C), DE (D, E), HL (H, L)
     {
         this->AF.set(0x11b0);
         this->BC.set(0x0013);

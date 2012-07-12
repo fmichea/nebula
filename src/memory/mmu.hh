@@ -56,6 +56,7 @@ public:
     Register Reg;
 # include "registers.hh"
 # undef X
+    Register IE;
     STATProxy STAT;
     LCDCProxy LCDC;
     PaletteProxy BGP;
@@ -68,12 +69,17 @@ private:
     bool load_ram_size(uint8_t val);
     bool reset_registers();
 
-    int             fd_;
-    size_t          size_;
-    uint8_t*        rom_;
-    MBC*            mbc_;
     char            title_[0x15];
+    int             fd_;
+    MBC*            mbc_;
+    size_t          size_;
     std::string     target_;
+    uint8_t*        rom_;
+    uint8_t*        vram_;
+    uint8_t*        wram_;
+    uint8_t*        oam_;
+    uint8_t*        io_;
+    uint8_t*        hram_;
 };
 
 # include "mmu.hxx"

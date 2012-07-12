@@ -41,9 +41,13 @@ std::list<Sprite> SpriteManager::get_sprites(MMU& mmu, uint8_t y)
 {
     std::list<Sprite> res;
 
+    (void) mmu;
+    (void) y;
     for (uint8_t it = 0; it < 40; ++it)
     {
         uint16_t addr = 0xFE00 + it * 4;
+        (void) addr;
+#if 0
         s_sprite sprite = mmu.read<s_sprite>(addr);
         if (sprite.x == 0 || 168 <= sprite.x)
             continue;
@@ -52,6 +56,7 @@ std::list<Sprite> SpriteManager::get_sprites(MMU& mmu, uint8_t y)
         if ((mmu.LCDC.OBJSS.get() ? 8 : 16) <= y - sprite.y)
             continue;
         res.push_back(Sprite(mmu, sprite, y));
+#endif
     }
     return res;
 }
