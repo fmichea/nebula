@@ -703,10 +703,15 @@ uint16_t sub_a_d8(MMU& mmu, Z80Registers& regs)
 
 uint16_t sbc_a_d8(MMU& mmu, Z80Registers& regs)
 {
-    uint8_t tmp = regs.A - mmu.read<uint8_t>(regs.PC + 1) - regs.F.cy.get();
+    uint8_t val = mmu.read<uint8_t>(regs.PC + 1);
+    uint16_t tmp = regs.A - val - regs.F.cy.get();
+    uint8_t tmp_ = (regs.A & 0xf) - (val & 0xf) - regs.F.cy.get();
 
     regs.A = tmp;
+    regs.F.zf.set(regs.A == 0 ? 0x1 : 0x0);
     regs.F.n.set(1);
+    regs.F.h.set((tmp_ & 0xf) ^ tmp_ ? 0x1 : 0x0);
+    regs.F.cy.set((tmp & 0xff) ^ tmp ? 0x1 : 0x0);
     return P(2, 8);
 }
 
