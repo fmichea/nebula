@@ -29,10 +29,7 @@ T MMU::read(uint16_t addr)
     else if (0xFF80 <= addr)
         ptr = (T*) (this->hram_ + addr - 0xFF80);
     if (ptr != 0)
-    {
-        print_debug("Read value %04X from address %04X.\n", *ptr, addr);
         return (*ptr);
-    }
     return this->mbc_->read<T>(addr);
 }
 
@@ -62,10 +59,7 @@ void MMU::write(uint16_t addr, T value)
     else if (0xFF80 <= addr)
         ptr = (T*) (this->hram_ + addr - 0xFF80);
     if (ptr != 0)
-    {
-        print_debug("Writing value %04X in address %04X.\n", value, addr);
         *ptr = value;
-    }
 }
 
 #endif // !MMU_HXX_
