@@ -153,6 +153,7 @@ uint16_t sub_a_1B_reg(MMU& mmu, Z80Registers& regs, uint8_t& reg)
     (void) mmu;
     regs.A = tmp;
     regs.F.zf.set(regs.A == 0 ? 0x1 : 0x0);
+    regs.F.n.set(1);
     regs.F.h.set((0xf & tmp_) ^ tmp_ ? 0x1 : 0x0);
     regs.F.cy.set((0xff & tmp) ^ tmp ? 0x1 : 0x0);
     return P(1, 4);
@@ -166,6 +167,7 @@ uint16_t sbc_a_1B_reg(MMU& mmu, Z80Registers& regs, uint8_t& reg)
     (void) mmu;
     regs.A = tmp;
     regs.F.zf.set(regs.A == 0 ? 0x1 : 0x0);
+    regs.F.n.set(1);
     regs.F.h.set((0xf & tmp_) ^ tmp_ ? 0x1 : 0x0);
     regs.F.cy.set((0xff & tmp) ^ tmp ? 0x1 : 0x0);
     return P(1, 4);
@@ -271,6 +273,7 @@ uint16_t rlca(MMU& mmu, Z80Registers& regs)
     regs.F.set(0x00);
     regs.F.cy.set((regs.A >> 7) & 0x1);
     regs.A <<= 1;
+    regs.A |= regs.F.cy.get();
     return P(1, 4);
 }
 
@@ -299,6 +302,7 @@ uint16_t rrca(MMU& mmu, Z80Registers& regs)
     regs.F.set(0x00);
     regs.F.cy.set(regs.A & 0x1);
     regs.A >>= 1;
+    regs.A |= (regs.F.cy.get() << 7);
     return P(1, 4);
 }
 
@@ -325,8 +329,8 @@ uint16_t cpl(MMU& mmu, Z80Registers& regs)
 uint16_t ccf(MMU& mmu, Z80Registers& regs)
 {
     (void) mmu;
-    regs.F.n.set(1);
-    regs.F.h.set(1);
+    regs.F.n.set(0);
+    regs.F.h.set(0);
     regs.F.cy.set(regs.F.cy.get() ^ 0x1);
     return P(1, 4);
 }

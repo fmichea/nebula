@@ -66,13 +66,15 @@ uint16_t sra_1B_reg(MMU& mmu, Z80Registers& regs, uint8_t& reg)
     (void) mmu;
     regs.F.set(0);
     regs.F.cy.set(reg & 0x1);
-    reg = (reg >> 1) | ((reg >> 7) | 0x1);
+    reg = (reg >> 1) | (reg & 0x80);
+    regs.F.zf.set(reg == 0 ? 0x1 : 0x0);
     return P(2, 8);
 }
 
 uint16_t srl_1B_reg(MMU& mmu, Z80Registers& regs, uint8_t& reg)
 {
     (void) mmu;
+    regs.F.set(0);
     regs.F.cy.set(reg & 0x1);
     reg >>= 1;
     regs.F.zf.set(reg == 0 ? 0x1 : 0x0);
