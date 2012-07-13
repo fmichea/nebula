@@ -10,6 +10,7 @@ import re
 import sys
 
 CALL_OPCODES = [0xC4, 0xCC, 0xCD, 0xD4, 0xDC]
+RST_OPCODES = [0xC7, 0xD7, 0xE7, 0xF7, 0xCF, 0xDF, 0xEF, 0xFF]
 JUMP_OPCODES = [0xC2, 0xC3, 0xCA, 0xD2, 0xDA, 0x18, 0x28, 0x38, 0x20, 0x30]
 OPCODE_LINE = re.compile('\[([A-Za-z0-9]+)\] Opcode : ([0-9A-Za-z]{2}), PC : ([A-Za-z0-9]{4})')
 DISSAS_LINE = re.compile('\[([A-Za-z0-9]{4})] ([^O:]+)')
@@ -126,7 +127,7 @@ class Block(object):
         return (self.to == other.to and self.opcodes == other.opcodes)
 
     def accepts_child(self):
-        if len(self.to) != 1 or self.opcodes[-1] == 0xc9:
+        if len(self.to) != 1 or self.opcodes[-1] in [0xc9, 0xd9]:
             return False
         if self.opcodes[-1] in CALL_OPCODES:
             return False
@@ -175,16 +176,16 @@ class Graph(object):
         self.links = set()
 
         # First node is a BEGIN node.
-        self.nodes[0] = Block(self, 0, 0)
-        self.nodes[0].disassembly = ['BEGIN']
-        self.nodes[0].is_sub = True
+        self.nodes[0x10000] = Block(self, 0x10000, 0)
+        self.nodes[0x10000].disassembly = ['BEGIN']
+        self.nodes[0x10000].is_sub = True
 
         # Last node is a END node.
-        self.nodes[1] = Block(self, 1, 0)
-        self.nodes[1].disassembly = ['END']
-        self.nodes[1].from_.add(0)
-        self.nodes[1].to.add(0)
-        self.nodes[1].is_sub = True
+        self.nodes[0x10001] = Block(self, 0x10001, 0)
+        self.nodes[0x10001].disassembly = ['END']
+        self.nodes[0x10001].from_.add(0)
+        self.nodes[0x10001].to.add(0)
+        self.nodes[0x10001].is_sub = True
 
     def generate(self, filename):
         self.create_graph(filename)
@@ -193,7 +194,7 @@ class Graph(object):
 
     def create_graph(self, filename):
         f = open(filename)
-        backtrace, last_addr = [], 0
+        backtrace, last_addr = [], 0x10000
         line = f.readline()
         while line:
             match, line = OPCODE_LINE.match(line), line[:-1]
@@ -209,12 +210,21 @@ class Graph(object):
                         break
                 except KeyError: # First time we encounter this address.
                     self.nodes[addr] = Block(self, addr, opcode)
-                self.nodes[last_addr].link_to(addr)
+                if last_addr is not None:
+                    self.nodes[last_addr].link_to(addr)
                 last_addr = addr
                 if self.nodes[addr].opcodes[-1] in CALL_OPCODES:
                     backtrace.append(addr)
-                elif self.nodes[addr].opcodes[-1] == 0xC9:
-                    last_addr = backtrace.pop()
+                elif self.nodes[addr].opcodes[-1] in RST_OPCODES:
+                    backtrace.append(addr)
+                    last_addr = None
+                elif self.nodes[addr].opcodes[-1] in [0xC9, 0xD9]:
+                    try: last_addr = backtrace.pop()
+                    except: pass
+
+            if line.startswith('Launching'): # Interrupt.
+                backtrace.append(addr)
+                last_addr = None
 
             match = DISSAS_LINE.match(line)
             if match is not None:
@@ -224,7 +234,7 @@ class Graph(object):
                 except KeyError:
                     print ('Unknow disass at %x (can be ret)' % addr)
             line = f.readline()
-        self.nodes[last_addr].link_to(1)
+        self.nodes[last_addr].link_to(0x10001)
 
     def merge_blocks(self):
         addrs = sorted(self.nodes.keys())
