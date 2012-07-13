@@ -132,7 +132,7 @@ uint16_t bit_nb_1B_reg(MMU& mmu, Z80Registers& regs, uint8_t& reg, uint8_t bit)
         uint8_t tmp = mmu.read<uint8_t>(regs.HL.get());     \
         uint16_t res = OpName(mmu, regs, tmp);              \
         mmu.write<uint8_t>(regs.HL.get(), tmp);             \
-        return res;                                         \
+        return res + P(0, 8);                               \
     }
 #define H2(FuncName, OpName, Bit)                           \
     uint16_t FuncName(MMU& mmu, Z80Registers& regs)         \
@@ -140,7 +140,7 @@ uint16_t bit_nb_1B_reg(MMU& mmu, Z80Registers& regs, uint8_t& reg, uint8_t bit)
         uint8_t tmp = mmu.read<uint8_t>(regs.HL.get());     \
         uint16_t res = OpName(mmu, regs, tmp, Bit);         \
         mmu.write<uint8_t>(regs.HL.get(), tmp);             \
-        return res;                                         \
+        return res + P(0, 8);                               \
     }
 #include "cbopcodes.def"
 #undef X1

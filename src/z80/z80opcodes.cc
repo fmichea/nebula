@@ -340,7 +340,7 @@ uint16_t ldh_a8_a(MMU& mmu, Z80Registers& regs)
     return P(2, 12);
 }
 
-uint16_t md_ma16_a(MMU& mmu, Z80Registers& regs)
+uint16_t ld_ma16_a(MMU& mmu, Z80Registers& regs)
 {
     mmu.write<uint8_t>(mmu.read<uint16_t>(regs.PC + 1), regs.A);
     return P(3, 16);
@@ -394,7 +394,7 @@ uint16_t jump_mhl(MMU& mmu, Z80Registers& regs)
 {
     (void) mmu;
     regs.PC = regs.HL.get();
-    return P(0, 4);
+    return P(0, 8);
 }
 
 uint16_t jr_if(MMU& mmu, Z80Registers& regs, uint8_t val)
@@ -624,7 +624,7 @@ uint16_t and_a_mhl(MMU& mmu, Z80Registers& regs)
     regs.F.set(0x20);
     regs.A &= mmu.read<uint8_t>(regs.HL.get());
     regs.F.zf.set(regs.A == 0 ? 0x1 : 0x0);
-    return P(1, 4);
+    return P(1, 8);
 }
 
 uint16_t xor_a_mhl(MMU& mmu, Z80Registers& regs)
@@ -726,22 +726,22 @@ uint16_t ldh_ma8_a(MMU& mmu, Z80Registers& regs)
     return P(2, 12);
 }
 
-uint16_t ld_ma16_a(MMU& mmu, Z80Registers& regs)
-{
-    mmu.write<uint8_t>(mmu.read<uint16_t>(regs.PC + 1), regs.A);
-    return P(3, 16);
-}
+//uint16_t ld_ma16_a(MMU& mmu, Z80Registers& regs)
+//{
+//    mmu.write<uint8_t>(mmu.read<uint16_t>(regs.PC + 1), regs.A);
+//    return P(3, 16);
+//}
 
 uint16_t ld_mc_a(MMU& mmu, Z80Registers& regs)
 {
     mmu.write<uint8_t>(0xff00 + regs.C, regs.A);
-    return P(2, 8);
+    return P(1, 8);
 }
 
 uint16_t ld_a_mc(MMU& mmu, Z80Registers& regs)
 {
     regs.A = mmu.read<uint8_t>(0xff00 + regs.C);
-    return P(2, 8);
+    return P(1, 8);
 }
 
 uint16_t and_a_d8(MMU& mmu, Z80Registers& regs)
@@ -828,7 +828,7 @@ uint16_t reti(MMU& mmu, Z80Registers& regs)
 uint16_t cb(MMU& mmu, Z80Registers& regs)
 {
     uint8_t op = mmu.read<uint8_t>(regs.PC + 1);
-    return (P(0, 4) + CBOPCODES[op](mmu, regs));
+    return CBOPCODES[op](mmu, regs);
 }
 
 #define X1(FuncName, OpName, Reg)                               \

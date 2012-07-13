@@ -1,7 +1,7 @@
 #include "interrupts.hh"
 
 Interrupts::Interrupts(MMU& mmu, Z80Registers& regs)
-    : mmu_ (mmu), regs_ (regs), div_cycles_ (0), tima_cycles_ (0)
+    : mmu_ (mmu), regs_ (regs), div_cycles_ (255), tima_cycles_ (255)
 {}
 
 void Interrupts::manage_interrupts()
@@ -46,7 +46,7 @@ void Interrupts::manage_timer(uint8_t cycles)
     {
         uint8_t tima = this->mmu_.TIMA.get();
         this->tima_cycles_ -= cycles;
-        if (this->tima_cycles_ < 0)
+        if (this->tima_cycles_ <= 0)
         {
             switch (tac & 0x3) // Controls speed of timer.
             {

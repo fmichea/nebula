@@ -23,7 +23,7 @@ class DotWriter(object):
 
         self.f.write('digraph Nebula {\n')
         self.f.write('\tsplines = true;\n')
-        self.f.write('\tnode [ shape = box ];\n\n')
+        self.f.write('\tnode [ shape = box, fontname = "Deja Vu Sans Mono" ];\n\n')
 
     def __del__(self):
         self.f.write('}\n')
@@ -108,7 +108,7 @@ class Link(object):
 
 class Block(object):
     def __init__(self, graph, addr, opcode):
-        self.addr = addr
+        self.addr, self.addrs = addr, [addr]
         self.opcodes, self.disassembly = [opcode], ['']
         self.from_, self.to = set(), set()
         self.is_sub = False
@@ -117,9 +117,9 @@ class Block(object):
     def __str__(self):
         res = '%s:\n' % self.name()
         res += ''.join(map(
-            lambda (opcode, disassembly): '    %02X %s\n' % (
-                    opcode, '' if disassembly == '' else ('- %s' % disassembly)
-            ), zip(self.opcodes, self.disassembly)
+            lambda (addr, opcode, disassembly): '%04X  -  %02X  %s    \n' % (
+                    addr, opcode, '' if disassembly == '' else ('-  %s' % disassembly)
+            ), zip(self.addrs, self.opcodes, self.disassembly)
         ))
         return res
 
@@ -140,6 +140,7 @@ class Block(object):
 
     def merge(self, block):
         self.opcodes.extend(block.opcodes)
+        self.addrs.extend(block.addrs)
         self.disassembly.extend(block.disassembly)
         self.to = set()
         for new_to in list(block.to):
@@ -261,7 +262,7 @@ class Graph(object):
         self.links = set(res)
 
 def compare_graphs(graph1, graph2):
-    addr_checked, stack, blocks_diff = [], [0], 0
+    addr_checked, stack, blocks_diff = [], [0x10000], 0
     while stack:
         addr, block1, block2 = stack.pop(), None, None
         if addr in addr_checked:
