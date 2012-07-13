@@ -67,7 +67,7 @@ for func in ['ret_%s', 'jump_%s_a16', 'call_%s_a16', 'jr_%s']:
         std.write('x0', func % flag, func % 'if', cond)
 
 for a in [0, 8, 10, 18, 20, 28, 30, 38]:
-    std.write('x0', 'rst_%02dh' % a, 'rst_nn', a)
+    std.write('x0', 'rst_%02dh' % a, 'rst_nn', '0x%d' % a)
 
 # CB Opcodes
 cb = DefMacro('cbopcodes.def')
