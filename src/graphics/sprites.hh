@@ -42,7 +42,7 @@ private:
 class SpriteManager
 {
 public:
-    static std::list<Sprite> get_sprites(MMU& mmu, uint8_t y);
+    static std::list<Sprite*> get_sprites(MMU& mmu, uint8_t y);
 };
 
 #endif // !SPRITES_HH_

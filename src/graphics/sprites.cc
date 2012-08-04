@@ -15,10 +15,11 @@ Sprite::Sprite(MMU& mmu, s_sprite sprite, uint8_t y)
 
     uint16_t colors = mmu.read<uint16_t>(addr);
 
-    for (int it = 0; it < 7; ++it)
+    for (int it = 0; it < 8; ++it)
     {
         uint8_t shift = (sprite.flags.x_flip ? it : 7 - it);
-        this->line_[it] = (colors >> (8 + shift)) + 0x2 * (colors >> shift);
+        this->line_[it] = (colors >> (8 + shift)) & 0x1;
+        this->line_[it] += 0x2 * ((colors >> shift) & 0x1);
     }
 }
 
@@ -37,9 +38,9 @@ uint8_t Sprite::x_base() const
     return this->x_;
 }
 
-std::list<Sprite> SpriteManager::get_sprites(MMU& mmu, uint8_t y)
+std::list<Sprite*> SpriteManager::get_sprites(MMU& mmu, uint8_t y)
 {
-    std::list<Sprite> res;
+    std::list<Sprite*> res;
 
     for (uint8_t it = 0; it < 40; ++it)
     {
@@ -51,7 +52,7 @@ std::list<Sprite> SpriteManager::get_sprites(MMU& mmu, uint8_t y)
             continue;
         if ((mmu.LCDC.OBJSS.get() ? 8 : 16) <= y - sprite.y)
             continue;
-        res.push_back(Sprite(mmu, sprite, y));
+        res.push_back(new Sprite(mmu, sprite, y));
     }
     return res;
 }

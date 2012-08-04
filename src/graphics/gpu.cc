@@ -110,17 +110,20 @@ void GPU::draw_line()
         objs[x] = 0xff;
     if (this->mmu_.LCDC.OBJSDE.get())
     {
-        std::list<Sprite> sprites = SpriteManager::get_sprites(
+        std::list<Sprite*> sprites = SpriteManager::get_sprites(
             this->mmu_, this->mmu_.LY.get()
         );
         print_debug("List size : %zu\n", sprites.size());
-        for (auto sprite = sprites.begin(); sprite != sprites.end(); ++sprite)
+        for (auto it_ = sprites.begin(); it_ != sprites.end(); ++it_)
         {
+            Sprite* sprite = *it_;
             for (int it = 0; it < 8; ++it)
             {
-                if (sprite->is_displayed(it, bkg[sprite->x_base() + it]))
-                    objs[sprite->x_base() + it] = sprite->color(it);
+                uint8_t x = sprite->x_base() + it;
+                if (x < WIDTH && sprite->is_displayed(it, bkg[x]))
+                    objs[x] = sprite->color(it);
             }
+            delete sprite;
         }
     }
 
