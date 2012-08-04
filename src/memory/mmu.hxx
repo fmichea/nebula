@@ -58,6 +58,18 @@ void MMU::write(uint16_t addr, T value)
         ptr = (T*) (this->io_ + addr - 0xFF00);
     else if (0xFF80 <= addr)
         ptr = (T*) (this->hram_ + addr - 0xFF80);
+
+    // Special register LY/DIV reset when wrote on.
+    if (addr == 0xFF44 || addr == 0xFF04)
+        value = 0;
+    // DMA Transfer and Start Address
+    if (addr == 0xFF46)
+    {
+        for (uint8_t it = 0; it < 0xA0; ++it)
+            this->oam_[it] = this->read<uint8_t>(((uint16_t) value << 8) | it);
+        ptr = 0;
+    }
+
     if (ptr != 0)
         *ptr = value;
 }
