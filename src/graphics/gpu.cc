@@ -70,33 +70,36 @@ void GPU::draw_line()
     uint8_t bkg[WIDTH];
     uint8_t real_y = this->mmu_.LY.get() + this->mmu_.SCY.get();
     uint8_t scx = this->mmu_.SCX.get();
+    uint8_t ds = this->mmu_.LCDC.BGTMDS.get();
 
     SDL_LockSurface(this->screen_);
 
-    printf("SCX = %02X; SCY = %02X\n", scx, (uint8_t) (real_y - this->mmu_.LY.get()));
+    print_debug("SCX = %02X; SCY = %02X\n", scx,
+                (uint8_t) (real_y - this->mmu_.LY.get()));
     // Real background.
     if (this->mmu_.LCDC.BGD.get())
     {
         //printf("Color: ");
-        BGWTile bg_tile(this->mmu_, scx, real_y);
+        BGWTile bg_tile(this->mmu_, scx, real_y, ds);
         for (uint8_t x = 0; x < WIDTH; ++x)
         {
             uint8_t real_x = scx + x;
             if (real_x % 8 == 0)
-                bg_tile = BGWTile(this->mmu_, real_x, real_y);
+                bg_tile = BGWTile(this->mmu_, real_x, real_y, ds);
             bkg[x] = this->mmu_.BGP.C[bg_tile.color(real_x % 8)].get();
         }
     }
 
     // Window on background.
-    if (this->mmu_.LCDC.WDE.get() && this->mmu_.WY.get() <= real_y)
+    ds = this->mmu_.LCDC.WTMDS.get();
+    if (this->mmu_.LCDC.WDE.get() && this->mmu_.WY.get() <= this->mmu_.LY.get())
     {
-        uint8_t tmp = this->mmu_.WX.get() - 7;
-        BGWTile win_tile(this->mmu_, tmp - (tmp % 8), real_y);
-        for (uint8_t x = tmp; x < WIDTH; ++x)
+        int16_t tmp = this->mmu_.WX.get() - 7;
+        uint8_t delta_y = this->mmu_.LY.get() - this->mmu_.WY.get();
+        for (int16_t x = tmp; x < WIDTH; ++x)
         {
-            if (x % 8 == 0)
-                win_tile = BGWTile(this->mmu_, x, real_y);
+            if (x < 0) continue;
+            BGWTile win_tile = BGWTile(this->mmu_, x - tmp, delta_y, ds);
             bkg[x] = this->mmu_.BGP.C[win_tile.color(x % 8)].get();
         }
     }
@@ -128,9 +131,14 @@ void GPU::draw_line()
     rect.h = COEF;
     for (uint8_t x = 0; x < WIDTH; x++)
     {
+        int res = 0;
         rect.x = x * COEF;
-        int res = SDL_FillRect(this->screen_, &rect,
-                     this->colors_[(objs[x] != 0xff ? objs[x] : bkg[x])]);
+        if (objs[x] == 0xff && !this->mmu_.LCDC.BGD.get())
+            res = SDL_FillRect(this->screen_, &rect, this->colors_[0]);
+        else if (objs[x] != 0xff)
+            res = SDL_FillRect(this->screen_, &rect, this->colors_[objs[x]]);
+        else
+            res = SDL_FillRect(this->screen_, &rect, this->colors_[bkg[x]]);
         if (res < 0)
             printf("SDL_FillRect failed: %s\n", SDL_GetError());
     }

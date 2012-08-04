@@ -1,8 +1,8 @@
 #include "bgwtile.hh"
 
-BGWTile::BGWTile(MMU& mmu, uint8_t x, uint8_t y)
+BGWTile::BGWTile(MMU& mmu, uint8_t x, uint8_t y, uint8_t data_select)
 {
-    uint16_t base = mmu.LCDC.BGTMDS.get() ? 0x9C00 : 0x9800;
+    uint16_t base = data_select ? 0x9C00 : 0x9800;
 
     base += ((y % 256) / 8) * TILE_BY_LINE;
     base += (x % 256) / 8;
