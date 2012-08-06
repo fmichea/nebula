@@ -1,4 +1,5 @@
 #include "gpu.hh"
+#include <iostream>
 
 GPU::GPU(MMU& mmu)
     : mmu_ (mmu), wait_count (456)
@@ -74,8 +75,6 @@ void GPU::draw_line()
 
     SDL_LockSurface(this->screen_);
 
-    print_debug("SCX = %02X; SCY = %02X\n", scx,
-                (uint8_t) (real_y - this->mmu_.LY.get()));
     // Real background.
     if (this->mmu_.LCDC.BGD.get())
     {
@@ -143,7 +142,7 @@ void GPU::draw_line()
         else
             res = SDL_FillRect(this->screen_, &rect, this->colors_[bkg[x]]);
         if (res < 0)
-            printf("SDL_FillRect failed: %s\n", SDL_GetError());
+            print_debug("SDL_FillRect failed: %s\n", SDL_GetError());
     }
     SDL_UnlockSurface(this->screen_);
 }

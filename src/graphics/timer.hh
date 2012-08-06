@@ -2,6 +2,7 @@
 # define TIMER_HH_
 
 # include <SDL/SDL.h>
+# include "../logging.hh"
 
 # define ELAPSED_FRAME 16
 

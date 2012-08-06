@@ -5,6 +5,8 @@
 
 # include "../memory/mmu.hh"
 
+# define SPRITE_HEIGHT (mmu.LCDC.OBJSS.get() ? 16 : 8)
+
 typedef struct
 {
     uint8_t                 : 4;
@@ -25,7 +27,7 @@ typedef struct
 class Sprite
 {
 public:
-    Sprite(MMU& mmu, s_sprite sprite, uint8_t y);
+    Sprite(MMU& mmu, s_sprite& sprite, uint8_t y);
 
     uint8_t x_base() const;
     uint8_t is_displayed(uint8_t x, uint8_t bkg_color) const;
@@ -34,6 +36,7 @@ public:
 private:
     MMU&        mmu_;
     uint8_t     x_;
+    uint8_t     y_;
     uint8_t     palette_;
     bool        above_bg_;
     uint8_t     line_[8];
