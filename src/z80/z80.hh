@@ -6,6 +6,7 @@
 # include "z80disassembler.hh"
 # include "../graphics/gpu.hh"
 # include "interrupts.hh"
+# include "../keyboard/keyboard.hh"
 
 class Z80
 {

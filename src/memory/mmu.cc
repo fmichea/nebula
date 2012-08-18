@@ -155,5 +155,6 @@ bool MMU::reset_registers()
     this->io_[0xff49 - 0xff00] = 0xFF;
     this->IE = Register(this->hram_ + 0xffff - 0xff80);
     this->IE.set(0x00);
+    this->write<uint8_t>(0xFF00, 0x3f);
     return true;
 }

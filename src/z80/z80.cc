@@ -27,6 +27,7 @@ bool Z80::execute()
 
         this->regs_.PC += (res >> 8) & 0xff;
         gpu_.do_cycle(res & 0xff);
+        keyboard_cycle(this->mmu_);
         int_.manage_timer(res & 0xff);
         int_.manage_interrupts();
         count += 1;

@@ -7,7 +7,7 @@ SRCS += src/memory/mmu.cc src/memory/mbcs/romonly.cc src/logging.cc
 SRCS += src/z80/z80opcodes.cc src/z80/z80.cc src/graphics/gpu.cc
 SRCS += src/graphics/bgwtile.cc src/graphics/timer.cc src/graphics/sprites.cc
 SRCS += src/z80/z80cbopcodes.cc src/z80/interrupts.cc
-SRCS += src/z80/z80disassembler.cc
+SRCS += src/z80/z80disassembler.cc src/keyboard/keyboard.cc
 
 OBJS = $(SRCS:%.cc=%.o)
 

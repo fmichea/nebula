@@ -4,7 +4,7 @@
 GPU::GPU(MMU& mmu)
     : mmu_ (mmu), wait_count (456)
 {
-    SDL_Init(SDL_INIT_EVERYTHING);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK);
     this->screen_ = SDL_SetVideoMode(WIDTH * COEF, HEIGHT * COEF, 32,
                                      SDL_SWSURFACE);
     SDL_WM_SetCaption("nebula", 0);
