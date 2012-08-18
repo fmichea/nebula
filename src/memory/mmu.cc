@@ -4,6 +4,7 @@ MMU::MMU()
     : fd_ (0), mbc_ (0)
 {
     this->vram_ = new uint8_t[0x2000];
+    memset(this->vram_, 0, 0x2000);
     this->wram_ = new uint8_t[0x8000];
     this->oam_ = new uint8_t[0xA0];
     this->io_ = new uint8_t[0x80];

@@ -67,6 +67,9 @@ public:
         this->HL.set(0x014d);
         this->SP = 0xfffe;
         this->PC = 0x0100;
+
+        // Other flags.
+        this->IME = false;
         this->halt_mode = false;
     }
 

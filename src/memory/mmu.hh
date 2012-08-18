@@ -1,21 +1,21 @@
 #ifndef MMU_HH_
 # define MMU_HH_
 
-# include <string>
+# include <fcntl.h>
 # include <string.h>
-# include <sys/stat.h>
+# include <string>
 # include <sys/mman.h>
+# include <sys/stat.h>
 # include <sys/types.h>
 # include <unistd.h>
-# include <fcntl.h>
 
+# include "../logging.hh"
 # include "mbcs/mbc.hh"
 # include "mbcs/mbc1.hh"
 # include "mbcs/romonly.hh"
-# include "registers/stat.hh"
-# include "registers/palette.hh"
 # include "registers/lcdc.hh"
-# include "../logging.hh"
+# include "registers/palette.hh"
+# include "registers/stat.hh"
 
 class MMU
 {

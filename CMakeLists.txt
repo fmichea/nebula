@@ -2,7 +2,7 @@ PROJECT(nebula)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 # CXXFLAGS used by compiler.
-ADD_DEFINITIONS(-Wall -Wextra -Werror -std=c++11 -I/usr/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT)
+ADD_DEFINITIONS(-Wall -Wextra -Werror -std=c++11 -I/usr/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT -ggdb)
 
 # LDFLAGS used when linking nebula.
 SET(NEBULA_LDFLAGS -L/usr/lib -lSDL -lpthread)
@@ -41,7 +41,7 @@ ADD_CUSTOM_COMMAND(
 )
 
 # distclean target
-IF (UNIX)
+IF(UNIX)
     ADD_CUSTOM_TARGET(distclean @echo cleaning for source distribution)
 
     ADD_CUSTOM_COMMAND(
@@ -53,7 +53,7 @@ IF (UNIX)
         COMMAND rm -f "${CMAKE_CURRENT_BINARY_DIR}/cmake_install.cmake"
         TARGET  distclean
     )
-endif(UNIX)
+ENDIF(UNIX)
 
 # Builds and links executable.
 ADD_EXECUTABLE(nebula ${NEBULA_SRCS} ${NEBULA_DEFINITIONS})

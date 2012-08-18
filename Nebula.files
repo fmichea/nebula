@@ -39,6 +39,5 @@ src/logging.cc
 src/logging.hh
 src/main.cc
 AUTHORS
-config.mk
-configure
+CMakeLists.txt
 README.markdown
