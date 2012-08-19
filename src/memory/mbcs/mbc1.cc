@@ -38,7 +38,7 @@ void* MBC1::write_address(uint16_t addr, uint16_t value)
     }
 
     // RAM/ROM Bank Select
-    if (0x4000 <= addr && addr <= 0x7fff)
+    if (0x4000 <= addr && addr <= 0x5fff)
     {
         if (this->mbc_mode_ == MODE_16_8)
             this->rom_bank_ |= (value & 0x3) << 5;
