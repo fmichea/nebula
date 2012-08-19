@@ -2,7 +2,9 @@ PROJECT(nebula)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 # CXXFLAGS used by compiler.
-ADD_DEFINITIONS(-Wall -Wextra -Werror -std=c++11 -I/usr/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT -ggdb)
+SET(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -std=c++11 -I/usr/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT")
+SET(CMAKE_CXX_FLAGS_RELEASE "-O3")
+SET(CMAKE_CXX_FLAGS_DEBUG "-ggdb -DDEBUG -DDISASSEMBLER")
 
 # LDFLAGS used when linking nebula.
 SET(NEBULA_LDFLAGS -L/usr/lib -lSDL -lpthread)
