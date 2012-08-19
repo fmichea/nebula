@@ -3,11 +3,12 @@
 
 # include <SDL/SDL.h>
 # include <list>
+# include <string.h>
 
-# include "timer.hh"
-# include "bgwtile.hh"
 # include "../memory/mmu.hh"
+# include "bgwtile.hh"
 # include "sprites.hh"
+# include "timer.hh"
 
 # define COEF 2
 
