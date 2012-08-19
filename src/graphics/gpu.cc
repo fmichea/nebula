@@ -74,6 +74,7 @@ void GPU::draw_line()
     uint8_t ds = this->mmu_.LCDC.BGTMDS.get();
 
     SDL_LockSurface(this->screen_);
+    memset(bkg, 0, WIDTH);
 
     // Real background.
     if (this->mmu_.LCDC.BGD.get())
