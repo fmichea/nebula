@@ -1,6 +1,7 @@
 #include "z80disassembler.hh"
 
 #define DISASS_LINE_SIZE 1024
+#define HEADER_SIZE 16
 
 char    disass_line[DISASS_LINE_SIZE];
 
@@ -8,222 +9,224 @@ void inc_reg(MMU& mmu, Z80Registers& regs, const char* reg)
 {
     (void) mmu;
     (void) regs;
-    sprintf(disass_line + 7, "inc %s", reg);
+    sprintf(disass_line + HEADER_SIZE, "inc %s", reg);
 }
 
 void dec_reg(MMU& mmu, Z80Registers& regs, const char* reg)
 {
     (void) mmu;
     (void) regs;
-    sprintf(disass_line + 7, "dec %s", reg);
+    sprintf(disass_line + HEADER_SIZE, "dec %s", reg);
 }
 
 void push_reg(MMU& mmu, Z80Registers& regs, const char* reg)
 {
     (void) mmu;
     (void) regs;
-    sprintf(disass_line + 7, "push %s", reg);
+    sprintf(disass_line + HEADER_SIZE, "push %s", reg);
 }
 
 void pop_reg(MMU& mmu, Z80Registers& regs, const char* reg)
 {
     (void) mmu;
     (void) regs;
-    sprintf(disass_line + 7, "pop %s", reg);
+    sprintf(disass_line + HEADER_SIZE, "pop %s", reg);
 }
 
 void ld_a_mreg(MMU& mmu, Z80Registers& regs, const char* reg)
 {
     (void) mmu;
     (void) regs;
-    sprintf(disass_line + 7, "ld %%a, (%s)", reg);
+    sprintf(disass_line + HEADER_SIZE, "ld %%a, (%s)", reg);
 }
 
 void ld_mreg_a(MMU& mmu, Z80Registers& regs, const char* reg)
 {
     (void) mmu;
     (void) regs;
-    sprintf(disass_line + 7, "ld (%s), a", reg);
+    sprintf(disass_line + HEADER_SIZE, "ld (%s), a", reg);
 }
 
 void add_hl_reg(MMU& mmu, Z80Registers& regs, const char* reg)
 {
     (void) mmu;
     (void) regs;
-    sprintf(disass_line + 7, "add %%hl, %s", reg);
+    sprintf(disass_line + HEADER_SIZE, "add %%hl, %s", reg);
 }
 
 template<typename T>
 void ld_reg_val(MMU& mmu, Z80Registers& regs, const char* reg)
 {
     T val = mmu.read<T>(regs.PC + 1);
-    sprintf(disass_line + 7, "ld %s, $0x%X", reg, val);
+    sprintf(disass_line + HEADER_SIZE, "ld %s, $0x%X", reg, val);
 }
 
 void op_mhl(MMU& mmu, Z80Registers& regs, const char* op)
 {
-    uint16_t hl = regs.HL.get();
-
     (void) mmu;
-    sprintf(disass_line + 7, "%s (%%hl)  ::  %s ($0x%04X)", op, op, hl);
+    (void) regs;
+    sprintf(disass_line + HEADER_SIZE, "%s (%%hl)", op);
 }
 
 void op_a_d8(MMU& mmu, Z80Registers& regs, const char* op)
 {
     uint8_t val = mmu.read<uint8_t>(regs.PC + 1);
-    sprintf(disass_line + 7, "%s %%a, $0x%02x", op, val);
+    sprintf(disass_line + HEADER_SIZE, "%s %%a, $0x%02x", op, val);
 }
 
 void uniq_operation(MMU& mmu, Z80Registers& regs, const char* op)
 {
     (void) mmu;
     (void) regs;
-    sprintf(disass_line + 7, "%s", op); // Opcode with no parameter.
+    sprintf(disass_line + HEADER_SIZE, "%s", op); // Opcode with no parameter.
 }
 
 void call_if_a16(MMU& mmu, Z80Registers& regs, const char* flag)
 {
     uint16_t addr = mmu.read<uint16_t>(regs.PC + 1);
-    sprintf(disass_line + 7, "call %s, $0x%04x", flag, addr);
+    sprintf(disass_line + HEADER_SIZE, "call %s, $0x%04x", flag, addr);
 }
 
 void jump_if_a16(MMU& mmu, Z80Registers& regs, const char* flag)
 {
     uint16_t addr = mmu.read<uint16_t>(regs.PC + 1);
-    sprintf(disass_line + 7, "jmp %s, $0x%04x", flag, addr);
+    sprintf(disass_line + HEADER_SIZE, "jmp %s, $0x%04x", flag, addr);
 }
 
 void jr_if_a16(MMU& mmu, Z80Registers& regs, const char* flag)
 {
     uint8_t off = mmu.read<uint8_t>(regs.PC + 1);
-    sprintf(disass_line + 7, "jr %s, $0x%02x ($%d)", flag, off, (int8_t) off);
+    sprintf(disass_line + HEADER_SIZE, "jr %s, $0x%02x ($%d)", flag, off, (int8_t) off);
 }
 
 void ret_if(MMU& mmu, Z80Registers& regs, const char* flag)
 {
     (void) mmu;
     (void) regs;
-    sprintf(disass_line + 7, "ret %s", flag);
+    sprintf(disass_line + HEADER_SIZE, "ret %s", flag);
 }
 
 void ld_reg_reg(MMU& mmu, Z80Registers& regs, const char* r1, const char* r2)
 {
     (void) mmu;
     (void) regs;
-    sprintf(disass_line + 7, "ld %s, %s", r1, r2);
+    sprintf(disass_line + HEADER_SIZE, "ld %s, %s", r1, r2);
 }
 
 void op_a_reg(MMU& mmu, Z80Registers& regs, const char* op, const char* reg)
 {
     (void) mmu;
     (void) regs;
-    sprintf(disass_line + 7, "%s %%a, %s", op, reg);
+    sprintf(disass_line + HEADER_SIZE, "%s %%a, %s", op, reg);
 }
 
 void rst_nn(MMU& mmu, Z80Registers& regs, uint8_t nn)
 {
     (void) mmu;
     (void) regs;
-    sprintf(disass_line + 7, "rst $0x%02d", nn);
+    sprintf(disass_line + HEADER_SIZE, "rst $0x%02d", nn);
 }
 
 static void jump_a16(MMU& mmu, Z80Registers& regs)
 {
     uint16_t addr = mmu.read<uint16_t>(regs.PC + 1);
-    sprintf(disass_line + 7, "jmp $0x%04x", addr);
+    sprintf(disass_line + HEADER_SIZE, "jmp $0x%04x", addr);
 }
 
 static void ld_mc_a(MMU& mmu, Z80Registers& regs)
 {
     (void) mmu;
-    sprintf(disass_line + 7, "ld (%%c), %%a  ::  ld ($0x%04x), %%a", 0xff00 + regs.C);
+    (void) regs;
+    sprintf(disass_line + HEADER_SIZE, "ld (%%c), %%a");
 }
 
 static void ld_a_mc(MMU& mmu, Z80Registers& regs)
 {
     (void) mmu;
-    sprintf(disass_line + 7, "ld %%a, (%%c)  ::  ld %%a, ($0x%04x)", 0xff00 + regs.C);
+    (void) regs;
+    sprintf(disass_line + HEADER_SIZE, "ld %%a, (%%c)");
 }
 
 static void cb(MMU& mmu, Z80Registers& regs)
 {
     uint8_t op = mmu.read<uint8_t>(regs.PC + 1);
-    sprintf(disass_line + 7, "cb $0x%02x", op);
+    sprintf(disass_line + HEADER_SIZE, "cb $0x%02x", op);
 }
 
 static void call_a16(MMU& mmu, Z80Registers& regs)
 {
     uint16_t addr = mmu.read<uint16_t>(regs.PC + 1);
-    sprintf(disass_line + 7, "call $0x%04x", addr);
+    sprintf(disass_line + HEADER_SIZE, "call $0x%04x", addr);
 }
 
 static void jr(MMU& mmu, Z80Registers& regs)
 {
     uint8_t off = mmu.read<uint8_t>(regs.PC + 1);
-    sprintf(disass_line + 7, "jr $0x%02x - jr $%d", off, (int8_t) off);
+    sprintf(disass_line + HEADER_SIZE, "jr $0x%02x [$%d]", off, (int8_t) off);
 }
 
 static void ld_ma16_sp(MMU& mmu, Z80Registers& regs)
 {
     uint16_t addr = mmu.read<uint8_t>(regs.PC + 1);
-    sprintf(disass_line + 7, "ld ($0x%04x), %%sp", addr);
+    sprintf(disass_line + HEADER_SIZE, "ld ($0x%04x), %%sp", addr);
 }
 
 static void ld_mhl_d8(MMU& mmu, Z80Registers& regs)
 {
-    uint16_t addr = regs.HL.get();
+    (void) mmu;
     uint8_t val = mmu.read<uint8_t>(regs.PC + 1);
-    sprintf(disass_line + 7, "ld (%%hl), d8  ::  ld ($0x%04x), $0x%02x", addr, val);
+    sprintf(disass_line + HEADER_SIZE, "ld (%%hl), $0x%02x", val);
 }
 
 static void add_hl_sp(MMU& mmu, Z80Registers& regs)
 {
     (void) mmu;
     (void) regs;
-    sprintf(disass_line + 7, "add %%hl, %%sp");
+    sprintf(disass_line + HEADER_SIZE, "add %%hl, %%sp");
 }
 
 static void add_sp_r8(MMU& mmu, Z80Registers& regs)
 {
     uint8_t val = mmu.read<uint8_t>(regs.PC + 1);
-    sprintf(disass_line + 7, "add sp, r8  ::  add sp, $0x%02x", val);
+    sprintf(disass_line + HEADER_SIZE, "add sp, $0x%02x [$%d]", val, (int8_t) val);
 }
 
 static void ld_ma16_a(MMU& mmu, Z80Registers& regs)
 {
     uint16_t addr = mmu.read<uint16_t>(regs.PC + 1);
-    sprintf(disass_line + 7, "ld (a16), %%a  ::  ld ($0x%04x), %%a", addr);
+    sprintf(disass_line + HEADER_SIZE, "ld ($0x%04x), %%a", addr);
 }
 
 static void ld_a_ma16(MMU& mmu, Z80Registers& regs)
 {
     uint16_t addr = mmu.read<uint16_t>(regs.PC + 1);
-    sprintf(disass_line + 7, "ld %%a, (a16)  ::  ld %%a, ($0x%04x)", addr);
+    sprintf(disass_line + HEADER_SIZE, "ld %%a, ($0x%04x)", addr);
 }
 
 static void ldh_a_ma8(MMU& mmu, Z80Registers& regs)
 {
     uint8_t addr = mmu.read<uint8_t>(regs.PC + 1);
-    sprintf(disass_line + 7, "ldh %%a, (a8)  ::  ldh %%a, ($0x%04x)", 0xff00 + addr);
+    sprintf(disass_line + HEADER_SIZE, "ldh %%a, ($0x%04x)", 0xff00 + addr);
 }
 
 static void ldh_ma8_a(MMU& mmu, Z80Registers& regs)
 {
     uint8_t addr = mmu.read<uint8_t>(regs.PC + 1);
-    sprintf(disass_line + 7, "ldh (a8), %%a  ::  ldh ($0x%04x), %%a", 0xff00 + addr);
+    sprintf(disass_line + HEADER_SIZE, "ldh ($0x%04x), %%a", 0xff00 + addr);
 }
 
 static void ld_hl_sppr8(MMU& mmu, Z80Registers& regs)
 {
-    uint8_t addr = regs.SP + mmu.read<uint8_t>(regs.PC + 1);
-    sprintf(disass_line + 7, "ld %%hl, (%%sp + r8)  ::  ld %%hl, ($0x%04x)", addr);
+    uint8_t r8 = mmu.read<uint8_t>(regs.PC + 1);
+    sprintf(disass_line + HEADER_SIZE, "ld %%hl, (%%sp + $0x%02x) [$%d]", r8,
+            (int8_t) r8);
 }
 
 static void ld_sp_hl(MMU& mmu, Z80Registers& regs)
 {
     (void) mmu;
     (void) regs;
-    sprintf(disass_line + 7, "ld %%sp, %%hl");
+    sprintf(disass_line + HEADER_SIZE, "ld %%sp, %%hl");
 }
 
 #define H2(FuncName, OpName, Arg1)                          \
@@ -296,8 +299,7 @@ op OPCODES_DISASS[0x100] = {
 void print_disassembly(MMU& mmu, Z80Registers& regs)
 {
 #if DISASSEMBLER
-
-    snprintf(disass_line, 8, "[%04x] ", regs.PC);
+    snprintf(disass_line, HEADER_SIZE + 1, "[%04x] Disass : ", regs.PC);
     op tmp = OPCODES_DISASS[mmu.read<uint8_t>(regs.PC)];
     if (tmp == 0) strncat(disass_line, "What?", DISASS_LINE_SIZE);
     else tmp(mmu, regs);

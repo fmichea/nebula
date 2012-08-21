@@ -20,7 +20,6 @@ void Interrupts::manage_interrupts()
     {
         if ((state >> it) & 0x1)
         {
-            print_debug("Launching interrupt %d (%x) !\n", it, ints[it]);
             this->regs_.IME = false;
             this->mmu_.IF.set(if_flag & (~(0x1 << it)));
             this->regs_.PC -= 1;
