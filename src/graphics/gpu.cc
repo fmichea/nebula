@@ -113,7 +113,7 @@ void GPU::draw_line()
         std::list<Sprite*> sprites = SpriteManager::get_sprites(
             this->mmu_, this->mmu_.LY.get()
         );
-        print_debug("List size : %zu\n", sprites.size());
+        logging::debug("List size : %zu", sprites.size());
         for (auto it_ = sprites.begin(); it_ != sprites.end(); ++it_)
         {
             Sprite* sprite = *it_;
@@ -143,7 +143,7 @@ void GPU::draw_line()
         else
             res = SDL_FillRect(this->screen_, &rect, this->colors_[bkg[x]]);
         if (res < 0)
-            print_debug("SDL_FillRect failed: %s\n", SDL_GetError());
+            logging::error("SDL_FillRect failed: %s", SDL_GetError());
     }
     SDL_UnlockSurface(this->screen_);
 }

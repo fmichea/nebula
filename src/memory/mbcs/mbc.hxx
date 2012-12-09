@@ -8,7 +8,7 @@ T MBC::read(uint16_t addr)
 {
     T* mem = (T*) this->read_address(addr);
     T res = *mem;
-    print_debug("Read value %04X from address %04X.\n", res, addr);
+    logging::debug("Read value %04X from address %04X.", res, addr);
     return res;
 }
 
@@ -18,7 +18,7 @@ void MBC::write(uint16_t addr, T value)
     T* mem = (T*) this->write_address(addr, (uint16_t) value);
     if (mem == nullptr)
         return;
-    print_debug("Writing value %04X in address %04X.\n", value, addr);
+    logging::debug("Writing value %04X in address %04X.", value, addr);
     *mem = value;
 }
 

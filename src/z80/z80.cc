@@ -20,7 +20,8 @@ bool Z80::execute()
                 fprintf(stderr, "Unknown opcodes %02X...", opcode);
                 return false;
             }
-            print_debug("[%x] Opcode : %02X, PC : %04X\n", count, opcode, this->regs_.PC);
+            logging::debug("[%x] Opcode : %02X, PC : %04X", count, opcode,
+                           this->regs_.PC);
             print_disassembly(this->mmu_, this->regs_);
             res = OPCODES[opcode](this->mmu_, this->regs_);
         }
@@ -32,6 +33,7 @@ bool Z80::execute()
         int_.manage_interrupts();
         count += 1;
 
+#if 0
         print_debug("\tState after execution:\n");
         print_debug("\r\tR1  R2\tV1  V2\n");
         print_debug("\t%2s  %2s\t%02X  %02X\n", "A", "A", regs_.A, regs_.A);
@@ -43,6 +45,7 @@ bool Z80::execute()
         print_debug("\tFlags: Z (%u), N (%u), H (%u), C (%u)\n",
                     regs_.F.zf.get(), regs_.F.n.get(),
                     regs_.F.h.get(), regs_.F.cy.get());
+#endif
     }
     return true;
 }

@@ -216,7 +216,7 @@ uint16_t push_2B_reg(MMU& mmu, Z80Registers& regs, uint16_t& reg)
 
 uint16_t rst_nn(MMU& mmu, Z80Registers& regs, uint16_t addr)
 {
-    print_debug("Interrupt : %X\n", addr);
+    logging::debug("Interrupt : %X", addr);
     regs.SP -= 2;
     mmu.write<uint16_t>(regs.SP, regs.PC + 1);
     regs.PC = addr;

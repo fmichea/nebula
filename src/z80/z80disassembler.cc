@@ -303,8 +303,7 @@ void print_disassembly(MMU& mmu, Z80Registers& regs)
     op tmp = OPCODES_DISASS[mmu.read<uint8_t>(regs.PC)];
     if (tmp == 0) strncat(disass_line, "What?", DISASS_LINE_SIZE);
     else tmp(mmu, regs);
-    strncat(disass_line, "\n", DISASS_LINE_SIZE);
-    print_debug("%s", disass_line);
+    logging::debug("%s", disass_line);
 #else
     (void) mmu;
     (void) regs;

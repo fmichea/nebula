@@ -51,13 +51,13 @@ bool MMU::load_rom(std::string filename)
         "\xbb\xbb\x67\x63\x6e\x0e\xec\xcc\xdd\xdc\x99\x9f\xbb\xb9\x33\x3e";
     if (memcmp(nintendo_logo, this->rom_ + 0x104, 0x30))
     {
-        print_debug("Nintendo logo doesn't match!\n");
+        logging::warning("Nintendo logo doesn't match!");
         return false;
     }
 
     // ROM Title
     strncpy(this->title_, (const char*) (this->rom_ + 0x134), 0x10);
-    print_debug("ROM Title: %s.\n", this->title_);
+    logging::info("ROM Title: %s.", this->title_);
 
     // Cartridge Type
     if (!this->load_cartridge_type(this->rom_[0x147]))
@@ -77,7 +77,7 @@ bool MMU::load_rom(std::string filename)
 
     // Target country
     this->target_ = this->rom_[0x14a] ? "Non-Japanese" : "Japanese";
-    print_debug("Target: %s\n", this->target_.c_str());
+    logging::info("Target: %s", this->target_.c_str());
 
     // Header checksum
     uint8_t x = 0;
@@ -87,8 +87,8 @@ bool MMU::load_rom(std::string filename)
     }
     if (this->rom_[0x14d] != x)
     {
-        print_debug("Cartridge header checksum failure: %x (expected %x).\n",
-                    x, this->rom_[0x14d]);
+        logging::error("Cartridge header checksum failure: %x (expected %x).",
+                       x, this->rom_[0x14d]);
         return false;
     }
 
