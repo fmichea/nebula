@@ -23,8 +23,12 @@ void keyboard_cycle(MMU& mmu)
     joyp = mmu.read<uint8_t>(0xFF00);
     while (SDL_PollEvent(&event))
     {
-        // FIXME: SDL_QUIT to stop processor and fix STOP opcode also.
-        if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP)
+        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)
+        {
+            mmu.stopped = true;
+            return;
+        }
+        else if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP)
         {
             for (int it = 0; it < NB_KEYBINDINGS; it++)
             {

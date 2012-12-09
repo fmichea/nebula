@@ -62,6 +62,8 @@ public:
     PaletteProxy BGP;
     PaletteProxy OBP[2];
 
+    bool            stopped;
+
 private:
     bool load_mbc(uint8_t ct_type);
     bool load_cartridge_type(uint8_t val);

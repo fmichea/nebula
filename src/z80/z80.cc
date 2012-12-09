@@ -10,7 +10,7 @@ bool Z80::execute()
 
     if (!this->mmu_.load_rom(filename_))
         return false;
-    while (true)
+    while (!this->mmu_.stopped)
     {
         uint16_t res = 0x4;
         if (!this->regs_.halt_mode)

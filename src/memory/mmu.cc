@@ -1,7 +1,7 @@
 #include "mmu.hh"
 
 MMU::MMU()
-    : fd_ (0), mbc_ (0)
+    : stopped(false), fd_ (0), mbc_ (0)
 {
     this->vram_ = new uint8_t[0x2000];
     memset(this->vram_, 0, 0x2000);
