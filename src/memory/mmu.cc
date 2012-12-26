@@ -100,6 +100,7 @@ bool MMU::load_rom_size(uint8_t val)
 {
     // FIXME
     (void) val;
+    logging::info("ROM Size: %x.", val);
     return true;
 }
 
@@ -107,23 +108,46 @@ bool MMU::load_ram_size(uint8_t val)
 {
     // FIXME
     (void) val;
+    logging::info("RAM Size: %x.", val);
     return true;
 }
 
 bool MMU::load_mbc(uint8_t val)
 {
+    std::string name;
+
+    // MBC Setting.
     switch (val)
     {
     case 0x00:
         this->mbc_ = new ROMOnly(this->rom_);
-        return true;
+        break;
     case 0x01:
     case 0x02:
     case 0x03:
         this->mbc_ = new MBC1(this->rom_);
-        return true;
+        break;
     };
-    return false;
+
+    // Name
+    switch (val)
+    {
+    case 0x00:
+        name = "ROM Only";
+        break;
+    case 0x01:
+        name = "MBC1";
+        break;
+    case 0x02:
+        name = "MBC1+RAM";
+        break;
+    case 0x03:
+        name = "MBC1+RAM+BATTERY";
+        break;
+    };
+    if (name.size() != 0)
+        logging::info("Memory type: %s", name.c_str());
+    return (this->mbc_ != 0);
 }
 
 bool MMU::reset_registers()
