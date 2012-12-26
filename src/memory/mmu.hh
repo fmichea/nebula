@@ -66,7 +66,6 @@ public:
 
 private:
     bool load_mbc(uint8_t ct_type);
-    bool load_cartridge_type(uint8_t val);
     bool load_rom_size(uint8_t val);
     bool load_ram_size(uint8_t val);
     bool reset_registers();

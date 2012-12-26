@@ -60,10 +60,6 @@ bool MMU::load_rom(std::string filename)
     logging::info("ROM Title: %s.", this->title_);
 
     // Cartridge Type
-    if (!this->load_cartridge_type(this->rom_[0x147]))
-        return false;
-
-    // MBC Type
     if (!this->load_mbc(this->rom_[0x147]))
         return false;
 
@@ -97,13 +93,6 @@ bool MMU::load_rom(std::string filename)
 
     // Reset all registers.
     this->reset_registers();
-    return true;
-}
-
-bool MMU::load_cartridge_type(uint8_t val)
-{
-    // FIXME
-    (void) val;
     return true;
 }
 
