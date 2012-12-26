@@ -1,13 +1,13 @@
 #include "logging.hh"
 
 namespace {
-    int log_level = 3;
+    logging::level log_lvl = logging::ERROR;
 
-    int log(int level, FILE* stream, const char* color, const char* type_name,
-            const char* format, va_list args)
+    int log(logging::level lvl, FILE* stream, const char* color,
+            const char* type_name, const char* format, va_list args)
     {
 #ifndef RELEASE
-        if (log_level < level) {
+        if (log_lvl < lvl) {
             return 0;
         }
 
@@ -34,8 +34,8 @@ namespace {
 }
 
 namespace logging {
-    void init(int level) {
-        log_level = level;
+    void init(level lvl) {
+        log_lvl = lvl;
     }
 
 #define X(Level, FuncName, DisplayName, Color, Stream)                  \
@@ -48,9 +48,10 @@ namespace logging {
         va_end(args);                                                   \
         return ret;                                                     \
     }
-X(1, info, INFO, "", stdout)
-X(2, warning, WARN, "\x1b[0;33m", stdout)
-X(3, error, ERROR, "\x1b[0;31m", stderr)
-X(4, debug, DEBUG, "", stderr)
+X(logging::INFO, info, INFO, "", stdout)
+X(logging::WARNING, warning, WARN, "\x1b[0;33m", stdout)
+X(logging::ERROR, error, ERROR, "\x1b[0;31m", stderr)
+X(logging::DEBUG, debug, DEBUG, "", stderr)
+X(logging::VERBOSE, verbose, VERB, "", stderr)
 #undef X
 }

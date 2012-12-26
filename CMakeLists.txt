@@ -16,6 +16,7 @@ SET(NEBULA_LDFLAGS -L/usr/lib -lSDL -lpthread)
 
 # List of all the files of the project.
 SET(NEBULA_SRCS
+    src/commandline.cc
     src/graphics/bgwtile.cc
     src/graphics/gpu.cc
     src/graphics/sprites.cc
