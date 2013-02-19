@@ -51,7 +51,7 @@ namespace logging {
 X(logging::INFO, info, INFO, "", stdout)
 X(logging::WARNING, warning, WARN, "\x1b[0;33m", stdout)
 X(logging::ERROR, error, ERROR, "\x1b[0;31m", stderr)
-X(logging::DEBUG, debug, DEBUG, "", stderr)
 X(logging::VERBOSE, verbose, VERB, "", stderr)
+X(logging::DEBUG, debug, DEBUG, "", stderr)
 #undef X
 }

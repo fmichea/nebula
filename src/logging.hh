@@ -19,6 +19,7 @@ namespace logging {
     int info(const char* format, ...);
     int warning(const char* format, ...);
     int error(const char* format, ...);
+    int verbose(const char* format, ...);
     int debug(const char* format, ...);
 }
 
