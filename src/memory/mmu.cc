@@ -3,6 +3,7 @@
 MMU::MMU()
     : stopped(false), fd_ (0), mbc_ (0)
 {
+    this->rom_ = 0;
     this->vram_ = new uint8_t[0x2000];
     memset(this->vram_, 0, 0x2000);
     this->wram_ = new uint8_t[0x8000];
