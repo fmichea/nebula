@@ -20,8 +20,8 @@ bool Z80::execute()
                 fprintf(stderr, "Unknown opcodes %02X...", opcode);
                 return false;
             }
-            logging::debug("[%x] Opcode : %02X, PC : %04X", count, opcode,
-                           this->regs_.PC);
+            logging::verbose("[%x] Opcode : %02X, PC : %04X", count, opcode,
+                             this->regs_.PC);
             print_disassembly(this->mmu_, this->regs_);
             res = OPCODES[opcode](this->mmu_, this->regs_);
         }
@@ -33,19 +33,17 @@ bool Z80::execute()
         int_.manage_interrupts();
         count += 1;
 
-#if 0
-        print_debug("\tState after execution:\n");
-        print_debug("\r\tR1  R2\tV1  V2\n");
-        print_debug("\t%2s  %2s\t%02X  %02X\n", "A", "A", regs_.A, regs_.A);
-        print_debug("\t%2s  %2s\t%02X  %02X\n", "B", "C", regs_.B, regs_.C);
-        print_debug("\t%2s  %2s\t%02X  %02X\n", "D", "E", regs_.D, regs_.E);
-        print_debug("\t%2s  %2s\t%02X  %02X\n", "H", "L", regs_.H, regs_.L);
-        print_debug("\t%2s = %04X\n", "PC", regs_.PC);
-        print_debug("\t%2s = %04X\n", "SP", regs_.SP);
-        print_debug("\tFlags: Z (%u), N (%u), H (%u), C (%u)\n",
-                    regs_.F.zf.get(), regs_.F.n.get(),
-                    regs_.F.h.get(), regs_.F.cy.get());
-#endif
+        logging::debug("\tState after execution:");
+        logging::debug("\tR1  R2\tV1  V2");
+        logging::debug("\t%2s  %2s\t%02X  %02X", "A", "A", regs_.A, regs_.A);
+        logging::debug("\t%2s  %2s\t%02X  %02X", "B", "C", regs_.B, regs_.C);
+        logging::debug("\t%2s  %2s\t%02X  %02X", "D", "E", regs_.D, regs_.E);
+        logging::debug("\t%2s  %2s\t%02X  %02X", "H", "L", regs_.H, regs_.L);
+        logging::debug("\t%2s = %04X", "PC", regs_.PC);
+        logging::debug("\t%2s = %04X", "SP", regs_.SP);
+        logging::debug("\tFlags: Z (%u), N (%u), H (%u), C (%u)",
+                       regs_.F.zf.get(), regs_.F.n.get(),
+                       regs_.F.h.get(), regs_.F.cy.get());
     }
     return true;
 }
