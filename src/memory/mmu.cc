@@ -20,11 +20,11 @@ MMU::~MMU()
         delete this->mbc_;
     if (this->fd_ != 0)
         close(this->fd_);
-    delete this->vram_;
-    delete this->wram_;
-    delete this->oam_;
-    delete this->io_;
-    delete this->hram_;
+    delete[] this->vram_;
+    delete[] this->wram_;
+    delete[] this->oam_;
+    delete[] this->io_;
+    delete[] this->hram_;
 }
 
 bool MMU::load_rom(std::string filename)
