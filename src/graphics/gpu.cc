@@ -2,12 +2,10 @@
 #include <iostream>
 
 GPU::GPU(MMU& mmu)
-    : mmu_ (mmu), wait_count (456)
+    : mmu_ (mmu), wait_count (456), display_ (nullptr)
 {
-#if _DISPLAY_BACKEND == 0
+#if _TARGET == 0
     this->display_ = new SDLDisplay("nebula");
-#else
-# error "You must define a DISPLAY variable at compile time."
 #endif
 
     // Colors

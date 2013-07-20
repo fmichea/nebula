@@ -21,6 +21,7 @@ private:
     MMU             mmu_;
     GPU             gpu_;
     Interrupts      int_;
+    Keyboard        kb_;
 };
 
 #endif // !Z___HH_

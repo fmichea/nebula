@@ -1,7 +1,7 @@
 #ifndef SDLDISPLAY_HH_
 # define SDLDISPLAY_HH_
 
-# if _DISPLAY_BACKEND == 0
+# if _TARGET == 0
 
 #  include <SDL/SDL.h>
 

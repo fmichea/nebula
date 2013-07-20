@@ -40,9 +40,11 @@ IF(NOT DEFINED _DISPLAY_BACKEND)
     MESSAGE(FATAL_ERROR "You must define the display backend to compile for.")
 ELSEIF(_DISPLAY_BACKEND MATCHES "SDL")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I/usr/include/SDL")
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_DISPLAY_BACKEND=0")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_TARGET=0")
     SET(NEBULA_SRCS ${NEBULA_SRCS}
-                    src/graphics/displays/sdldisplay.cc)
+                    src/graphics/displays/sdldisplay.cc
+                    src/keyboard/handlers/sdlkbhandler.cc
+    )
 ELSE()
     MESSAGE(FATAL_ERROR "THis is not a known display backend.")
 ENDIF()
