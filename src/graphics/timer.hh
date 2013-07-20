@@ -1,10 +1,13 @@
 #ifndef TIMER_HH_
 # define TIMER_HH_
 
-# include <SDL/SDL.h>
+# include <stdint.h>
+# include <unistd.h>
+# include <sys/time.h>
+
 # include "../logging.hh"
 
-# define ELAPSED_FRAME 16
+# define ELAPSED_FRAME 16742
 
 class Timer
 {
@@ -14,7 +17,10 @@ public:
     void adjust();
 
 private:
-    unsigned int last_;
+    uint64_t tick();
+
+private:
+    uint64_t last_;
 };
 
 #endif // !TIMER_HH_
