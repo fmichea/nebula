@@ -1,7 +1,5 @@
 #include "sdldisplay.hh"
 
-#if _DISPLAY_BACKEND == 0
-
 SDLDisplay::SDLDisplay(const char* windowName)
 {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK);
@@ -41,5 +39,3 @@ uint32_t SDLDisplay::getColor(uint8_t r, uint8_t g, uint8_t b)
 {
     return SDL_MapRGB(this->screen_->format, r, g, b);
 }
-
-#endif // _DISPLAY_BACKEND == 0
