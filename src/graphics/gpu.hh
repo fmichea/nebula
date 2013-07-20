@@ -1,7 +1,6 @@
 #ifndef GPU_HH_
 # define GPU_HH_
 
-# include <SDL/SDL.h>
 # include <list>
 # include <string.h>
 
@@ -10,10 +9,8 @@
 # include "sprites.hh"
 # include "timer.hh"
 
-# define COEF 2
-
-# define WIDTH 160
-# define HEIGHT 144
+# include "displays/display.hh"
+# include "displays/sdldisplay.hh"
 
 # define LCDC_MODE_0 0
 # define LCDC_MODE_1 1
@@ -32,10 +29,11 @@ private:
     void draw_line();
 
     MMU&            mmu_;
-    SDL_Surface*    screen_;
-    unsigned int    colors_[4];
     Timer           timer_;
     int16_t         wait_count;
+
+    Display*        display_;
+    uint32_t        colors_[4];
 };
 
 #endif // !GPU_HH_

@@ -19,6 +19,7 @@ SET(NEBULA_SRCS
     src/commandline.cc
     src/graphics/bgwtile.cc
     src/graphics/gpu.cc
+    src/graphics/displays/sdldisplay.cc
     src/graphics/sprites.cc
     src/graphics/timer.cc
     src/keyboard/keyboard.cc

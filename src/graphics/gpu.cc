@@ -4,22 +4,22 @@
 GPU::GPU(MMU& mmu)
     : mmu_ (mmu), wait_count (456)
 {
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK);
-    this->screen_ = SDL_SetVideoMode(WIDTH * COEF, HEIGHT * COEF, 32,
-                                     SDL_SWSURFACE);
-    SDL_WM_SetCaption("nebula", 0);
-    SDL_FillRect(this->screen_, 0, SDL_MapRGB(this->screen_->format, 255, 255, 255));
+#if _DISPLAY_BACKEND == 0
+    this->display_ = new SDLDisplay("nebula");
+#else
+# error "You must define a DISPLAY variable at compile time."
+#endif
 
     // Colors
-    this->colors_[0] = SDL_MapRGB(this->screen_->format, 255, 255, 255);
-    this->colors_[1] = SDL_MapRGB(this->screen_->format, 192, 192, 192);
-    this->colors_[2] = SDL_MapRGB(this->screen_->format, 96, 96, 96);
-    this->colors_[3] = SDL_MapRGB(this->screen_->format, 0, 0, 0);
+    this->colors_[0] = this->display_->getColor(255, 255, 255);
+    this->colors_[1] = this->display_->getColor(192, 192, 192);
+    this->colors_[2] = this->display_->getColor(96, 96, 96);
+    this->colors_[3] = this->display_->getColor(0, 0, 0);
 }
 
 GPU::~GPU()
 {
-    SDL_Quit();
+    delete this->display_;
 }
 
 void GPU::do_cycle(uint8_t cycles)
@@ -52,7 +52,7 @@ void GPU::do_cycle(uint8_t cycles)
             this->timer_.adjust();
             this->mmu_.IF.set(this->mmu_.IF.get() | 0x1);
             this->mmu_.LY.set(0);
-            SDL_Flip(this->screen_);
+            this->display_->commit();
             break;
         case LCDC_MODE_2:
             this->wait_count += 80;
@@ -73,7 +73,7 @@ void GPU::draw_line()
     uint8_t scx = this->mmu_.SCX.get();
     uint8_t ds = this->mmu_.LCDC.BGTMDS.get();
 
-    SDL_LockSurface(this->screen_);
+    this->display_->lock();
     memset(bkg, 0, WIDTH);
 
     // Real background.
@@ -128,22 +128,18 @@ void GPU::draw_line()
     }
 
     // Drawing of the final background and objects.
-    SDL_Rect rect;
-    rect.y = this->mmu_.LY.get() * COEF;
-    rect.w = COEF;
-    rect.h = COEF;
+    uint8_t y = this->mmu_.LY.get();
     for (uint8_t x = 0; x < WIDTH; x++)
     {
         int res = 0;
-        rect.x = x * COEF;
         if (objs[x] == 0xff && !this->mmu_.LCDC.BGD.get())
-            res = SDL_FillRect(this->screen_, &rect, this->colors_[0]);
+            res = this->display_->setPixel(x, y, this->colors_[0]);
         else if (objs[x] != 0xff)
-            res = SDL_FillRect(this->screen_, &rect, this->colors_[objs[x]]);
+            res = this->display_->setPixel(x, y, this->colors_[objs[x]]);
         else
-            res = SDL_FillRect(this->screen_, &rect, this->colors_[bkg[x]]);
+            res = this->display_->setPixel(x, y, this->colors_[bkg[x]]);
         if (res < 0)
             logging::error("SDL_FillRect failed: %s", SDL_GetError());
     }
-    SDL_UnlockSurface(this->screen_);
+    this->display_->unlock();
 }
