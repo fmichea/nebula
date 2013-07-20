@@ -1,5 +1,6 @@
 #include "keyboard.hh"
 
+#if 0
 static s_keybinding keybindings[NB_KEYBINDINGS] = {
     // Direction Keys.
     { .key = SDLK_DOWN, .bit = 3, .request = 4 },
@@ -13,9 +14,11 @@ static s_keybinding keybindings[NB_KEYBINDINGS] = {
     { .key = SDLK_q, .bit = 1, .request = 5 }, // A
     { .key = SDLK_a, .bit = 0, .request = 5 }, // B
 };
+#endif
 
 void keyboard_cycle(MMU& mmu)
 {
+#if 0
     SDL_Event   event;
     uint8_t     joyp;
     bool        joyp_changed = false;
@@ -51,4 +54,7 @@ void keyboard_cycle(MMU& mmu)
     // Keyboard interrupt requested when key pressed.
     if (joyp_changed)
         mmu.IF.set(mmu.IF.get() | 0x10);
+#else
+    (void) mmu;
+#endif
 }
