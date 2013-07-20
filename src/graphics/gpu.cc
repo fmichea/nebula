@@ -139,7 +139,7 @@ void GPU::draw_line()
         else
             res = this->display_->setPixel(x, y, this->colors_[bkg[x]]);
         if (res < 0)
-            logging::error("SDL_FillRect failed: %s", SDL_GetError());
+            logging::error("Display::setPixel failed: %s", SDL_GetError());
     }
     this->display_->unlock();
 }
