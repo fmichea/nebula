@@ -84,7 +84,10 @@ for func in ['bit_%s_%s', 'set_%s_%s', 'res_%s_%s']:
         for bit in xrange(8):
             cb.write('x3', func % (bit, reg.lower()), func % ('nb', '1B_reg'), reg, bit)
     for bit in xrange(8):
-        cb.write('h2', func % (bit, 'mhl'), func % ('nb', '1B_reg'), bit)
+        delay = 8
+        if func.startswith('bit'):
+            delay = 4
+        cb.write('h3', func % (bit, 'mhl'), func % ('nb', '1B_reg'), bit, delay)
 
 # Disassembly
 dis = DefMacro('disass.def')
