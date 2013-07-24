@@ -726,12 +726,6 @@ uint16_t ldh_ma8_a(MMU& mmu, Z80Registers& regs)
     return P(2, 12);
 }
 
-//uint16_t ld_ma16_a(MMU& mmu, Z80Registers& regs)
-//{
-//    mmu.write<uint8_t>(mmu.read<uint16_t>(regs.PC + 1), regs.A);
-//    return P(3, 16);
-//}
-
 uint16_t ld_mc_a(MMU& mmu, Z80Registers& regs)
 {
     mmu.write<uint8_t>(0xff00 + regs.C, regs.A);
