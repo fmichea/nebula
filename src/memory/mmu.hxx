@@ -55,15 +55,12 @@ void MMU::write(uint16_t addr, T value)
     else if (0xFEA0 <= addr && addr < 0xFF00) // Not usable
         return;
     else if (0xFF00 <= addr && addr < 0xFF80) { // I/O Ports
-        if (addr == this->DIV.addr())
-            this->DIV.set(0);
+        if (addr == this->DIV.addr() || addr == this->LY.addr())
+            value = 0;
         ptr = (T*) (this->io_ + addr - 0xFF00);
     } else if (0xFF80 <= addr)
         ptr = (T*) (this->hram_ + addr - 0xFF80);
 
-    // Special register LY/DIV reset when wrote on.
-    if (addr == 0xFF44 || addr == 0xFF04)
-        value = 0;
     // DMA Transfer and Start Address
     if (addr == 0xFF46)
     {
