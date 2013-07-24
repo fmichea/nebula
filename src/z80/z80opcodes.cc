@@ -525,12 +525,12 @@ uint16_t daa(MMU& mmu, Z80Registers& regs)
 
 uint16_t inc_mhl(MMU& mmu, Z80Registers& regs)
 {
-    uint8_t tmp = mmu.read<uint8_t>(regs.HL.get());
+    uint8_t tmp = mmu.read<uint8_t>(regs.HL.get()) + 1;
 
-    mmu.write<uint8_t>(regs.HL.get(), tmp + 1);
+    mmu.write<uint8_t>(regs.HL.get(), tmp);
     regs.F.n.set(0);
-    regs.F.h.set((0xf & tmp) == 0xf ? 0x1 : 0x0);
-    regs.F.zf.set(tmp == 0xff ? 0x1 : 0x0);
+    regs.F.h.set((tmp & 0xf) == 0x0 ? 0x1 : 0x0);
+    regs.F.zf.set(tmp == 0x0 ? 0x1 : 0x0);
     return P(1, 12);
 }
 
