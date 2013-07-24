@@ -14,11 +14,12 @@ BGWTile::BGWTile(MMU& mmu, uint8_t x, uint8_t y, uint8_t data_select)
     base = mmu.LCDC.BGWTDS.get() ? 0x8000 : 0x8800;
     base += TILE_SZ * tile_number + (y % 8) * 2;
 
-    uint16_t colors = mmu.read<uint16_t>(base);
+    uint8_t colors1 = mmu.read<uint8_t>(base);
+    uint8_t colors2 = mmu.read<uint8_t>(base + 1);
     for (uint8_t it = 0; it < 8; ++it)
     {
-        this->colors_[it] = (colors >> (15 - it)) & 0x1;
-        this->colors_[it] += 2 * ((colors >> (7 - it)) & 0x1);
+        this->colors_[it] = (colors1 >> (7 - it)) & 0x1;
+        this->colors_[it] += 2 * ((colors2 >> (7 - it)) & 0x1);
     }
 }
 
