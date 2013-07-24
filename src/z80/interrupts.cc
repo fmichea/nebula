@@ -20,9 +20,9 @@ void Interrupts::manage_interrupts()
     {
         if ((state >> it) & 0x1)
         {
-            this->regs_.IME = false;
             this->mmu_.IF.set(if_flag & (~(0x1 << it)));
             this->regs_.PC -= 1;
+            di(this->mmu_, this->regs_);
             rst_nn(this->mmu_, this->regs_, ints[it]);
             break;
         }
