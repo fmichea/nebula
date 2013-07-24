@@ -54,9 +54,11 @@ void MMU::write(uint16_t addr, T value)
         ptr = (T*) (this->oam_ + addr - 0xFE00);
     else if (0xFEA0 <= addr && addr < 0xFF00) // Not usable
         return;
-    else if (0xFF00 <= addr && addr < 0xFF80) // I/O Ports
+    else if (0xFF00 <= addr && addr < 0xFF80) { // I/O Ports
+        if (addr == this->DIV.addr())
+            this->DIV.set(0);
         ptr = (T*) (this->io_ + addr - 0xFF00);
-    else if (0xFF80 <= addr)
+    } else if (0xFF80 <= addr)
         ptr = (T*) (this->hram_ + addr - 0xFF80);
 
     // Special register LY/DIV reset when wrote on.

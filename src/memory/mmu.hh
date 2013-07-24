@@ -26,8 +26,8 @@ class MMU
             : reg_ (0)
         {}
 
-        Register(uint8_t* reg)
-            : reg_ (reg)
+        Register(uint8_t* reg, uint16_t addr)
+            : reg_ (reg), addr_ (addr)
         {}
 
         void set(uint8_t val)
@@ -40,8 +40,14 @@ class MMU
             return *this->reg_;
         }
 
+        uint16_t addr()
+        {
+            return this->addr_;
+        }
+
     private:
         uint8_t*    reg_;
+        uint16_t    addr_;
     };
 
 public:

@@ -153,8 +153,8 @@ bool MMU::load_mbc(uint8_t val)
 
 bool MMU::reset_registers()
 {
-#define X(Reg, Addr, Value)                             \
-    this->Reg = Register(this->io_ + Addr - 0xff00);    \
+#define X(Reg, Addr, Value)                                     \
+    this->Reg = Register(this->io_ + Addr - 0xff00, Addr);      \
     this->Reg.set(Value);
 #include "registers.hh"
 #undef X
@@ -168,7 +168,7 @@ bool MMU::reset_registers()
     this->io_[0xff48 - 0xff00] = 0xFF;
     this->OBP[1] = PaletteProxy(this->io_ + 0xff49 - 0xff00);
     this->io_[0xff49 - 0xff00] = 0xFF;
-    this->IE = Register(this->hram_ + 0xffff - 0xff80);
+    this->IE = Register(this->hram_ + 0xffff - 0xff80, 0xffff);
     this->IE.set(0x00);
     this->write<uint8_t>(0xFF00, 0x3f);
     return true;
