@@ -595,8 +595,8 @@ uint16_t adc_a_mhl(MMU& mmu, Z80Registers& regs)
 uint16_t sub_a_mhl(MMU& mmu, Z80Registers& regs)
 {
     uint8_t val = mmu.read<uint8_t>(regs.HL.get());
-    uint32_t tmp = regs.A - val;
-    uint16_t tmp_ = (regs.A & 0xf) - (val & 0xf);
+    uint16_t tmp = regs.A - val;
+    uint8_t tmp_ = (regs.A & 0xf) - (val & 0xf);
 
     regs.A = tmp;
     regs.F.zf.set(regs.A == 0 ? 0x1 : 0x0);
