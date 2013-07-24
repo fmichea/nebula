@@ -395,7 +395,7 @@ uint16_t jump_mhl(MMU& mmu, Z80Registers& regs)
 {
     (void) mmu;
     regs.PC = regs.HL.get();
-    return P(0, 8);
+    return P(0, 4);
 }
 
 uint16_t jr_if(MMU& mmu, Z80Registers& regs, uint8_t val)
