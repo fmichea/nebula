@@ -821,8 +821,7 @@ uint16_t cp_a_d8(MMU& mmu, Z80Registers& regs)
 uint16_t reti(MMU& mmu, Z80Registers& regs)
 {
     ei(mmu, regs);
-    ret(mmu, regs);
-    return P(0, 16);
+    return ret(mmu, regs);
 }
 
 uint16_t cb(MMU& mmu, Z80Registers& regs)
