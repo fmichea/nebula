@@ -55,6 +55,12 @@ void MMU::write(uint16_t addr, T value)
     else if (0xFEA0 <= addr && addr < 0xFF00) // Not usable
         return;
     else if (0xFF00 <= addr && addr < 0xFF80) { // I/O Ports
+        if (addr == this->STAT.addr()) { // First three bits are read-only.
+            //logging::info("stat: %x", value);
+            ptr = (T*) (this->io_ + addr - 0xff00);
+            *ptr = (*ptr & 0x07) | (value & 0xf8);
+            return;
+        }
         if (addr == this->DIV.addr() || addr == this->LY.addr())
             value = 0;
         ptr = (T*) (this->io_ + addr - 0xFF00);

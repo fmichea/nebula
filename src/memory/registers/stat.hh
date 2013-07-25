@@ -21,6 +21,8 @@ public:
         this->mode = BitProxy(reg, 0, 0x3);
     }
 
+    uint16_t addr() { return 0xFF41; }
+
     BitProxy coin_int; // LYC = LY Coincidence Interrupt (1 = Enable)
     BitProxy OAM_int; // Mode 2 (OAM Interrupt)
     BitProxy VBlank_int; // Mode 1 (V-Blank Interrupt)
