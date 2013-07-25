@@ -65,7 +65,7 @@ void* MBC1::write_address(uint16_t addr, uint16_t value)
     // Mode Select
     if (0x6000 <= addr && addr <= 0x7fff)
     {
-        this->mbc_mode_ = (value & 0x1) ? MODE_16_8 : MODE_4_32;
+        this->mbc_mode_ = (value & 0x1) ? MODE_4_32 : MODE_16_8;
         return NULL;
     }
 
