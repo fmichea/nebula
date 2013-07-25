@@ -3,7 +3,7 @@
 MMU::MMU()
     : stopped(false), fd_ (0), mbc_ (0)
 {
-    this->rom_ = 0;
+    this->rom_ = new uint8_t[0x2000000];
     this->vram_ = new uint8_t[0x2000];
     memset(this->vram_, 0, 0x2000);
     this->wram_ = new uint8_t[0x8000];
@@ -15,12 +15,11 @@ MMU::MMU()
 
 MMU::~MMU()
 {
-    if (this->rom_ != 0)
-        free(this->rom_);
     if (this->mbc_ != 0)
         delete this->mbc_;
     if (this->fd_ != 0)
         close(this->fd_);
+    delete[] this->rom_;
     delete[] this->vram_;
     delete[] this->wram_;
     delete[] this->oam_;
@@ -40,7 +39,6 @@ bool MMU::load_rom(std::string filename)
     this->size_ = stat.st_size;
     char* mapped = (char*) mmap(0, stat.st_size, PROT_READ, MAP_PRIVATE,
                                 this->fd_, 0);
-    this->rom_ = (uint8_t*) malloc(this->size_ * sizeof (uint8_t));
     if (this->rom_ == MAP_FAILED)
         return false;
     memcpy(this->rom_, mapped, stat.st_size);
