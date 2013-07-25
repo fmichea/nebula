@@ -16,13 +16,13 @@ Sprite::Sprite(MMU& mmu, s_sprite& sprite, uint8_t y)
     else
         addr += (y - this->y_) * 2;
 
-    uint8_t colors1 = mmu.read<uint8_t>(addr);
-    uint8_t colors2 = mmu.read<uint8_t>(addr + 1);
+    uint16_t colors = mmu.read<uint16_t>(addr);
+
     for (int it = 0; it < 8; ++it)
     {
         uint8_t shift = (sprite.flags.x_flip ? it : 7 - it);
-        this->line_[it] = (colors1 >> shift) & 0x1;
-        this->line_[it] += 0x2 * ((colors2 >> shift) & 0x1);
+        this->line_[it] = (colors >> (8 + shift)) & 0x1;
+        this->line_[it] += 0x2 * ((colors >> shift) & 0x1);
     }
 }
 
