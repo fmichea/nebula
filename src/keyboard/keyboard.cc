@@ -58,5 +58,5 @@ void Keyboard::do_cycle(MMU& mmu)
 
     // Keyboard interrupt requested when key pressed.
     if (joyp_changed)
-        mmu.IF.set(mmu.IF.get() | 0x10);
+        mmu.IF.set(mmu.IF.get() | INTERRUPT_JOYPAD);
 }
