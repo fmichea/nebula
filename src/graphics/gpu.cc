@@ -31,7 +31,7 @@ void GPU::do_cycle(uint8_t cycles)
             if (this->mmu_.LY.get() == this->mmu_.LYC.get())
             {
                 this->mmu_.STAT.coin_int.set(1);
-                this->mmu_.IF.set(this->mmu_.IF.get() | 0x2);
+                this->mmu_.IF.set(this->mmu_.IF.get() | INTERRUPT_STAT);
             }
             else
                 this->mmu_.STAT.coin_int.set(0);
@@ -48,7 +48,7 @@ void GPU::do_cycle(uint8_t cycles)
             this->mmu_.STAT.mode.set(LCDC_MODE_2);
             this->wait_count += 4560; // Cycles for V-Blank.
             this->timer_.adjust();
-            this->mmu_.IF.set(this->mmu_.IF.get() | 0x1);
+            this->mmu_.IF.set(this->mmu_.IF.get() | INTERRUPT_VBLANK);
             this->mmu_.LY.set(0);
             this->display_->commit();
             break;

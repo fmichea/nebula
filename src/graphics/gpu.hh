@@ -4,6 +4,7 @@
 # include <list>
 # include <string.h>
 
+# include "../z80/interrupts.hh"
 # include "../memory/mmu.hh"
 # include "bgwtile.hh"
 # include "sprites.hh"
