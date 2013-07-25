@@ -6,6 +6,12 @@
 # include "z80registers.hh"
 # include "z80opcodes.hh"
 
+# define INTERRUPT_VBLANK   (1 << 0)
+# define INTERRUPT_STAT     (1 << 1)
+# define INTERRUPT_TIMER    (1 << 2)
+# define INTERRUPT_SERIAL   (1 << 3)
+# define INTERRUPT_JOYPAD   (1 << 4)
+
 class Interrupts
 {
 public:
