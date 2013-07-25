@@ -35,9 +35,19 @@ void* MBC1::write_address(uint16_t addr, uint16_t value)
     // ROM Bank Select
     if (0x2000 <= addr && addr <= 0x3fff)
     {
-        this->rom_bank_ = value & 0x1f;
-        if (!this->rom_bank_)
-            this->rom_bank_ = 0x1;
+        if (this->mbc_mode_ == MODE_16_8)
+            this->rom_bank_ &= ~0x1f;
+        else
+            this->rom_bank_ = 0;
+        this->rom_bank_ |= value & 0x1f;
+        switch (this->rom_bank_) {
+        case 0x00:
+        case 0x20:
+        case 0x40:
+        case 0x60:
+            this->rom_bank_ += 0x1;
+            break;
+        };
         return NULL;
     }
 
