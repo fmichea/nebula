@@ -174,17 +174,15 @@ bool MMU::reset_registers()
     return true;
 }
 
-// TODO: Check if this is necessary or not.
-//
-//template<>
-//uint16_t MMU::read<uint16_t>(uint16_t addr) {
-//    uint16_t res = this->read<uint8_t>(addr);
-//    res |= ((uint16_t) this->read<uint8_t>(addr + 1)) << 8;
-//    return res;
-//}
-//
-//template<>
-//void MMU::write<uint16_t>(uint16_t addr, uint16_t value) {
-//    this->write<uint8_t>(addr, value & 0xff);
-//    this->write<uint8_t>(addr + 1, (value >> 8) & 0xff);
-//}
+template<>
+uint16_t MMU::read<uint16_t>(uint16_t addr) {
+    uint16_t res = this->read<uint8_t>(addr);
+    res |= ((uint16_t) this->read<uint8_t>(addr + 1)) << 8;
+    return res;
+}
+
+template<>
+void MMU::write<uint16_t>(uint16_t addr, uint16_t value) {
+    this->write<uint8_t>(addr, value & 0xff);
+    this->write<uint8_t>(addr + 1, (value >> 8) & 0xff);
+}

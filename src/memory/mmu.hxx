@@ -73,4 +73,7 @@ void MMU::write(uint16_t addr, T value)
         *ptr = value;
 }
 
+template<> uint16_t MMU::read<uint16_t>(uint16_t addr);
+template<> void MMU::write<uint16_t>(uint16_t addr, uint16_t value);
+
 #endif // !MMU_HXX_

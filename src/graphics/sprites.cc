@@ -21,8 +21,8 @@ Sprite::Sprite(MMU& mmu, s_sprite& sprite, uint8_t y)
     for (int it = 0; it < 8; ++it)
     {
         uint8_t shift = (sprite.flags.x_flip ? it : 7 - it);
-        this->line_[it] = (colors >> (8 + shift)) & 0x1;
-        this->line_[it] += 0x2 * ((colors >> shift) & 0x1);
+        this->line_[it] = (colors >> shift) & 0x1;
+        this->line_[it] += 0x2 * ((colors >> (8 + shift)) & 0x1);
     }
 }
 
