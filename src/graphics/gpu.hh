@@ -13,6 +13,11 @@
 # include "displays/display.hh"
 # include "displays/sdldisplay.hh"
 
+# define LCDC_MODE_0_CLKS   201
+# define LCDC_MODE_1_CLKS   4560
+# define LCDC_MODE_2_CLKS   77
+# define LCDC_MODE_3_CLKS   169
+
 # define LCDC_MODE_0 0
 # define LCDC_MODE_1 1
 # define LCDC_MODE_2 2
