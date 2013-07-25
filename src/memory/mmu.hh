@@ -76,7 +76,7 @@ private:
     bool load_ram_size(uint8_t val);
     bool reset_registers();
 
-    char            title_[0x15];
+    char            title_[0x18];
     int             fd_;
     MBC*            mbc_;
     size_t          size_;

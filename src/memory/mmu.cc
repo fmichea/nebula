@@ -10,6 +10,7 @@ MMU::MMU()
     this->oam_ = new uint8_t[0xA0];
     this->io_ = new uint8_t[0x80];
     this->hram_ = new uint8_t[0x80];
+    memset(this->title_, 0, 0x18);
 }
 
 MMU::~MMU()
