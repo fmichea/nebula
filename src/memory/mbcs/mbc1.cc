@@ -70,8 +70,12 @@ void* MBC1::write_address(uint16_t addr, uint16_t value)
     }
 
     // RAM Write
-    if (0xa000 <= addr && addr <= 0xbfff)
-        return (this->ram_ + addr - 0xa000 + this->ram_bank_ * 0x2000);
+    if (0xa000 <= addr && addr <= 0xbfff) {
+        if (this->mbc_mode_ == MODE_4_32)
+            return (this->ram_ + addr - 0xa000 + this->ram_bank_ * 0x2000);
+        else
+            return (this->ram_ + addr - 0xa000);
+    }
 
     // ROM Write
     return (this->rom_ + addr);
