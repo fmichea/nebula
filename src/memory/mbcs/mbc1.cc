@@ -1,7 +1,7 @@
 #include "mbc1.hh"
 
 MBC1::MBC1(void* rom)
-    : MBC(rom), rom_bank_ (1), ram_bank_ (0)
+    : MBC(rom), mbc_mode_ (MODE_16_8), rom_bank_ (1), ram_bank_ (0)
 {}
 
 void* MBC1::read_address(uint16_t addr)
