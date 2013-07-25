@@ -10,12 +10,13 @@ void Interrupts::manage_interrupts()
 
     uint8_t if_flag = this->mmu_.IF.get();
     uint8_t state = mmu_.IE.get() & if_flag;
+
+    if (!this->regs_.IME || !state)
+        return;
     logging::debug("IE = %02X; IF = %02X; state = %02X;", mmu_.IE.get(),
                    if_flag, state);
     if (state)
         this->regs_.halt_mode = false;
-    if (!this->regs_.IME)
-        return;
     for (uint8_t it = 0; it < 5 && state; ++it)
     {
         if ((state >> it) & 0x1)
