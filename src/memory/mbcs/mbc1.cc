@@ -15,8 +15,12 @@ void* MBC1::read_address(uint16_t addr)
         return (this->rom_ + addr + 0x4000 * (this->rom_bank_ - 1));
 
     // RAM Bank 00 - 03
-    if (0xa000  <= addr && addr <= 0xbfff)
-        return (this->ram_ + addr - 0xa000 + 0x2000 * this->ram_bank_);
+    if (0xa000  <= addr && addr <= 0xbfff) {
+        if (this->mbc_mode_ == MODE_4_32)
+            return (this->ram_ + addr - 0xa000 + 0x2000 * this->ram_bank_);
+        else
+            return (this->ram_ + addr - 0xa000);
+    }
 
     // Other cases, we just return rom.
     return (this->rom_ + addr);
