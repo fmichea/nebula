@@ -16,13 +16,15 @@ bool Z80::execute()
         if (!this->regs_.halt_mode)
         {
             uint8_t opcode = this->mmu_.read<uint8_t>(this->regs_.PC);
+            uint8_t mem1 = this->mmu_.read<uint8_t>(this->regs_.PC + 1);
+            uint8_t mem2 = this->mmu_.read<uint8_t>(this->regs_.PC + 2);
+            logging::verbose("PC: %04X | OPCODE: %02X | MEM: %02X%02X",
+                             this->regs_.PC, opcode, mem1, mem2);
             if (OPCODES[opcode] == 0) {
                 fprintf(stderr, "Unknown opcodes %02X...", opcode);
                 return false;
             }
-            logging::verbose("[%x] Opcode : %02X, PC : %04X", count, opcode,
-                             this->regs_.PC);
-            print_disassembly(this->mmu_, this->regs_);
+            //print_disassembly(this->mmu_, this->regs_);
             res = OPCODES[opcode](this->mmu_, this->regs_);
         }
 
