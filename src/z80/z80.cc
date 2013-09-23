@@ -18,8 +18,8 @@ bool Z80::execute()
             uint8_t opcode = this->mmu_.read<uint8_t>(this->regs_.PC);
             uint8_t mem1 = this->mmu_.read<uint8_t>(this->regs_.PC + 1);
             uint8_t mem2 = this->mmu_.read<uint8_t>(this->regs_.PC + 2);
-            logging::verbose("PC: %04X | OPCODE: %02X | MEM: %02X%02X",
-                             this->regs_.PC, opcode, mem1, mem2);
+            logging::debug("PC: %04X | OPCODE: %02X | MEM: %02X%02X",
+                           this->regs_.PC, opcode, mem1, mem2);
             if (OPCODES[opcode] == 0) {
                 fprintf(stderr, "Unknown opcodes %02X...", opcode);
                 return false;
@@ -35,15 +35,15 @@ bool Z80::execute()
         this->int_.manage_interrupts();
         count += 1;
 
-        logging::debug("\tState after execution:");
-        logging::debug("\tR1  R2\tV1  V2");
-        logging::debug("\t%2s  %2s\t%02X  %02X", "A", "A", regs_.A, regs_.A);
-        logging::debug("\t%2s  %2s\t%02X  %02X", "B", "C", regs_.B, regs_.C);
-        logging::debug("\t%2s  %2s\t%02X  %02X", "D", "E", regs_.D, regs_.E);
-        logging::debug("\t%2s  %2s\t%02X  %02X", "H", "L", regs_.H, regs_.L);
-        logging::debug("\t%2s = %04X", "PC", regs_.PC);
-        logging::debug("\t%2s = %04X", "SP", regs_.SP);
-        logging::debug("\tFlags: Z (%u), N (%u), H (%u), C (%u)",
+        logging::verbose("\tState after execution:");
+        logging::verbose("\tR1  R2\tV1  V2");
+        logging::verbose("\t%2s  %2s\t%02X  %02X", "A", "A", regs_.A, regs_.A);
+        logging::verbose("\t%2s  %2s\t%02X  %02X", "B", "C", regs_.B, regs_.C);
+        logging::verbose("\t%2s  %2s\t%02X  %02X", "D", "E", regs_.D, regs_.E);
+        logging::verbose("\t%2s  %2s\t%02X  %02X", "H", "L", regs_.H, regs_.L);
+        logging::verbose("\t%2s = %04X", "PC", regs_.PC);
+        logging::verbose("\t%2s = %04X", "SP", regs_.SP);
+        logging::verbose("\tFlags: Z (%u), N (%u), H (%u), C (%u)",
                        regs_.F.zf.get(), regs_.F.n.get(),
                        regs_.F.h.get(), regs_.F.cy.get());
     }
