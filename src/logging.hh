@@ -11,16 +11,16 @@ namespace logging {
         INFO        = 1,
         WARNING     = 2,
         ERROR       = 3,
-        VERBOSE     = 4,
-        DEBUG       = 5,
+        DEBUG       = 4,
+        VERBOSE     = 5,
     };
     void init(level lvl);
 
     int info(const char* format, ...);
     int warning(const char* format, ...);
     int error(const char* format, ...);
-    int verbose(const char* format, ...);
     int debug(const char* format, ...);
+    int verbose(const char* format, ...);
 }
 
 #endif // !LOGGING_HH_
