@@ -51,7 +51,7 @@ bool MMU::load_rom(std::string filename)
         "\xbb\xbb\x67\x63\x6e\x0e\xec\xcc\xdd\xdc\x99\x9f\xbb\xb9\x33\x3e";
     if (memcmp(nintendo_logo, this->rom_ + 0x104, 0x30))
     {
-        logging::warning("Nintendo logo doesn't match!");
+        logging::error("Nintendo logo doesn't match!");
         return false;
     }
 
@@ -114,7 +114,24 @@ bool MMU::load_ram_size(uint8_t val)
 
 bool MMU::load_mbc(uint8_t val)
 {
-    std::string name;
+    const char* names[0x1F] = {
+        "ROM ONLY", /* 0x00 */
+        "MBC1", "MBC1+RAM", "MBC1+RAM+BATTERY", /* 0x01 -> 0x03 */
+        nullptr,
+        "MBC2", "MBC2+BATTERY", /* 0x05 -> 0x06 */
+        nullptr,
+        "ROM+RAM", "ROM+RAM+BATTERY", /* 0x08 -> 0x09 */
+        nullptr,
+        "MMM01", "MMM01+RAM", "MMM01+RAM+BATTERY", /* 0x0B -> 0x0D */
+        nullptr,
+        "MBC3+TIMER+BATTERY", "MBC3+TIMER+RAM+BATTERY", "MBC3", "MBC3+RAM",
+        "MBC3+RAM+BATTERY", /* 0x0F -> 0x13 */
+        nullptr,
+        "MBC4", "MBC4+RAM", "MBC4+RAM+BATTERY", /* 0x15 -> 0x17 */
+        nullptr,
+        "MBC5", "MBC5+RAM", "MBC5+RAM+BATTERY", "MBC5+RUMBLE+RAM",
+        "MBC5+RUMBLE+RAM+BATTERY" /* 0x19 -> 0x1E */
+    };
 
     // MBC Setting.
     switch (val)
@@ -130,24 +147,34 @@ bool MMU::load_mbc(uint8_t val)
     };
 
     // Name
-    switch (val)
-    {
-    case 0x00:
-        name = "ROM Only";
-        break;
-    case 0x01:
-        name = "MBC1";
-        break;
-    case 0x02:
-        name = "MBC1+RAM";
-        break;
-    case 0x03:
-        name = "MBC1+RAM+BATTERY";
-        break;
-    };
-    if (name.size() != 0)
-        logging::info("Memory type: %s", name.c_str());
-    return (this->mbc_ != 0);
+    const char* name = nullptr;
+    if (val <= 0x1E)
+        name = names[val];
+    else {
+        switch (val) {
+        case 0xFC:
+            name = "POCKET CAMERA";
+            break;
+        case 0xFD:
+            name = "BANDAI TAMA5";
+            break;
+        case 0xFE:
+            name = "HuC3";
+            break;
+        case 0xFF:
+            name = "HuC1+RAM+BATTERY";
+            break;
+        };
+    }
+    if (name != 0)
+        logging::info("Cartridge type: %s", name);
+    else
+        logging::error("Cartridge type is not a known value.");
+
+    if (this->mbc_ == nullptr)
+        logging::error("This cartridge type was not implemented.");
+
+    return (name != nullptr && this->mbc_ != nullptr);
 }
 
 bool MMU::reset_registers()
