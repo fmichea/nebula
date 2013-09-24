@@ -144,6 +144,14 @@ bool MMU::load_mbc(uint8_t val)
     case 0x03:
         this->mbc_ = new MBC1(this->rom_);
         break;
+    case 0x19:
+    case 0x1A:
+    case 0x1B:
+    case 0x1C:
+    case 0x1D:
+    case 0x1E:
+        this->mbc_ = new MBC5(this->rom_);
+        break;
     };
 
     // Name

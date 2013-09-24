@@ -26,6 +26,7 @@ SET(NEBULA_SRCS
     src/main.cc
     src/memory/mbcs/mbc.cc
     src/memory/mbcs/mbc1.cc
+    src/memory/mbcs/mbc5.cc
     src/memory/mbcs/romonly.cc
     src/memory/mmu.cc
     src/z80/interrupts.cc
