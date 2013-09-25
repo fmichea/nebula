@@ -59,7 +59,7 @@ void* MBC::write_address(uint16_t addr, uint16_t value)
 // different for every controller
 void* MBC::read_rom_address(uint16_t addr)
 {
-    return this->rom_ + addr + 0x4000 * this->rom_bank_;
+    return this->rom_ + addr - 0x4000 + 0x4000 * this->rom_bank_;
 }
 
 // different for every controller
