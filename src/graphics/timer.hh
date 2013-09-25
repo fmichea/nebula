@@ -7,7 +7,10 @@
 
 # include "../logging.hh"
 
-# define ELAPSED_FRAME 16742
+# ifndef BOOSTER
+#  define BOOSTER 100
+#endif
+# define ELAPSED_FRAME static_cast<uint64_t>((16742 * 100) / BOOSTER)
 
 class Timer
 {
