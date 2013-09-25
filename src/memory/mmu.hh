@@ -12,6 +12,8 @@
 # include "../logging.hh"
 # include "mbcs/mbc.hh"
 # include "mbcs/mbc1.hh"
+# include "mbcs/mbc2.hh"
+# include "mbcs/mbc3.hh"
 # include "mbcs/mbc5.hh"
 # include "mbcs/romonly.hh"
 # include "registers/lcdc.hh"
