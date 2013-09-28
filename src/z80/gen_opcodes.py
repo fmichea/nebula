@@ -17,6 +17,7 @@ class DefMacro(object):
         'h1': 'H1(%s, %s)\n',
         'h2': 'H2(%s, %s, %s)\n',
         'h3': 'H3(%s, %s, %s, %s)\n',
+        'h3ro': 'H3RO(%s, %s, %s, %s)\n',
     }
 
     def __init__(self, name):
@@ -84,10 +85,10 @@ for func in ['bit_%s_%s', 'set_%s_%s', 'res_%s_%s']:
         for bit in xrange(8):
             cb.write('x3', func % (bit, reg.lower()), func % ('nb', '1B_reg'), reg, bit)
     for bit in xrange(8):
-        delay = 8
+        hname, delay = 'h3', 8
         if func.startswith('bit'):
-            delay = 4
-        cb.write('h3', func % (bit, 'mhl'), func % ('nb', '1B_reg'), bit, delay)
+            hname, delay = 'h3ro', 4
+        cb.write(hname, func % (bit, 'mhl'), func % ('nb', '1B_reg'), bit, delay)
 
 # Disassembly
 dis = DefMacro('disass.def')
