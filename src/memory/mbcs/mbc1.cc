@@ -24,15 +24,10 @@ void* MBC1::write_rom_bank(uint16_t addr, uint16_t value)
         this->rom_bank_ &= ~0x1F;
     else
         this->rom_bank_ = 0;
-    this->rom_bank_ |= value & 0x1F;
-    switch (this->rom_bank_) {
-    case 0x00:
-    case 0x20:
-    case 0x40:
-    case 0x60:
-        this->rom_bank_ += 0x1;
-        break;
-    };
+    value &= 0x1F;
+    if (value == 0) // ROM select 0x00, 0x20, 0x40, 0x60.
+        value += 1;
+    this->rom_bank_ |= value;
     return NULL;
 }
 
