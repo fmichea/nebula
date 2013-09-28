@@ -84,12 +84,11 @@ private:
     MBC*            mbc_;
     size_t          size_;
     std::string     target_;
-    uint8_t*        rom_;
-    uint8_t*        vram_;
-    uint8_t*        wram_;
-    uint8_t*        oam_;
-    uint8_t*        io_;
-    uint8_t*        hram_;
+
+# define X(Name, Size)      \
+    uint8_t*        Name;
+# include "mmap.def"
+# undef X
 };
 
 # include "mmu.hxx"

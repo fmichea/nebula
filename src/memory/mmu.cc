@@ -3,14 +3,11 @@
 MMU::MMU()
     : stopped(false), fd_ (0), mbc_ (0)
 {
-    this->rom_ = new uint8_t[0x2000000];
-    this->vram_ = new uint8_t[0x2000];
-    memset(this->vram_, 0, 0x2000);
-    this->wram_ = new uint8_t[0x8000];
-    this->oam_ = new uint8_t[0xA0];
-    this->io_ = new uint8_t[0x80];
-    this->hram_ = new uint8_t[0x80];
-    memset(this->title_, 0, 0x18);
+#define X(Name, Size)                   \
+    this->Name = new uint8_t[Size];     \
+    memset(this->Name, 0, Size);
+#include "mmap.def"
+#undef X
 }
 
 MMU::~MMU()
@@ -19,12 +16,10 @@ MMU::~MMU()
         delete this->mbc_;
     if (this->fd_ != 0)
         close(this->fd_);
-    delete[] this->rom_;
-    delete[] this->vram_;
-    delete[] this->wram_;
-    delete[] this->oam_;
-    delete[] this->io_;
-    delete[] this->hram_;
+#define X(Name, Size)               \
+    delete[] this->Name;
+#include "mmap.def"
+#undef X
 }
 
 bool MMU::load_rom(std::string filename)
