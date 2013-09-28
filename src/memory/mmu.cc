@@ -35,8 +35,10 @@ bool MMU::load_rom(std::string filename)
     this->size_ = stat.st_size;
     char* mapped = (char*) mmap(0, stat.st_size, PROT_READ, MAP_PRIVATE,
                                 this->fd_, 0);
-    if (this->rom_ == MAP_FAILED)
+    if (this->rom_ == MAP_FAILED) {
+        logging::error("ROM mapping failed.");
         return false;
+    }
     memcpy(this->rom_, mapped, stat.st_size);
     munmap(mapped, stat.st_size);
 
