@@ -3,11 +3,11 @@
 
 # include "mbc.hh"
 
-typedef enum mbc_mode
+typedef enum
 {
-    MBC_MODE_ROM,
-    MBC_MODE_RAM
-} e_mbc_mode;
+    MBC1_MODE_16_8,
+    MBC1_MODE_4_32,
+} e_mbc1_mode;
 
 
 class MBC1 : public MBC
@@ -23,7 +23,7 @@ private:
     void* write_extra_address(uint16_t addr, uint16_t value);
     void* write_ram_address(uint16_t addr, uint16_t value);
 
-    e_mbc_mode  mbc_mode_;
+    e_mbc1_mode  mbc_mode_;
 };
 
 #endif // !MBC1_HH_

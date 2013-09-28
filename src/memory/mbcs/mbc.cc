@@ -41,7 +41,7 @@ void* MBC::write_address(uint16_t addr, uint16_t value)
     if (0x2000 <= addr && addr <= 0x3fff)
         return this->write_rom_bank(addr, value);
 
-    // RAM Bank Select, different for every controller
+    // ROM/RAM Bank Select, different for every controller
     if (0x4000 <= addr && addr <= 0x5fff)
         return this->write_ram_bank(addr, value);
 
