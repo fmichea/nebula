@@ -555,6 +555,12 @@ uint16_t halt(MMU& mmu, Z80Registers& regs)
 {
     (void) mmu;
     regs.halt_mode = true;
+    if (!regs.IME) {
+        if (regs.halt_bug_pc != 0) {
+            logging::error("Multiple halts with halt bug nested...");
+        }
+        regs.halt_bug_pc = regs.PC + 1;
+    }
     return P(1, 4);
 }
 
