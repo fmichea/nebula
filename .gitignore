@@ -1,4 +1,4 @@
-*.def
+src/z80/*.def
 build-*
 tests
 logs
