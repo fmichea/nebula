@@ -24,14 +24,11 @@ bool Z80::execute()
                 fprintf(stderr, "Unknown opcodes %02X...", opcode);
                 return false;
             }
-            if (this->regs_.PC == this->regs_.halt_bug_pc) {
-                this->regs_.PC -= 1;
-                this->regs_.halt_bug_pc = 0;
-            }
+            //print_disassembly(this->mmu_, this->regs_);
             res = OPCODES[opcode](this->mmu_, this->regs_);
         }
-        this->regs_.PC += (res >> 8) & 0xff;
 
+        this->regs_.PC += (res >> 8) & 0xff;
         this->gpu_.do_cycle(res & 0xff);
         this->kb_.do_cycle(this->mmu_);
         this->int_.manage_timer(res & 0xff);

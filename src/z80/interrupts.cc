@@ -11,7 +11,7 @@ void Interrupts::manage_interrupts()
     uint8_t if_flag = this->mmu_.IF.get();
     uint8_t state = mmu_.IE.get() & if_flag;
 
-    if (!(this->regs_.halt_mode || this->regs_.IME) || !state)
+    if (!this->regs_.IME || !state)
         return;
     logging::debug("IE = %02X; IF = %02X; state = %02X;", mmu_.IE.get(),
                    if_flag, state);

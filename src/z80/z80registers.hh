@@ -71,7 +71,6 @@ public:
         // Other flags.
         this->IME = false;
         this->halt_mode = false;
-        this->halt_bug_pc = 0;
     }
 
     uint8_t         A;
@@ -91,7 +90,6 @@ public:
 
     bool            IME; // Interrupt Master Enable Flag (Write Only)
     bool            halt_mode; // Waits an interrupt.
-    uint16_t        halt_bug_pc; // PC for halt bug.
 
 private:
     uint8_t flags_;
