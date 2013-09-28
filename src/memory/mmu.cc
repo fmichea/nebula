@@ -8,6 +8,7 @@ MMU::MMU()
     memset(this->Name, 0, Size);
 #include "mmap.def"
 #undef X
+    memset(this->title_, 0, 0x18);
 }
 
 MMU::~MMU()
