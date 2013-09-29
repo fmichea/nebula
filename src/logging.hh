@@ -14,7 +14,10 @@ namespace logging {
         DEBUG       = 4,
         VERBOSE     = 5,
     };
+
     void init(level lvl);
+
+    bool isEnabledFor(level lvl);
 
     int info(const char* format, ...);
     int warning(const char* format, ...);

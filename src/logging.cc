@@ -3,14 +3,9 @@
 namespace {
     logging::level log_lvl = logging::ERROR;
 
-    int log(logging::level lvl, FILE* stream, const char* color,
-            const char* type_name, const char* format, va_list args)
+    int log(FILE* stream, const char* color, const char* type_name,
+            const char* format, va_list args)
     {
-#ifndef RELEASE
-        if (log_lvl < lvl) {
-            return 0;
-        }
-
         int ret = 0;
 
         if (isatty(fileno(stream)))
@@ -22,14 +17,6 @@ namespace {
             ret += fprintf(stream, "\x1b[0m");
         fflush(stream);
         return ret;
-#else
-        (void) args;
-        (void) format;
-        (void) level;
-        (void) stream;
-        (void) type_name;
-        return 0;
-#endif
     }
 }
 
@@ -38,13 +25,21 @@ namespace logging {
         log_lvl = lvl;
     }
 
-#define X(Level, FuncName, DisplayName, Color, Stream)                  \
+    bool isEnabledFor(logging::level lvl) {
+        return lvl <= log_lvl;
+    }
+
+# define X(Level, FuncName, DisplayName, Color, Stream)                 \
     int FuncName(const char* format, ...) {                             \
+        if (!isEnabledFor(Level)) {                                      \
+            return 0;                                                   \
+        }                                                               \
+                                                                        \
         int     ret;                                                    \
         va_list args;                                                   \
                                                                         \
         va_start(args, format);                                         \
-        ret = log(Level, Stream, Color, #DisplayName, format, args);    \
+        ret = log(Stream, Color, #DisplayName, format, args);           \
         va_end(args);                                                   \
         return ret;                                                     \
     }
