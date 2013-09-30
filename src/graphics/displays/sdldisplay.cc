@@ -2,7 +2,7 @@
 
 SDLDisplay::SDLDisplay(const char* windowName)
 {
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK | SDL_INIT_EVENTTHREAD);
     this->screen_ = SDL_SetVideoMode(WIDTH * COEF, HEIGHT * COEF, 32,
                                      SDL_SWSURFACE);
     SDL_WM_SetCaption(windowName, 0);

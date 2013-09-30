@@ -18,16 +18,13 @@ typedef struct {
 
 class Keyboard {
 public:
-    Keyboard();
+    Keyboard(MMU& mmu);
     virtual ~Keyboard();
 
-    void do_cycle(MMU& mmu);
-
+    void do_cycle();
 private:
+    KBEventHandler* eventhandler_;
     KBHandler* handler_;
-    // state_ and select_ follow the GB convention: 0 = enabled
-    uint8_t state_; // b0-3 = directions; b4-7 = buttons
-    uint8_t select_; // select lines, b0: directions; b1: buttons
 };
 
 #endif // !KEYBOARD_HH_

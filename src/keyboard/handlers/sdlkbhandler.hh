@@ -4,11 +4,11 @@
 
 #  include <SDL/SDL.h>
 
-# include "kbhandler.hh"
+#  include "kbhandler.hh"
 
 class SDLKBHandler : public KBHandler {
 public:
-    bool pollEvent(s_kbh_event* event);
+    SDLKBHandler(KBEventHandler* eventhandler);
 };
 
 # endif // _TARGET == 0

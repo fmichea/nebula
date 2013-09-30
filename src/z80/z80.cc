@@ -1,7 +1,7 @@
 #include "z80.hh"
 
 Z80::Z80(std::string filename)
-    : filename_(filename), gpu_ (mmu_), int_ (mmu_, regs_), kb_ ()
+    : filename_(filename), gpu_ (mmu_), int_ (mmu_, regs_), kb_ (mmu_)
 {}
 
 bool Z80::execute()
@@ -31,7 +31,7 @@ bool Z80::execute()
 
         this->regs_.PC += (res >> 8) & 0xff;
         this->gpu_.do_cycle(res & 0xff);
-        this->kb_.do_cycle(this->mmu_);
+        this->kb_.do_cycle();
         this->int_.manage_timer(res & 0xff);
         this->int_.manage_interrupts();
         count += 1;
