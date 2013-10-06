@@ -5,6 +5,7 @@
 
 # include "graphics/gpu.hh"
 # include "keyboard/keyboard.hh"
+# include "sound/sound.hh"
 # include "z80/interrupts.hh"
 # include "z80/z80disassembler.hh"
 # include "z80/z80opcodes.hh"
@@ -23,6 +24,7 @@ private:
     GPU             gpu_;
     Interrupts      int_;
     Keyboard        kb_;
+    Sound           sound_;
 };
 
 #endif // !Z___HH_

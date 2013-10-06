@@ -1,7 +1,7 @@
 #include "z80.hh"
 
 Z80::Z80(std::string filename)
-    : filename_(filename), gpu_ (mmu_), int_ (mmu_, regs_), kb_ (mmu_)
+    : filename_(filename), gpu_ (mmu_), int_ (mmu_, regs_), kb_ (mmu_), sound_ (mmu_)
 {}
 
 bool Z80::execute()
