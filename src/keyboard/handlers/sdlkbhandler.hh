@@ -4,7 +4,7 @@
 
 #  include <SDL/SDL.h>
 
-#  include "kbhandler.hh"
+#  include "keyboard/handlers/kbhandler.hh"
 
 class SDLKBHandler : public KBHandler {
 public:

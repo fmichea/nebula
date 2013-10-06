@@ -1,12 +1,11 @@
 #ifndef KEYBOARD_HH_
 # define KEYBOARD_HH_
 
-# include "../z80/interrupts.hh"
-# include "../memory/mmu.hh"
-# include "../memory/registers/bitproxy.hh"
-
-# include "handlers/kbhandler.hh"
-# include "handlers/sdlkbhandler.hh"
+# include "keyboard/handlers/kbhandler.hh"
+# include "keyboard/handlers/sdlkbhandler.hh"
+# include "memory/mmu.hh"
+# include "memory/registers/bitproxy.hh"
+# include "z80/interrupts.hh"
 
 # define NB_KEYBINDINGS 8
 

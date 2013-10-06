@@ -2,11 +2,12 @@
 # define Z___HH_
 
 # include <stdio.h>
-# include "z80opcodes.hh"
-# include "z80disassembler.hh"
-# include "../graphics/gpu.hh"
-# include "interrupts.hh"
-# include "../keyboard/keyboard.hh"
+
+# include "graphics/gpu.hh"
+# include "keyboard/keyboard.hh"
+# include "z80/interrupts.hh"
+# include "z80/z80disassembler.hh"
+# include "z80/z80opcodes.hh"
 
 class Z80
 {

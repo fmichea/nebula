@@ -1,7 +1,7 @@
 #ifndef BGPPROXY_HH_
 # define BGPPROXY_HH_
 
-# include "bitproxy.hh"
+# include "memory/registers/bitproxy.hh"
 
 class PaletteProxy
 {

@@ -6,6 +6,7 @@ SET(CMAKE_CXX_COMPILER "clang++")
 
 # CXXFLAGS used by compiler.
 SET(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -std=c++11 -D_GNU_SOURCE=1")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I${CMAKE_CURRENT_SOURCE_DIR}/src")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_REENTRANT")
 
 SET(CMAKE_CXX_FLAGS_RELEASE "-O3 -DRELEASE")
@@ -31,6 +32,7 @@ SET(NEBULA_SRCS
     src/memory/mbcs/mbc5.cc
     src/memory/mbcs/romonly.cc
     src/memory/mmu.cc
+    src/sound/sound.cc
     src/z80/interrupts.cc
     src/z80/z80.cc
     src/z80/z80cbopcodes.cc

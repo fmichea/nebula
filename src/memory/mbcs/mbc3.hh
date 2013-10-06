@@ -3,7 +3,7 @@
 
 # include <time.h>
 
-# include "mbc.hh"
+# include "memory/mbcs/mbc.hh"
 
 class MBC3 : public MBC
 {

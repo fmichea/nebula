@@ -9,16 +9,16 @@
 # include <sys/types.h>
 # include <unistd.h>
 
-# include "../logging.hh"
-# include "mbcs/mbc.hh"
-# include "mbcs/mbc1.hh"
-# include "mbcs/mbc2.hh"
-# include "mbcs/mbc3.hh"
-# include "mbcs/mbc5.hh"
-# include "mbcs/romonly.hh"
-# include "registers/lcdc.hh"
-# include "registers/palette.hh"
-# include "registers/stat.hh"
+# include "logging.hh"
+# include "memory/mbcs/mbc.hh"
+# include "memory/mbcs/mbc1.hh"
+# include "memory/mbcs/mbc2.hh"
+# include "memory/mbcs/mbc3.hh"
+# include "memory/mbcs/mbc5.hh"
+# include "memory/mbcs/romonly.hh"
+# include "memory/registers/lcdc.hh"
+# include "memory/registers/palette.hh"
+# include "memory/registers/stat.hh"
 
 class MMU
 {

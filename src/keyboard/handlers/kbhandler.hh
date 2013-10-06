@@ -1,7 +1,7 @@
 #ifndef KBHANDLER_HH_
 # define KBHANDLER_HH_
 
-# include "../../memory/mmu.hh"
+# include "memory/mmu.hh"
 
 enum kbh_event_type {
     KBH_EVENT_TYPE_KEYDOWN,

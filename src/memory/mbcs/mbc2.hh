@@ -1,7 +1,7 @@
 #ifndef MBC2_HH_
 # define MBC2_HH_
 
-# include "mbc.hh"
+# include "memory/mbcs/mbc.hh"
 
 class MBC2 : public MBC
 {

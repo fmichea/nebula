@@ -5,7 +5,7 @@
 # include <unistd.h>
 # include <sys/time.h>
 
-# include "../logging.hh"
+# include "logging.hh"
 
 # ifndef BOOSTER
 #  define BOOSTER 100

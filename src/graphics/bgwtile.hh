@@ -1,7 +1,7 @@
 #ifndef BGTILE_HH_
 # define BGTILE_HH_
 
-# include "../memory/mmu.hh"
+# include "memory/mmu.hh"
 
 # define TILE_BY_LINE 32
 # define TILE_SZ 16

@@ -1,7 +1,7 @@
 #ifndef MBC_HXX_
 # define MBC_HXX_
 
-# include "mbc.hh"
+# include "memory/mbcs/mbc.hh"
 
 template<typename T>
 T MBC::read(uint16_t addr)
