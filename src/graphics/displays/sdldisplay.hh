@@ -3,7 +3,7 @@
 
 # if _TARGET == 0
 
-#  include <SDL/SDL.h>
+#  include <SDL.h>
 
 #  include "graphics/displays/display.hh"
 
@@ -24,7 +24,8 @@ public:
     uint32_t getColor(uint8_t r, uint8_t g, uint8_t b);
 
 private:
-    SDL_Surface*    screen_;
+    SDL_Window*     window_;
+    SDL_Renderer*   renderer_;
     SDL_Rect        rect_;
 };
 
