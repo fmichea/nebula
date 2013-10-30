@@ -1,6 +1,8 @@
 PROJECT(nebula)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
+INCLUDE(FindPkgConfig)
+
 # CXX compiler
 SET(CMAKE_CXX_COMPILER "clang++")
 
@@ -10,10 +12,10 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I${CMAKE_CURRENT_SOURCE_DIR}/src")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_REENTRANT")
 
 SET(CMAKE_CXX_FLAGS_RELEASE "-O3 -DRELEASE")
-SET(CMAKE_CXX_FLAGS_DEBUG "-ggdb -DDISASSEMBLER")
+SET(CMAKE_CXX_FLAGS_DEBUG "-g3 -DDISASSEMBLER")
 
 # LDFLAGS used when linking nebula.
-SET(NEBULA_LDFLAGS -L/usr/lib -lSDL -lpthread)
+SET(NEBULA_LDFLAGS "")
 
 # List of all the files of the project.
 SET(NEBULA_SRCS
@@ -44,8 +46,13 @@ SET(NEBULA_SRCS
 IF(NOT DEFINED _DISPLAY_BACKEND)
     MESSAGE(FATAL_ERROR "You must define the display backend to compile for.")
 ELSEIF(_DISPLAY_BACKEND MATCHES "SDL")
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I/usr/include/SDL")
+    PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
+
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I${SDL2_INCLUDE_DIRS}")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_TARGET=0")
+
+    SET(NEBULA_LDFLAGS "-lpthread -l${SDL2_LIBRARIES}")
+
     SET(NEBULA_SRCS ${NEBULA_SRCS}
                     src/graphics/displays/sdldisplay.cc
                     src/keyboard/handlers/sdlkbhandler.cc
