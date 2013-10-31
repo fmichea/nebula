@@ -59,7 +59,6 @@ static void* handle_events(void* data) {
                         ret.type = KBH_EVENT_TYPE_KEYUP;
                     ret.key = key_assoc[it].kbhkey;
                     eventhandler->handle_event(&ret);
-                    return 0;
                 }
             }
         } else if (event.type == SDL_QUIT) {
