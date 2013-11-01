@@ -34,6 +34,8 @@ SET(NEBULA_SRCS
     src/memory/mbcs/romonly.cc
     src/memory/mmu.cc
     src/sound/sound.cc
+    src/sound/channels/channel.cc
+    src/sound/channels/channel1.cc
     src/z80/interrupts.cc
     src/z80/z80.cc
     src/z80/z80cbopcodes.cc

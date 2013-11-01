@@ -3,83 +3,94 @@
 static void sound_callback(void* userdata, Uint8* stream, int len);
 
 Sound::Sound(const MMU& mmu)
+    : mmu_ (mmu)
 {
-    SDL_AudioSpec spec;
+    // Init channels.
+    for (int it = 0; it < NB_GB_CHANNELS; ++it)
+        this->channels_[it] = nullptr;
+    this->channels_[0] = new Channel1(this->mmu_);
 
-    memset(&spec, 0, sizeof (SDL_AudioSpec));
-    spec.channels = 2;
-    spec.format = AUDIO_S16;
-    spec.freq = SAMPLE_RATE;
-    spec.samples = SAMPLE_COUNT;
+    // Initialize SDL.
 
-    spec.callback = sound_callback;
-    spec.userdata = (void*) &mmu;
+    memset(&this->spec_, 0, sizeof (SDL_AudioSpec));
+    this->spec_.channels = NB_CHANNELS;
+    this->spec_.format = AUDIO_S16SYS;
+    this->spec_.freq = SAMPLE_RATE;
+    this->spec_.samples = SAMPLE_COUNT;
 
-    int dev = SDL_OpenAudio(&spec, nullptr);
+    this->spec_.callback = sound_callback;
+    this->spec_.userdata = (void*) this;
+
+    int dev = SDL_OpenAudio(&this->spec_, nullptr);
     if (dev < 0) {
         logging::error("Failed to open audio device: %s\n", SDL_GetError());
     }
     SDL_PauseAudio(0); // Activate audio.
 }
 
+void Sound::fill_stream(Uint8* stream, int _len) {
+    int         len = _len / sizeof (Sint16);
+    int16_t*    channels[NB_GB_CHANNELS];
+    int16_t*    stream_ = new int16_t[len];
+    int32_t     data;
+
+    // Buffer is not initialized by default.
+    memset(stream, this->spec_.silence, _len);
+
+    // If sound is not ON, end there.
+    if ((this->mmu_.NR52.get() & (1 << 7)) == 0)
+        return;
+
+    for (int it = 0; it < NB_GB_CHANNELS; ++it) {
+        channels[it] = new int16_t[len];
+        memset(channels[it], 0, len * sizeof (int16_t));
+        if (this->channels_[it] == nullptr)
+            continue;
+//        if ((this->mmu_.NR52.get() & (1 << it)) == 0)
+//            continue;
+        this->channels_[it]->fill_stream(channels[it], len);
+    }
+
+    for (int chan = 0; chan < NB_CHANNELS; ++chan) {
+        for (int it = 0; it < len; it++) {
+            // Fetch the frequency computed.
+            data = 0;
+            for (int it_ = 0; it_ < NB_GB_CHANNELS; ++it_) {
+                if ((1 << (4 * chan + it_)) & this->mmu_.NR51.get())
+                    data += channels[it_][it];
+            }
+
+            // Avoid saturation.
+            if (MAX_FREQ < data) data = MAX_FREQ;
+            if (data < MIN_FREQ) data = MIN_FREQ;
+
+            // Add sound to outputs.
+            stream_[it] = (Sint16) data;
+        }
+    }
+
+    //SDL_MixAudioFormat(stream, (Uint8*) stream_, AUDIO_S16SYS, len, 10);
+    memcpy(stream, stream_, _len);
+
+    for (int it = 0; it < NB_GB_CHANNELS; ++it)
+        delete[] channels[it];
+    delete[] stream_;
+}
+
 Sound::~Sound() {
+    // Delete channels from memory.
+    for (int it = 0; it < NB_GB_CHANNELS; ++it) {
+        delete this->channels_[it];
+    }
+
+    // Close SDL sound system.
     SDL_CloseAudio();
 }
 
-typedef void (*chandler)(const MMU*, int32_t*, int);
+static void sound_callback(void* userdata, Uint8* _stream, int len) {
+    Sound* sound = static_cast<Sound*>(userdata);
 
-static void channel1(const MMU* mmu, int32_t* data, int len);
-static void channel2(const MMU* mmu, int32_t* data, int len);
-static void channel3(const MMU* mmu, int32_t* data, int len);
-static void channel4(const MMU* mmu, int32_t* data, int len);
-
-static void sound_callback(void* userdata, Uint8* stream, int len) {
-    chandler handlers[NB_CHANNELS] = { channel1, channel2, channel3, channel4 };
-    const MMU* mmu = (const MMU*) userdata;
-    int16_t* stream_ = (int16_t*) stream;
-    int32_t data[len];
-
-    memset(data, 0, len);
-    for (int it = 0; it < NB_CHANNELS; ++it) {
-        handlers[it](mmu, data, len / 2);
-    }
-    for (int it = 0; it < len / 2; it += 2) {
-        // Avoid saturation.
-        if (MAX_FREQ <= data[it]) data[it] = MAX_FREQ;
-        if (data[it] < MIN_FREQ) data[it] = MIN_FREQ;
-        stream_[it] = stream_[it + 1] = data[it];
-    }
-}
-
-// Channel 1: Tone & Sweep
-static uint32_t count_channel1 = 0;
-static void channel1(const MMU* mmu, int32_t* data, int len) {
-    (void) mmu;
-    float freqs[] = { 261., 293., 329., 349., 391., 440., 493., 523.};
-    for (int it = 0; it < len; ++it, ++count_channel1) {
-        float a = sin(2. * PI * freqs[(count_channel1 / 40000) % 8] *
-                      (static_cast<float>(count_channel1) / SAMPLE_RATE));
-        data[it] = (a < 0 ? MIN_FREQ : MAX_FREQ);
-    }
-}
-
-// Channel 2: Tone
-static void channel2(const MMU* mmu, int32_t* data, int len) {
-    (void) mmu;
-    (void) data;
-    (void) len;
-}
-
-// Channel 3: Wave Output
-static void channel3(const MMU* mmu, int32_t* data, int len) {
-    (void) mmu;
-    (void) data;
-    (void) len;
-}
-
-// Channel 4: Noise
-static void channel4(const MMU* mmu, int32_t* data, int len) {
-    (void) mmu;
-    (void) data;
-    (void) len;
+    if (sound == NULL)
+        return;
+    sound->fill_stream(_stream, len);
 }
