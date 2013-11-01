@@ -40,7 +40,7 @@ class MMU
             *this->reg_ = val;
         }
 
-        uint8_t get()
+        uint8_t get() const
         {
             if (this->reg_ == nullptr)
                 return 0;
