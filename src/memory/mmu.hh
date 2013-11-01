@@ -35,11 +35,15 @@ class MMU
 
         void set(uint8_t val)
         {
+            if (this->reg_ == nullptr)
+                return;
             *this->reg_ = val;
         }
 
         uint8_t get()
         {
+            if (this->reg_ == nullptr)
+                return 0;
             return *this->reg_;
         }
 
