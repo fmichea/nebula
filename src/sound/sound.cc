@@ -1,15 +1,5 @@
 #include "sound.hh"
 
-#define NB_CHANNELS 4
-
-#define SAMPLE_RATE 44100
-#define SAMPLE_COUNT 4410
-
-#define BITS 16
-
-#define MAX_FREQ (1 << (BITS - 1)) - 1
-#define MIN_FREQ -(1 << (BITS - 1))
-
 static void sound_callback(void* userdata, Uint8* stream, int len);
 
 Sound::Sound(const MMU& mmu)

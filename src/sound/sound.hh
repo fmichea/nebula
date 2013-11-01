@@ -8,7 +8,7 @@
 # include "logging.hh"
 # include "memory/mmu.hh"
 
-# define PI 3.14159265
+# include "sound/constants.hh"
 
 class Sound {
 public:
