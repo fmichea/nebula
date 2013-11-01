@@ -26,7 +26,7 @@ class MMU
     {
     public:
         Register()
-            : reg_ (0)
+            : reg_ (nullptr), addr_ (0)
         {}
 
         Register(uint8_t* reg, uint16_t addr)
