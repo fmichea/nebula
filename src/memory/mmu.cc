@@ -199,7 +199,7 @@ bool MMU::reset_registers()
     this->IE = RegisterProxy(this->hram_ + 0xffff - 0xff80, 0xffff);
     this->IE.set(0x00);
 #define X2(RegType, Reg, Addr, Value)                           \
-    this->Reg = RegType(this->io_ + Addr - 0xff00, Addr);      \
+    this->Reg = RegType(this->io_ + (Addr - 0xff00), Addr);     \
     this->Reg.set(Value);
 #define X1(Reg, Addr, Value) X2(RegisterProxy, Reg, Addr, Value)
 #include "registers.def"
