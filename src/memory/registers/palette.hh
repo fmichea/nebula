@@ -2,22 +2,22 @@
 # define BGPPROXY_HH_
 
 # include "memory/registers/bitproxy.hh"
+# include "memory/registers/register.hh"
 
-class PaletteProxy
-{
+# define _NB_COLORS 4
+
+class PaletteProxy : public RegisterProxy {
 public:
-    PaletteProxy()
-    {}
+    PaletteProxy() : RegisterProxy() {}
 
-    PaletteProxy(uint8_t* reg)
+    PaletteProxy(uint8_t* reg, uint16_t addr)
+        : RegisterProxy(reg, addr)
     {
-        this->C[0] = BitProxy(reg, 0, 0x3);
-        this->C[1] = BitProxy(reg, 2, 0x3);
-        this->C[2] = BitProxy(reg, 4, 0x3);
-        this->C[3] = BitProxy(reg, 6, 0x3);
+        for (int it = 0; it < _NB_COLORS; ++it)
+            this->C[it] = BitProxy(reg, it * 2, 0x3);
     }
 
-    BitProxy C[4];
+    BitProxy C[_NB_COLORS];
 };
 
 #endif // !BGPPROXY_HH_
