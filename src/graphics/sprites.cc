@@ -33,11 +33,11 @@ uint8_t Sprite::is_displayed(uint8_t x, uint8_t bkg_color) const
 
 uint8_t Sprite::color(uint8_t x) const
 {
-    PaletteProxy& palette = this->mmu_.OBP1;
+    PaletteProxy* palette = &this->mmu_.OBP1;
     if (this->palette_ == 1) {
-        palette = this->mmu_.OBP2;
+        palette = &this->mmu_.OBP2;
     }
-    return palette.C[this->line_[x]].get();
+    return palette->C[this->line_[x]].get();
 }
 
 uint8_t Sprite::x_base() const
