@@ -2,7 +2,7 @@
 
 static void sound_callback(void* userdata, Uint8* stream, int len);
 
-Sound::Sound(const MMU& mmu)
+Sound::Sound(MMU& mmu)
     : mmu_ (mmu)
 {
     // Init channels.
@@ -11,6 +11,7 @@ Sound::Sound(const MMU& mmu)
     this->channels_[0] = new Channel1(this->mmu_);
 
     // Initialize SDL.
+    SDL_InitSubSystem(SDL_INIT_AUDIO);
 
     memset(&this->spec_, 0, sizeof (SDL_AudioSpec));
     this->spec_.channels = NB_CHANNELS;
@@ -63,6 +64,9 @@ void Sound::fill_stream(Uint8* stream, int _len) {
             // Avoid saturation.
             if (MAX_FREQ < data) data = MAX_FREQ;
             if (data < MIN_FREQ) data = MIN_FREQ;
+
+            // Volume fix.
+            data = data / 100;
 
             // Add sound to outputs.
             stream_[it] = (Sint16) data;

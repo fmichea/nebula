@@ -11,14 +11,14 @@
 
 class Sound {
 public:
-    Sound(const MMU& mmu);
+    Sound(MMU& mmu);
     ~Sound();
 
     void fill_stream(Uint8* stream, int len);
 
 private:
-    const MMU&      mmu_;
-    Channel*        channels_[NB_GB_CHANNELS];
+    MMU& mmu_;
+    Channel* channels_[NB_GB_CHANNELS];
 
     // FIXME: move this soon.
     SDL_AudioSpec   spec_;
