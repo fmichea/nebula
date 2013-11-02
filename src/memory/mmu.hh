@@ -18,44 +18,11 @@
 # include "memory/mbcs/romonly.hh"
 # include "memory/registers/lcdc.hh"
 # include "memory/registers/palette.hh"
+# include "memory/registers/register.hh"
 # include "memory/registers/stat.hh"
 
 class MMU
 {
-    class Register
-    {
-    public:
-        Register()
-            : reg_ (nullptr), addr_ (0)
-        {}
-
-        Register(uint8_t* reg, uint16_t addr)
-            : reg_ (reg), addr_ (addr)
-        {}
-
-        void set(uint8_t val)
-        {
-            if (this->reg_ == nullptr)
-                return;
-            *this->reg_ = val;
-        }
-
-        uint8_t get() const
-        {
-            if (this->reg_ == nullptr)
-                return 0;
-            return *this->reg_;
-        }
-
-        uint16_t addr()
-        {
-            return this->addr_;
-        }
-
-    private:
-        uint8_t*    reg_;
-        uint16_t    addr_;
-    };
 
 public:
     MMU();
