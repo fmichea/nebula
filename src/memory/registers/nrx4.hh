@@ -5,6 +5,7 @@
 # include "memory/registers/register.hh"
 
 class NRX4Proxy : public RegisterProxy {
+public:
     NRX4Proxy() : RegisterProxy() {}
 
     NRX4Proxy(uint8_t* reg, uint16_t addr)
