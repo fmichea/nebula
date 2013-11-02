@@ -10,13 +10,17 @@
 # include <unistd.h>
 
 # include "logging.hh"
+
 # include "memory/mbcs/mbc.hh"
 # include "memory/mbcs/mbc1.hh"
 # include "memory/mbcs/mbc2.hh"
 # include "memory/mbcs/mbc3.hh"
 # include "memory/mbcs/mbc5.hh"
 # include "memory/mbcs/romonly.hh"
+
 # include "memory/registers/lcdc.hh"
+# include "memory/registers/nr10.hh"
+# include "memory/registers/nrx4.hh"
 # include "memory/registers/palette.hh"
 # include "memory/registers/register.hh"
 # include "memory/registers/stat.hh"
@@ -32,15 +36,12 @@ public:
     template<typename T> T read(uint16_t addr);
     template<typename T> void write(uint16_t addr, T value);
 
-# define X(Reg, Addr, Value)    \
-    Register Reg;
-# include "registers.hh"
-# undef X
-    Register IE;
-    STATProxy STAT;
-    LCDCProxy LCDC;
-    PaletteProxy BGP;
-    PaletteProxy OBP[2];
+# define X2(RegType, Reg, Addr, Value) RegType Reg;
+# define X1(Reg, Addr, Value) X2(RegisterProxy, Reg, Addr, Value)
+# include "registers.def"
+# undef X1
+# undef X2
+    RegisterProxy IE;
 
     bool            stopped;
 
