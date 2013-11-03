@@ -35,7 +35,8 @@ SET(NEBULA_SRCS
     src/sound/sound.cc
     src/sound/frequency.cc
     src/sound/channels/channel.cc
-    src/sound/channels/channel1.cc
+#    src/sound/channels/channel1.cc
+#    src/sound/channels/channel2.cc
     src/sound/filters/volume.cc
     src/sound/filters/wave.cc
     src/sound/filters/length.cc
