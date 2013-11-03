@@ -6,8 +6,8 @@
 # define NB_CHANNELS    2
 # define NB_GB_CHANNELS 4
 
-# define SAMPLE_RATE 44100
-# define SAMPLE_COUNT 4096
+# define SAMPLE_RATE 48000
+# define SAMPLE_COUNT 2400
 
 # define BITS 16
 
