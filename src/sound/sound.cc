@@ -8,7 +8,17 @@ Sound::Sound(MMU& mmu)
     // Init channels.
     for (int it = 0; it < NB_GB_CHANNELS; ++it)
         this->channels_[it] = nullptr;
-    this->channels_[0] = new Channel1(this->mmu_);
+    this->channels_[0] = new Channel(mmu.NR13, mmu.NR14, {
+        new WaveForm(mmu.NR11),
+        new Length(mmu.NR11, mmu.NR14),
+        new VolumeEnvelop(mmu.NR12),
+    });
+    this->channels_[1] = new Channel(mmu.NR23, mmu.NR24, {
+        new WaveForm(mmu.NR21),
+        new Length(mmu.NR21, mmu.NR24),
+        new VolumeEnvelop(mmu.NR22),
+    });
+    //this->channels_[1] = new Channel2(this->mmu_);
 
     // Initialize SDL.
     SDL_InitSubSystem(SDL_INIT_AUDIO);
@@ -33,10 +43,10 @@ void Sound::fill_stream(Uint8* stream, int _len) {
     int         len = _len / sizeof (Sint16);
     int16_t*    channels[NB_GB_CHANNELS];
     int16_t*    stream_ = new int16_t[len];
-    int32_t     data;
+    int32_t     data, count;
 
     // Buffer is not initialized by default.
-    memset(stream, this->spec_.silence, _len);
+    memset(stream, 0, _len);
 
     // If sound is not ON, end there.
     if ((this->mmu_.NR52.get() & (1 << 7)) == 0)
@@ -53,20 +63,26 @@ void Sound::fill_stream(Uint8* stream, int _len) {
     }
 
     for (int chan = 0; chan < NB_CHANNELS; ++chan) {
-        for (int it = 0; it < len; it++) {
+        for (int it = chan; it < len; it += 2) {
             // Fetch the frequency computed.
-            data = 0;
+            data = 0, count = 0;
             for (int it_ = 0; it_ < NB_GB_CHANNELS; ++it_) {
-                if ((1 << (4 * chan + it_)) & this->mmu_.NR51.get())
-                    data += channels[it_][it];
+                if ((1 << (4 * chan + it_)) & this->mmu_.NR51.get()) {
+                    if (channels[it_][it]) {
+                        data += channels[it_][it];
+                        count += 1;
+                    }
+                }
             }
+            if (count != 0)
+                data /= count;
 
             // Avoid saturation.
             if (MAX_FREQ < data) data = MAX_FREQ;
             if (data < MIN_FREQ) data = MIN_FREQ;
 
             // Volume fix.
-            data = data / 100;
+            //data = data / 100;
 
             // Add sound to outputs.
             stream_[it] = (Sint16) data;

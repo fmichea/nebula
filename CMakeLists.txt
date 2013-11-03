@@ -32,14 +32,14 @@ SET(NEBULA_SRCS
     src/memory/mbcs/mbc5.cc
     src/memory/mbcs/romonly.cc
     src/memory/mmu.cc
-    src/sound/sound.cc
-    src/sound/frequency.cc
     src/sound/channels/channel.cc
 #    src/sound/channels/channel1.cc
 #    src/sound/channels/channel2.cc
     src/sound/filters/volume.cc
     src/sound/filters/wave.cc
     src/sound/filters/length.cc
+    src/sound/frequency.cc
+    src/sound/sound.cc
     src/z80/interrupts.cc
     src/z80/z80.cc
     src/z80/z80cbopcodes.cc
