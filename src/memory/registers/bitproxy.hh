@@ -14,7 +14,7 @@ public:
         : reg_ (reg), bit_ (bit), mask_ (mask)
     {}
 
-    uint8_t get()
+    uint8_t get() const
     {
         return (*this->reg_ >> this->bit_) & this->mask_;
     }
