@@ -1,4 +1,4 @@
-#include "sound/channels/channel.hh"
+#include "channel.hh"
 
 Channel::Channel(MMU& mmu)
     : mmu_ (mmu)

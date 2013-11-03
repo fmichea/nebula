@@ -1,7 +1,7 @@
 #ifndef ROMONLY_HH_
 # define ROMONLY_HH_
 
-# include "memory/mbcs/mbc.hh"
+# include "mbc.hh"
 
 class ROMOnly : public MBC
 {

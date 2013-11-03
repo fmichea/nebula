@@ -1,8 +1,8 @@
 #ifndef STAT_HH_
 # define STAT_HH_
 
-# include "memory/registers/bitproxy.hh"
-# include "memory/registers/register.hh"
+# include "bitproxy.hh"
+# include "register.hh"
 
 class STATProxy : public RegisterProxy {
 public:

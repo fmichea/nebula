@@ -1,8 +1,8 @@
 #ifndef CHANNEL__HH_
 # define CHANNEL__HH_
 
-# include "sound/frequency.hh"
-# include "sound/channels/channel.hh"
+# include "../frequency.hh"
+# include "channel.hh"
 
 // Channel 1: Tone & Sweep
 class Channel1 : public Channel {

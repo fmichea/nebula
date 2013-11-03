@@ -4,7 +4,7 @@
 # include <stdint.h>
 # include <malloc.h>
 
-# include "logging.hh"
+# include "../../logging.hh"
 
 class MBC
 {

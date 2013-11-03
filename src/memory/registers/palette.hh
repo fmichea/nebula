@@ -1,8 +1,8 @@
 #ifndef BGPPROXY_HH_
 # define BGPPROXY_HH_
 
-# include "memory/registers/bitproxy.hh"
-# include "memory/registers/register.hh"
+# include "bitproxy.hh"
+# include "register.hh"
 
 # define _NB_COLORS 4
 

@@ -5,7 +5,7 @@
 
 #  include <SDL.h>
 
-#  include "graphics/displays/display.hh"
+#  include "display.hh"
 
 #  define COEF 2
 

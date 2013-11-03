@@ -5,8 +5,8 @@
 # include <stdint.h>
 # include <cmath>
 
-# include "logging.hh"
-# include "sound/constants.hh"
+# include "../logging.hh"
+# include "constants.hh"
 
 typedef enum {
     WAVEFORM_SINE,

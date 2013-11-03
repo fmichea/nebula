@@ -1,4 +1,4 @@
-#include "sound/frequency.hh"
+#include "frequency.hh"
 
 WaveForm::WaveForm(waveform_type type)
     : type_ (type), counter_ (0), cur_freq_ (0)

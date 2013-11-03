@@ -3,12 +3,12 @@
 
 # include <stdio.h>
 
-# include "graphics/gpu.hh"
-# include "keyboard/keyboard.hh"
-# include "sound/sound.hh"
-# include "z80/interrupts.hh"
-# include "z80/z80disassembler.hh"
-# include "z80/z80opcodes.hh"
+# include "../graphics/gpu.hh"
+# include "../keyboard/keyboard.hh"
+# include "../sound/sound.hh"
+# include "interrupts.hh"
+# include "z80disassembler.hh"
+# include "z80opcodes.hh"
 
 class Z80
 {

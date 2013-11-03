@@ -3,8 +3,8 @@
 
 # include <cmath>
 
-# include "memory/mmu.hh"
-# include "sound/constants.hh"
+# include "../../memory/mmu.hh"
+# include "../constants.hh"
 
 class Channel {
 public:

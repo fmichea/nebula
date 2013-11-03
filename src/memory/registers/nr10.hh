@@ -1,8 +1,8 @@
-#ifndef NR___HH_
-# define NR___HH_
+#ifndef NR10_HH_
+# define NR10_HH_
 
-# include "memory/registers/bitproxy.hh"
-# include "memory/registers/register.hh"
+# include "bitproxy.hh"
+# include "register.hh"
 
 class NR10Proxy : public RegisterProxy {
 public:
@@ -21,4 +21,4 @@ public:
     BitProxy sweep_shift;
 };
 
-#endif // !NR___HH_
+#endif // !NR10_HH_

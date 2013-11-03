@@ -1,8 +1,8 @@
-#ifndef NRX___HH_
-# define NRX___HH_
+#ifndef NRX4_HH_
+# define NRX4_HH_
 
-# include "memory/registers/bitproxy.hh"
-# include "memory/registers/register.hh"
+# include "bitproxy.hh"
+# include "register.hh"
 
 class NRX4Proxy : public RegisterProxy {
 public:
@@ -21,4 +21,4 @@ public:
     BitProxy freq_hi;
 };
 
-#endif // !NRX___HH_
+#endif // !NRX4_HH_

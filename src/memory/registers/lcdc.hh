@@ -3,8 +3,8 @@
 
 # include <stdint.h>
 
-# include "memory/registers/register.hh"
-# include "memory/registers/bitproxy.hh"
+# include "register.hh"
+# include "bitproxy.hh"
 
 class LCDCProxy : public RegisterProxy {
 public:

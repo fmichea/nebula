@@ -4,14 +4,14 @@
 # include <list>
 # include <string.h>
 
-# include "graphics/bgwtile.hh"
-# include "graphics/sprites.hh"
-# include "graphics/timer.hh"
-# include "memory/mmu.hh"
-# include "z80/interrupts.hh"
+# include "../memory/mmu.hh"
+# include "../z80/interrupts.hh"
+# include "bgwtile.hh"
+# include "sprites.hh"
+# include "timer.hh"
 
-# include "graphics/displays/display.hh"
-# include "graphics/displays/sdldisplay.hh"
+# include "displays/display.hh"
+# include "displays/sdldisplay.hh"
 
 # define LCDC_MODE_0_CLKS   201
 # define LCDC_MODE_1_CLKS   4560

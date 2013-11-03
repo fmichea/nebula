@@ -5,7 +5,7 @@
 #  include <SDL.h>
 #  include <pthread.h>
 
-#  include "keyboard/handlers/kbhandler.hh"
+#  include "kbhandler.hh"
 
 class SDLKBHandler : public KBHandler {
 public:

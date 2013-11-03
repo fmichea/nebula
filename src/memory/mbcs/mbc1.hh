@@ -1,7 +1,7 @@
 #ifndef MBC1_HH_
 # define MBC1_HH_
 
-# include "memory/mbcs/mbc.hh"
+# include "mbc.hh"
 
 typedef enum
 {

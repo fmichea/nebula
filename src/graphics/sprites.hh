@@ -3,7 +3,7 @@
 
 # include <list>
 
-# include "memory/mmu.hh"
+# include "../memory/mmu.hh"
 
 # define SPRITE_HEIGHT (mmu.LCDC.OBJSS.get() ? 16 : 8)
 
