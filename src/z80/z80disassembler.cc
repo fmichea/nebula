@@ -239,7 +239,7 @@ static void ld_sp_hl(MMU& mmu, Z80Registers& regs)
     {                                                       \
         OpName(mmu, regs, Arg1, Arg2);                      \
     }
-#include "disass.def"
+#include "disass.gdef"
 #undef H2
 #undef H3
 
