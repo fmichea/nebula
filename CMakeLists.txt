@@ -38,6 +38,7 @@ SET(NEBULA_SRCS
     src/sound/channels/channel1.cc
     src/sound/filters/volume.cc
     src/sound/filters/wave.cc
+    src/sound/filters/length.cc
     src/z80/interrupts.cc
     src/z80/z80.cc
     src/z80/z80cbopcodes.cc
