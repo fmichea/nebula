@@ -9,6 +9,9 @@ public:
     T& operator++ ();
     T operator++ (int unused);
 
+    T& operator-- ();
+    T operator-- (int unused);
+
     void reset();
 
 private:
