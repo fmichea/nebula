@@ -4,6 +4,7 @@
 # include <limits>
 
 # include "../../memory/registers/nrx2.hh"
+# include "../../utils/cycle.hh"
 # include "../frequency.hh"
 # include "filter.hh"
 
@@ -20,7 +21,7 @@ private:
 
     uint8_t volume_;
     uint8_t way_;
-    uint8_t sweep_;
+    Cycle<unsigned int> sweep_;
 };
 
 #endif // !VOLUME_HH_

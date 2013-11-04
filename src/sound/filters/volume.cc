@@ -1,14 +1,12 @@
 #include "volume.hh"
 
 VolumeEnvelop::VolumeEnvelop(const NRX2Proxy& nrx2)
-    : Filter(), tick_ (SAMPLE_RATE, 64), nrx2_ (nrx2), enabled_ (false)
+    : Filter(), tick_ (SAMPLE_RATE, 64), nrx2_ (nrx2), sweep_(0)
 {}
 
 int32_t VolumeEnvelop::filter(int32_t freq) {
     if (this->enabled_) {
-        if (this->tick_.next())
-            this->sweep_--;
-        if (this->sweep_ == 0) {
+        if (this->tick_.next() && (--this->sweep_) == 0) {
             logging::info("volume sweep.");
             if (this->way_ && this->volume_ != 0xf)
                 this->volume_ -= 1;
@@ -28,8 +26,8 @@ int32_t VolumeEnvelop::filter(int32_t freq) {
 void VolumeEnvelop::reload() {
     this->volume_ = this->nrx2_.volume.get();
     this->way_ = this->nrx2_.envelop_way.get();
-    this->sweep_ = this->nrx2_.envelop_sweep.get();
-    this->enabled_ = (this->sweep_ != 0);
+    this->sweep_ = Cycle<unsigned int>(this->nrx2_.envelop_sweep.get());
+    this->enabled_ = (this->sweep_.maximum() != 0);
     logging::info("volume: %d", this->volume_);
-    logging::info("sweeps: %d", this->sweep_);
+    logging::info("sweeps: %d (%s)", this->sweep_.maximum(), this->enabled_ ? "ON" : "OFF");
 }
