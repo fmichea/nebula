@@ -282,6 +282,11 @@ uint16_t stop(MMU& mmu, Z80Registers& regs)
     (void) mmu;
     (void) regs;
     // FIXME
+
+    // toogle CGB double-speed mode
+    if (mmu.gb_type == GBType::CGB && (mmu.KEY1.get() & 0x01))
+        mmu.KEY1.set((mmu.KEY1.get() >> 7 ^ 1) << 7);
+
     return P(1, 4);
 }
 

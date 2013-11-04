@@ -1,5 +1,13 @@
 #include "z80.hh"
 
+static inline bool do_doublespeed_cycle(MMU& mmu, uint32_t count)
+{
+    // Is it time to execute a doublespeed cycle ?
+    return mmu.gb_type == GBType::GB // GB: always
+        || mmu.KEY1.get() >> 7 == 0 // CGB in normal mode
+        || count % 2 == 0; // CGB in double speed and even frame
+}
+
 Z80::Z80(std::string filename)
     : filename_(filename), gpu_ (mmu_), int_ (mmu_, regs_), kb_ (mmu_)
 {}
@@ -30,7 +38,11 @@ bool Z80::execute()
         }
 
         this->regs_.PC += (res >> 8) & 0xff;
-        this->gpu_.do_cycle(res & 0xff);
+
+        // double-speed mode ?
+        if (do_doublespeed_cycle(this->mmu_, count))
+            this->gpu_.do_cycle(res & 0xff);
+
         this->kb_.do_cycle();
         this->int_.manage_timer(res & 0xff);
         this->int_.manage_interrupts();

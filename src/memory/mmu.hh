@@ -20,6 +20,8 @@
 # include "registers/palette.hh"
 # include "registers/stat.hh"
 
+enum class GBType { GB, CGB, SGB };
+
 class MMU
 {
     class Register
@@ -58,6 +60,7 @@ public:
     ~MMU();
 
     bool load_rom(std::string filename);
+    void do_hdma();
     template<typename T> T read(uint16_t addr);
     template<typename T> void write(uint16_t addr, T value);
 
@@ -72,6 +75,8 @@ public:
     PaletteProxy OBP[2];
 
     bool            stopped;
+    GBType          gb_type = GBType::GB;
+    bool            hdma_active = false;
 
 private:
     bool load_mbc(uint8_t ct_type);
@@ -84,11 +89,16 @@ private:
     MBC*            mbc_;
     size_t          size_;
     std::string     target_;
+    uint16_t        hdma_index_ = 0;
+    uint16_t        hdma_length_ = 0;
 
 # define X(Name, Size)      \
     uint8_t*        Name;
 # include "mmap.def"
 # undef X
+
+    // GPU needs to access video memory directly
+    friend class GPU;
 };
 
 # include "mmu.hxx"

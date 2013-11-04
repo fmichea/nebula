@@ -9,6 +9,8 @@ MMU::MMU()
 #include "mmap.def"
 #undef X
     memset(this->title_, 0, 0x18);
+    memset(this->cbgp_, 0xff, 0x40);
+    memset(this->cobp_, 0xff, 0x40);
 }
 
 MMU::~MMU()
@@ -42,19 +44,25 @@ bool MMU::load_rom(std::string filename)
     memcpy(this->rom_, mapped, stat.st_size);
     munmap(mapped, stat.st_size);
 
+    // ROM type
+    this->gb_type = (this->rom_[0x143] == 0x80 || this->rom_[0x143] == 0x80)
+        ? GBType::CGB : GBType::GB;
+
     // Checking that ROM was correctly loaded.
     const char* nintendo_logo =
         "\xce\xed\x66\x66\xcc\x0d\x00\x0b\x03\x73\x00\x83\x00\x0c\x00\x0d"
         "\x00\x08\x11\x1f\x88\x89\x00\x0e\xdc\xcc\x6e\xe6\xdd\xdd\xd9\x99"
         "\xbb\xbb\x67\x63\x6e\x0e\xec\xcc\xdd\xdc\x99\x9f\xbb\xb9\x33\x3e";
-    if (memcmp(nintendo_logo, this->rom_ + 0x104, 0x30))
+    if (memcmp(nintendo_logo, this->rom_ + 0x104,
+        this->gb_type == GBType::CGB ? 0x18 : 0x30))
     {
         logging::error("Nintendo logo doesn't match!");
         return false;
     }
 
     // ROM Title
-    strncpy(this->title_, (const char*) (this->rom_ + 0x134), 0x10);
+    strncpy(this->title_, (const char*) (this->rom_ + 0x134),
+        this->gb_type == GBType::CGB ? 15 : 16);
     logging::info("ROM Title: %s.", this->title_);
 
     // Cartridge Type
@@ -213,8 +221,30 @@ bool MMU::reset_registers()
     this->io_[0xff49 - 0xff00] = 0xFF;
     this->IE = Register(this->hram_ + 0xffff - 0xff80, 0xffff);
     this->IE.set(0x00);
-    //this->write<uint8_t>(0xFF00, 0xff);
+    this->write<uint8_t>(0xFF00, 0xff);
     return true;
+}
+
+void MMU::do_hdma()
+{
+    if (this->hdma_index_ < this->hdma_length_) {
+        uint16_t srcaddr = (this->HDMA1.get() << 8) | this->HDMA2.get();
+        uint16_t dstaddr = (this->HDMA3.get() << 8) | this->HDMA4.get();
+        srcaddr &= 0xfc;
+        dstaddr = (dstaddr & 0x1ffc) | 0x8000; // ensure we are in VRAM
+
+        for (size_t i = 0; i < 0x10; ++i)
+            this->write<uint8_t>(dstaddr + this->hdma_index_ + i,
+                this->read<uint8_t>(srcaddr + this->hdma_index_ + i));
+
+        this->hdma_index_ += 0x10;
+        this->HDMA5.set((this->hdma_length_ - this->hdma_index_) / 0x10 - 1);
+    }
+    // HDMA finished
+    else {
+        this->hdma_active = false;
+        this->HDMA5.set(0xff);
+    }
 }
 
 template<>

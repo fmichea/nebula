@@ -32,14 +32,16 @@ public:
     void do_cycle(uint8_t cycles);
 
 private:
-    void draw_line();
+    void     draw_line();
+    uint32_t bgp_to_color(uint8_t idx, uint8_t pal);
+    uint32_t obp_to_color(uint8_t idx, uint8_t pal);
 
     MMU&            mmu_;
     Timer           timer_;
     int16_t         wait_count;
 
     Display*        display_;
-    uint32_t        colors_[4];
+    uint32_t        bgcolors_[4];
 };
 
 #endif // !GPU_HH_

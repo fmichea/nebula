@@ -9,8 +9,9 @@
 
 typedef struct
 {
-    uint8_t                 : 4;
-    uint8_t     palette     : 1;
+    uint8_t     c_palette   : 3;
+    uint8_t     bank        : 1;
+    uint8_t     bw_palette  : 1;
     uint8_t     x_flip      : 1;
     uint8_t     y_flip      : 1;
     uint8_t     bg_to_obj   : 1;
@@ -30,15 +31,14 @@ public:
     Sprite(MMU& mmu, s_sprite& sprite, uint8_t y);
 
     uint8_t x_base() const;
-    uint8_t is_displayed(uint8_t x, uint8_t bkg_color) const;
     uint8_t color(uint8_t x) const;
 
+    uint8_t     palette;
+    bool        above_bg;
+
 private:
-    MMU&        mmu_;
     uint8_t     x_;
     uint8_t     y_;
-    uint8_t     palette_;
-    bool        above_bg_;
     uint8_t     line_[8];
 };
 

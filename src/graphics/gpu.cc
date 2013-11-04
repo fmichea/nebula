@@ -9,10 +9,10 @@ GPU::GPU(MMU& mmu)
 #endif
 
     // Colors
-    this->colors_[0] = this->display_->getColor(255, 255, 255);
-    this->colors_[1] = this->display_->getColor(192, 192, 192);
-    this->colors_[2] = this->display_->getColor(96, 96, 96);
-    this->colors_[3] = this->display_->getColor(0, 0, 0);
+    this->bgcolors_[0] = this->display_->getColor(255, 255, 255);
+    this->bgcolors_[1] = this->display_->getColor(192, 192, 192);
+    this->bgcolors_[2] = this->display_->getColor(96, 96, 96);
+    this->bgcolors_[3] = this->display_->getColor(0, 0, 0);
 }
 
 GPU::~GPU()
@@ -43,6 +43,8 @@ void GPU::do_cycle(uint8_t cycles)
                 this->mmu_.STAT.mode.set(LCDC_MODE_2);
             else
                 this->mmu_.STAT.mode.set(LCDC_MODE_1);
+            if (this->mmu_.gb_type == GBType::CGB && this->mmu_.hdma_active)
+                this->mmu_.do_hdma();
             break;
         case LCDC_MODE_1: // V-Blank
             this->mmu_.STAT.mode.set(LCDC_MODE_2);
@@ -64,27 +66,65 @@ void GPU::do_cycle(uint8_t cycles)
     }
 }
 
+static inline uint8_t correct_color(uint8_t color)
+{
+    return color * 255 / 31;
+}
+
+uint32_t GPU::bgp_to_color(uint8_t idx, uint8_t pal)
+{
+    if (this->mmu_.gb_type == GBType::GB)
+        return this->bgcolors_[this->mmu_.BGP.C[idx].get()];
+    else {//TODO
+        uint16_t color = *(uint16_t*)(this->mmu_.cbgp_ + pal * 8 + idx * 2);
+        return this->display_->getColor(
+            correct_color(color & 0x1f),
+            correct_color((color >> 5) & 0x1f),
+            correct_color((color >> 10) & 0x1f));
+    }
+}
+
+uint32_t GPU::obp_to_color(uint8_t idx, uint8_t pal)
+{
+    if (this->mmu_.gb_type == GBType::GB)
+        return this->bgcolors_[this->mmu_.OBP[pal].C[idx].get()];
+    else {
+        // each palette is 8 bytes
+        // each color is 2 bytes
+        uint16_t color = *(uint16_t*)(this->mmu_.cobp_ + pal * 8 + idx * 2);
+        return this->display_->getColor(
+            correct_color(color & 0x1f),
+            correct_color((color >> 5) & 0x1f),
+            correct_color((color >> 10) & 0x1f));
+    }
+}
+
+
 void GPU::draw_line()
 {
-    uint8_t bkg[WIDTH];
-    uint8_t real_y = this->mmu_.LY.get() + this->mmu_.SCY.get();
-    uint8_t scx = this->mmu_.SCX.get();
-    uint8_t ds = this->mmu_.LCDC.BGTMDS.get();
+    uint32_t line[WIDTH];
+    bool     bg_priority[WIDTH];
+    uint8_t  real_y = this->mmu_.LY.get() + this->mmu_.SCY.get();
+    uint8_t  scx = this->mmu_.SCX.get();
+    uint8_t  ds = this->mmu_.LCDC.BGTMDS.get();
 
-    this->display_->lock();
-    memset(bkg, 0, WIDTH);
+    memset(line, 0, sizeof (line));
+    for (uint8_t x = 0; x < WIDTH; ++x)
+        bg_priority[x] = false;
 
     // Real background.
-    if (this->mmu_.LCDC.BGD.get())
+    if (this->mmu_.gb_type == GBType::CGB || this->mmu_.LCDC.BGD.get())
     {
-        //printf("Color: ");
         BGWTile bg_tile(this->mmu_, scx, real_y, ds);
         for (uint8_t x = 0; x < WIDTH; ++x)
         {
             uint8_t real_x = scx + x;
             if (real_x % 8 == 0)
                 bg_tile = BGWTile(this->mmu_, real_x, real_y, ds);
-            bkg[x] = this->mmu_.BGP.C[bg_tile.color(real_x % 8)].get();
+            line[x] = this->bgp_to_color(
+                bg_tile.color(real_x % 8), bg_tile.attribute.palette);
+            bg_priority[x] =
+                !this->mmu_.LCDC.BGD.get() && bg_tile.attribute.priority;
         }
     }
 
@@ -92,25 +132,26 @@ void GPU::draw_line()
     ds = this->mmu_.LCDC.WTMDS.get();
     if (this->mmu_.LCDC.WDE.get() && this->mmu_.WY.get() <= this->mmu_.LY.get())
     {
-        int16_t tmp = this->mmu_.WX.get() - 7;
+        int16_t tmp = this->mmu_.WX.get() - 7; // -7 is wired that way
         uint8_t delta_y = this->mmu_.LY.get() - this->mmu_.WY.get();
         for (int16_t x = tmp; x < WIDTH; ++x)
         {
             if (x < 0) continue;
             BGWTile win_tile = BGWTile(this->mmu_, x - tmp, delta_y, ds);
-            bkg[x] = this->mmu_.BGP.C[win_tile.color(x % 8)].get();
+            if (!bg_priority[x]) {
+                line[x] = this->bgp_to_color(
+                    win_tile.color(x % 8), win_tile.attribute.palette);
+                bg_priority[x] =
+                    !this->mmu_.LCDC.BGD.get() && win_tile.attribute.priority;
+            }
         }
     }
 
     // Draw objects.
-    uint8_t objs[WIDTH];
-    for (uint8_t x = 0; x < WIDTH; ++x)
-        objs[x] = 0xff;
     if (this->mmu_.LCDC.OBJSDE.get())
     {
         std::list<Sprite*> sprites = SpriteManager::get_sprites(
-            this->mmu_, this->mmu_.LY.get()
-        );
+            this->mmu_, this->mmu_.LY.get());
         logging::debug("List size : %zu", sprites.size());
         for (auto it_ = sprites.begin(); it_ != sprites.end(); ++it_)
         {
@@ -118,24 +159,22 @@ void GPU::draw_line()
             for (int it = 0; it < 8; ++it)
             {
                 uint8_t x = sprite->x_base() + it;
-                if (x < WIDTH && sprite->is_displayed(it, bkg[x]))
-                    objs[x] = sprite->color(it);
+                uint8_t col = sprite->color(it);
+                if (x < WIDTH && col > 0
+                    && (!bg_priority[x] && sprite->above_bg))
+                        line[x] = obp_to_color(col, sprite->palette);
             }
             delete sprite;
         }
     }
 
     // Drawing of the final background and objects.
+    this->display_->lock();
     uint8_t y = this->mmu_.LY.get();
     for (uint8_t x = 0; x < WIDTH; x++)
     {
         int res = 0;
-        if (objs[x] == 0xff && !this->mmu_.LCDC.BGD.get())
-            res = this->display_->setPixel(x, y, this->colors_[0]);
-        else if (objs[x] != 0xff)
-            res = this->display_->setPixel(x, y, this->colors_[objs[x]]);
-        else
-            res = this->display_->setPixel(x, y, this->colors_[bkg[x]]);
+        res = this->display_->setPixel(x, y, line[x]);
         if (res < 0)
             logging::error("Display::setPixel failed!");
     }

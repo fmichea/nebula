@@ -61,6 +61,7 @@ public:
     Z80Registers()
         : F (&flags_), AF (A, flags_, 0xf0), BC (B, C), DE (D, E), HL (H, L)
     {
+        // A == 0x11: we are CGB-compatible
         this->AF.set(0x11b0);
         this->BC.set(0x0013);
         this->DE.set(0x00d8);
