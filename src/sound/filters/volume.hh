@@ -17,7 +17,6 @@ public:
 private:
     Converter tick_;
     const NRX2Proxy& nrx2_;
-    bool enabled_;
 
     uint8_t volume_;
     uint8_t way_;
