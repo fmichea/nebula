@@ -8,6 +8,11 @@
 # include "../frequency.hh"
 # include "filter.hh"
 
+typedef enum {
+    VOLUMEENVELOP_INC,
+    VOLUMEENVELOP_DEC,
+} volumeenvelop_way;
+
 class VolumeEnvelop : public Filter {
 public:
     VolumeEnvelop(const NRX2Proxy& nrx2);
@@ -19,8 +24,8 @@ private:
     Converter tick_;
     const NRX2Proxy& nrx2_;
 
-    uint8_t volume_;
-    uint8_t way_;
+    int32_t volume_;
+    volumeenvelop_way way_;
     Cycle<unsigned int> sweep_;
 };
 
