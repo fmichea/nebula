@@ -80,6 +80,10 @@ void MMU::write(uint16_t addr, T value)
         if (addr == this->DIV.addr() || addr == this->LY.addr())
             value = 0;
         ptr = (T*) (this->io_ + addr - 0xFF00);
+        if (addr == this->NR52.addr()) {
+            this->NR52.sound_on.set((value >> 7) & 1);
+            ptr = nullptr;
+        }
     } else if (0xFF80 <= addr)
         ptr = (T*) (this->hram_ + addr - 0xFF80);
 

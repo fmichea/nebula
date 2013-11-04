@@ -23,6 +23,7 @@
 # include "registers/nrx1.hh"
 # include "registers/nrx2.hh"
 # include "registers/nrx4.hh"
+# include "registers/nr52.hh"
 # include "registers/palette.hh"
 # include "registers/register.hh"
 # include "registers/stat.hh"
