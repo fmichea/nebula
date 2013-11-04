@@ -8,17 +8,16 @@ Sound::Sound(MMU& mmu)
     // Init channels.
     for (int it = 0; it < NB_GB_CHANNELS; ++it)
         this->channels_[it] = nullptr;
-    this->channels_[0] = new Channel(mmu.NR13, mmu.NR14, {
+    this->channels_[0] = new Channel(1, mmu.NR52, mmu.NR13, mmu.NR14, {
         new WaveForm(mmu.NR11),
-        new Length(mmu.NR11, mmu.NR14),
+        new Length(mmu.NR52, mmu.NR11, mmu.NR14),
         new VolumeEnvelop(mmu.NR12),
     });
-    this->channels_[1] = new Channel(mmu.NR23, mmu.NR24, {
+    this->channels_[1] = new Channel(2, mmu.NR52, mmu.NR23, mmu.NR24, {
         new WaveForm(mmu.NR21),
-        new Length(mmu.NR21, mmu.NR24),
+        new Length(mmu.NR52, mmu.NR21, mmu.NR24),
         new VolumeEnvelop(mmu.NR22),
     });
-    //this->channels_[1] = new Channel2(this->mmu_);
 
     // Initialize SDL.
     SDL_InitSubSystem(SDL_INIT_AUDIO);
@@ -49,7 +48,7 @@ void Sound::fill_stream(Uint8* stream, int _len) {
     memset(stream, 0, _len);
 
     // If sound is not ON, end there.
-    if ((this->mmu_.NR52.get() & (1 << 7)) == 0)
+    if (this->mmu_.NR52.sound_on.get() == 0)
         return;
 
     for (int it = 0; it < NB_GB_CHANNELS; ++it) {

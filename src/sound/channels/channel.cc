@@ -1,7 +1,7 @@
 #include "channel.hh"
 
-Channel::Channel(const RegisterProxy& nrx3, const NRX4Proxy& nrx4, const std::list<Filter*>& filters)
-    : frequency_ (261), filters_ (filters), nrx3_ (nrx3), nrx4_ (nrx4)
+Channel::Channel(int num, NR52Proxy& nr52, const RegisterProxy& nrx3, const NRX4Proxy& nrx4, const std::list<Filter*>& filters)
+    : num_ (num), frequency_ (261), filters_ (filters), nr52_ (nr52), nrx3_ (nrx3), nrx4_ (nrx4)
 {}
 
 Channel::~Channel()
@@ -40,5 +40,6 @@ void Channel::update() {
         for (it = this->filters_.begin(); it != this->filters_.end(); it++) {
             (*it)->reload();
         }
+        this->nr52_.channel_on[this->num_ - 1].set(1);
     }
 }
