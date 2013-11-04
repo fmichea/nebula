@@ -47,4 +47,14 @@ void Cycle<T>::reset() {
     this->counter_ = T(0);
 }
 
+template <typename T>
+T Cycle<T>::counter() {
+    return this->counter_;
+}
+
+template <typename T>
+T Cycle<T>::maximum() {
+    return this->maximum_;
+}
+
 #endif // !CYCLE_HXX_

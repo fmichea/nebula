@@ -12,6 +12,9 @@ public:
     T& operator-- ();
     T operator-- (int unused);
 
+    T counter();
+    T maximum();
+
     void reset();
 
 private:
