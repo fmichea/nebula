@@ -45,7 +45,7 @@ bool MMU::load_rom(std::string filename)
     munmap(mapped, stat.st_size);
 
     // ROM type
-    this->gb_type = (this->rom_[0x143] == 0x80 || this->rom_[0x143] == 0x80)
+    this->gb_type = (this->rom_[0x143] == 0x80 || this->rom_[0x143] == 0xC0)
         ? GBType::CGB : GBType::GB;
 
     // Checking that ROM was correctly loaded.
