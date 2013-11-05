@@ -9,7 +9,10 @@ static inline bool do_doublespeed_cycle(MMU& mmu, uint32_t count)
 }
 
 Z80::Z80(std::string filename)
-    : filename_(filename), gpu_ (mmu_), int_ (mmu_, regs_), kb_ (mmu_), sound_ (mmu_)
+    : filename_(filename), gpu_ (mmu_), int_ (mmu_, regs_), kb_ (mmu_)
+#ifdef _SOUND
+      ,sound_ (mmu_) // FIXME
+#endif
 {}
 
 bool Z80::execute()
