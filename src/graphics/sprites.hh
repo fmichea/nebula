@@ -37,8 +37,8 @@ public:
     bool        above_bg;
 
 private:
-    uint8_t     x_;
-    uint8_t     y_;
+    int16_t     x_;
+    int16_t     y_;
     uint8_t     line_[8];
 };
 
