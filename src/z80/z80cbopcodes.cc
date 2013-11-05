@@ -149,7 +149,7 @@ uint16_t bit_nb_1B_reg(MMU& mmu, Z80Registers& regs, uint8_t& reg, uint8_t bit)
         uint16_t res = OpName(mmu, regs, tmp, Bit);         \
         return res + P(0, Delay);                           \
     }
-#include "cbopcodes.def"
+#include "cbopcodes.gdef"
 #undef X1
 #undef X2
 #undef H1

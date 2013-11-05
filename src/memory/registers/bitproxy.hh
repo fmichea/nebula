@@ -14,8 +14,10 @@ public:
         : reg_ (reg), bit_ (bit), mask_ (mask)
     {}
 
-    uint8_t get()
+    uint8_t get() const
     {
+        if (this->reg_ == nullptr)
+            return 0;
         return (*this->reg_ >> this->bit_) & this->mask_;
     }
 
@@ -23,6 +25,8 @@ public:
     {
         uint8_t value = (val & this->mask_) << this->bit_;
 
+        if (this->reg_ == nullptr)
+            return;
         *this->reg_ &= (~0 ^ (this->mask_ << this->bit_));
         *this->reg_ |= value;
     }

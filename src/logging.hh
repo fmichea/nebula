@@ -1,8 +1,8 @@
 #ifndef LOGGING_HH_
 # define LOGGING_HH_
 
-# include <stdio.h>
 # include <stdarg.h>
+# include <stdio.h>
 # include <unistd.h>
 
 namespace logging {

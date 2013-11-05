@@ -2,11 +2,13 @@
 # define Z___HH_
 
 # include <stdio.h>
-# include "z80opcodes.hh"
-# include "z80disassembler.hh"
+
 # include "../graphics/gpu.hh"
-# include "interrupts.hh"
 # include "../keyboard/keyboard.hh"
+# include "../sound/sound.hh"
+# include "interrupts.hh"
+# include "z80disassembler.hh"
+# include "z80opcodes.hh"
 
 class Z80
 {
@@ -22,6 +24,7 @@ private:
     GPU             gpu_;
     Interrupts      int_;
     Keyboard        kb_;
+    Sound           sound_;
 };
 
 #endif // !Z___HH_

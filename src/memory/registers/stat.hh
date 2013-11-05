@@ -1,17 +1,15 @@
 #ifndef STAT_HH_
 # define STAT_HH_
 
-# include <stdint.h>
-
 # include "bitproxy.hh"
+# include "register.hh"
 
-class STATProxy
-{
+class STATProxy : public RegisterProxy {
 public:
-    STATProxy()
-    {}
+    STATProxy() : RegisterProxy() {}
 
-    STATProxy(uint8_t* reg)
+    STATProxy(uint8_t* reg, uint16_t addr)
+        : RegisterProxy(reg, addr)
     {
         this->coin_int = BitProxy(reg, 6, 0x1);
         this->OAM_int = BitProxy(reg, 5, 0x1);
@@ -20,8 +18,6 @@ public:
         this->coin_flag = BitProxy(reg, 2, 0x1);
         this->mode = BitProxy(reg, 0, 0x3);
     }
-
-    uint16_t addr() { return 0xFF41; }
 
     BitProxy coin_int; // LYC = LY Coincidence Interrupt (1 = Enable)
     BitProxy OAM_int; // Mode 2 (OAM Interrupt)

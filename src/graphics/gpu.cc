@@ -86,9 +86,12 @@ uint32_t GPU::bgp_to_color(uint8_t idx, uint8_t pal)
 
 uint32_t GPU::obp_to_color(uint8_t idx, uint8_t pal)
 {
-    if (this->mmu_.gb_type == GBType::GB)
-        return this->bgcolors_[this->mmu_.OBP[pal].C[idx].get()];
-    else {
+    if (this->mmu_.gb_type == GBType::GB) {
+        PaletteProxy* palette = &this->mmu_.OBP1;
+        if (pal)
+            palette = &this->mmu_.OBP2;
+        return this->bgcolors_[palette->C[idx].get()];
+    } else {
         // each palette is 8 bytes
         // each color is 2 bytes
         uint16_t color = *(uint16_t*)(this->mmu_.cobp_ + pal * 8 + idx * 2);

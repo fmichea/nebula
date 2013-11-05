@@ -18,7 +18,7 @@ Sprite::Sprite(MMU& mmu, s_sprite& sprite, uint8_t y)
         mmu.write<uint8_t>(0xff4f, sprite.flags.bank);
 
     if (mmu.LCDC.OBJSS.get()) tile_number &= ~1;
-    uint16_t addr = 0x8000+ tile_number * 16;
+    uint16_t addr = 0x8000 + tile_number * 16;
 
     if (sprite.flags.y_flip)
         addr += 2 * ((SPRITE_HEIGHT - (y - this->y_)));

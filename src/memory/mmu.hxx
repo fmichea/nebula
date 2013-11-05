@@ -3,6 +3,17 @@
 
 # include "mmu.hh"
 
+static const uint8_t _nr_masks[32] = {
+    /*          NRx0 | NRx1 | NRx2 | NRx3 | NRx4 */
+    /* NR1x */  0x80,  0x3F,  0x00,  0xFF,  0xBF,
+    /* NR2x */  0xFF,  0x3F,  0x00,  0xFF,  0xBF,
+    /* NR3x */  0x7F,  0xFF,  0x9F,  0xFF,  0xBF,
+    /* NR4x */  0xFF,  0xFF,  0x00,  0x00,  0xBF,
+    /* NR5x */  0x00,  0x00,  0x70,
+    /* WTF: */  0xFF,  0xFF,  0xFF,  0xFF,  0xFF,
+                0xFF,  0xFF,  0xFF,  0xFF
+};
+
 template<typename T>
 T MMU::read(uint16_t addr)
 {
@@ -39,8 +50,16 @@ T MMU::read(uint16_t addr)
     }
     else if (0xFF80 <= addr)
         ptr = (T*) (this->hram_ + addr - 0xFF80);
-    if (ptr != 0)
-        return (*ptr);
+    if (ptr != 0) {
+        T res = (*ptr);
+        if ((this->NR10.addr() <= addr && addr <= this->NR52.addr()) ||
+            (0xFF27 <= addr && addr <= 0xFF2F)) {
+            // FIXME: quite dirty, any way to do this cleaner?
+            uint8_t* tmp = (uint8_t*) &res;
+            *tmp |= _nr_masks[addr - this->NR10.addr()];
+        }
+        return res;
+    }
     return this->mbc_->read<T>(addr);
 }
 
@@ -104,6 +123,10 @@ void MMU::write(uint16_t addr, T value)
             return;
         if (addr == this->DIV.addr() || addr == this->LY.addr())
             value = 0;
+        if (addr == this->NR52.addr()) {
+            this->NR52.sound_on.set((value >> 7) & 1);
+            ptr = nullptr;
+        }
     } else if (0xFF80 <= addr)
         ptr = (T*) (this->hram_ + addr - 0xFF80);
 

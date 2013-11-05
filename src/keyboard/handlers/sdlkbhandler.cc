@@ -2,8 +2,8 @@
 
 #define KEY_ASSOC_SZ 9
 struct {
-    SDLKey sdlkey;
-    e_kbh_key kbhkey;
+    SDL_Keycode sdlkey;
+    e_kbh_key   kbhkey;
 } key_assoc[KEY_ASSOC_SZ] = {
     { .sdlkey = SDLK_ESCAPE, .kbhkey = KBH_KEY_QUIT },
 
@@ -19,34 +19,54 @@ struct {
     { .sdlkey = SDLK_RETURN, .kbhkey = KBH_KEY_SELECT },
 };
 
-static int handle_event(const SDL_Event* e);
-
-static KBEventHandler* _eventhandler = nullptr;
+static void* handle_events(void* data);
 
 SDLKBHandler::SDLKBHandler(KBEventHandler* eventhandler)
     : KBHandler(eventhandler)
 {
-    _eventhandler = this->eventhandler_;
-    SDL_SetEventFilter(handle_event);
+    pthread_attr_t attr;
+
+    // Initialize SDL sub systems.
+    SDL_InitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_EVENTS);
+
+    // Create the event manager thread.
+    pthread_attr_init(&attr);
+    pthread_create(&this->thread_, &attr, handle_events, eventhandler);
+    pthread_attr_destroy(&attr);
 }
 
-static int handle_event(const SDL_Event* e) {
-    s_kbh_event event;
+SDLKBHandler::~SDLKBHandler() {
+    // Kill the thread.
+    pthread_cancel(this->thread_);
+    pthread_join(this->thread_, NULL);
 
-    if (_eventhandler == nullptr)
-        return 1;
-    if (e->type == SDL_KEYDOWN || e->type == SDL_KEYUP) {
-        for (int it = 0; it < KEY_ASSOC_SZ; ++it) {
-            if (e->key.keysym.sym == key_assoc[it].sdlkey) {
-                if (e->type == SDL_KEYDOWN)
-                    event.type = KBH_EVENT_TYPE_KEYDOWN;
-                else
-                    event.type = KBH_EVENT_TYPE_KEYUP;
-                event.key = key_assoc[it].kbhkey;
-                _eventhandler->handle_event(&event);
-                return 0;
+    // Quit submodule.
+    SDL_QuitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_EVENTS);
+}
+
+static void* handle_events(void* data) {
+    SDL_Event       event;
+    s_kbh_event     ret;
+    KBEventHandler* eventhandler = static_cast<KBEventHandler*>(data);
+
+    while (SDL_WaitEvent(&event)) {
+        if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) {
+            for (int it = 0; it < KEY_ASSOC_SZ; ++it) {
+                if (event.key.keysym.sym == key_assoc[it].sdlkey) {
+                    if (event.type == SDL_KEYDOWN)
+                        ret.type = KBH_EVENT_TYPE_KEYDOWN;
+                    else
+                        ret.type = KBH_EVENT_TYPE_KEYUP;
+                    ret.key = key_assoc[it].kbhkey;
+                    eventhandler->handle_event(&ret);
+                }
             }
+        } else if (event.type == SDL_QUIT) {
+            ret.key = KBH_KEY_QUIT;
+            ret.type = KBH_EVENT_TYPE_KEYDOWN;
+            eventhandler->handle_event(&ret);
+            break;
         }
     }
-    return 1;
+    return NULL;
 }

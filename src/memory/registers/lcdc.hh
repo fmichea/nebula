@@ -3,15 +3,15 @@
 
 # include <stdint.h>
 
+# include "register.hh"
 # include "bitproxy.hh"
 
-class LCDCProxy
-{
+class LCDCProxy : public RegisterProxy {
 public:
-    LCDCProxy()
-    {}
+    LCDCProxy() : RegisterProxy() {}
 
-    LCDCProxy(uint8_t* reg)
+    LCDCProxy(uint8_t* reg, uint16_t addr)
+        : RegisterProxy(reg, addr)
     {
         this->LDE = BitProxy(reg, 7, 0x1);
         this->WTMDS = BitProxy(reg, 6, 0x1);

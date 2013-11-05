@@ -21,6 +21,7 @@ class DefMacro(object):
     }
 
     def __init__(self, name):
+        name = '{}.gdef'.format(name)
         self.f = open(os.path.join(os.path.dirname(__file__), name), 'w')
 
     def __del__(self):
@@ -30,7 +31,7 @@ class DefMacro(object):
         self.f.write(self.MACROS[macro] % args)
 
 # Standart opcodes.
-std = DefMacro('opcodes.def')
+std = DefMacro('opcodes')
 
 for func in ['inc_%s_reg', 'dec_%s_reg']:
     for reg in ALL_regs:
@@ -71,7 +72,7 @@ for a in [0, 8, 10, 18, 20, 28, 30, 38]:
     std.write('x0', 'rst_%02dh' % a, 'rst_nn', '0x%d' % a)
 
 # CB Opcodes
-cb = DefMacro('cbopcodes.def')
+cb = DefMacro('cbopcodes')
 
 funcs = ['rlc_%s', 'rl_%s', 'sla_%s', 'rrc_%s', 'rr_%s', 'sra_%s', 'srl_%s',
          'swap_%s']
@@ -91,7 +92,7 @@ for func in ['bit_%s_%s', 'set_%s_%s', 'res_%s_%s']:
         cb.write(hname, func % (bit, 'mhl'), func % ('nb', '1B_reg'), bit, delay)
 
 # Disassembly
-dis = DefMacro('disass.def')
+dis = DefMacro('disass')
 
 for op in ['inc', 'dec']:
     for reg in ALL_regs:

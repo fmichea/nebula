@@ -839,7 +839,7 @@ uint16_t cb(MMU& mmu, Z80Registers& regs)
     {                                                           \
         return OpName(mmu, regs, Reg1, Reg2);                   \
     }
-#include "opcodes.def"
+#include "opcodes.gdef"
 #undef X2
 #undef X1
 

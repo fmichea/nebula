@@ -204,24 +204,15 @@ bool MMU::load_mbc(uint8_t val)
 
 bool MMU::reset_registers()
 {
-#define X(Reg, Addr, Value)                                     \
-    this->Reg = Register(this->io_ + Addr - 0xff00, Addr);      \
-    this->Reg.set(Value);
-#include "registers.hh"
-#undef X
-    this->LCDC = LCDCProxy(this->io_ + 0xff40 - 0xff00);
-    this->io_[0xff40 - 0xff00] = 0x91;
-    this->STAT = STATProxy(this->io_ + 0xff41 - 0xff00);
-    this->STAT.mode.set(0);
-    this->BGP = PaletteProxy(this->io_ + 0xff47 - 0xff00);
-    this->io_[0xff47 - 0xff00] = 0xFC;
-    this->OBP[0] = PaletteProxy(this->io_ + 0xff48 - 0xff00);
-    this->io_[0xff48 - 0xff00] = 0xFF;
-    this->OBP[1] = PaletteProxy(this->io_ + 0xff49 - 0xff00);
-    this->io_[0xff49 - 0xff00] = 0xFF;
-    this->IE = Register(this->hram_ + 0xffff - 0xff80, 0xffff);
+    this->IE = RegisterProxy(this->hram_ + 0xffff - 0xff80, 0xffff);
     this->IE.set(0x00);
-    this->write<uint8_t>(0xFF00, 0xff);
+#define X2(RegType, Reg, Addr, Value)                           \
+    this->Reg = RegType(this->io_ + (Addr - 0xff00), Addr);     \
+    this->Reg.set(Value);
+#define X1(Reg, Addr, Value) X2(RegisterProxy, Reg, Addr, Value)
+#include "registers.def"
+#undef X1
+#undef X2
     return true;
 }
 

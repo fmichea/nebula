@@ -10,50 +10,28 @@
 # include <unistd.h>
 
 # include "../logging.hh"
+
 # include "mbcs/mbc.hh"
 # include "mbcs/mbc1.hh"
 # include "mbcs/mbc2.hh"
 # include "mbcs/mbc3.hh"
 # include "mbcs/mbc5.hh"
 # include "mbcs/romonly.hh"
+
 # include "registers/lcdc.hh"
+# include "registers/nr10.hh"
+# include "registers/nrx1.hh"
+# include "registers/nrx2.hh"
+# include "registers/nrx4.hh"
+# include "registers/nr52.hh"
 # include "registers/palette.hh"
+# include "registers/register.hh"
 # include "registers/stat.hh"
 
 enum class GBType { GB, CGB, SGB };
 
 class MMU
 {
-    class Register
-    {
-    public:
-        Register()
-            : reg_ (0)
-        {}
-
-        Register(uint8_t* reg, uint16_t addr)
-            : reg_ (reg), addr_ (addr)
-        {}
-
-        void set(uint8_t val)
-        {
-            *this->reg_ = val;
-        }
-
-        uint8_t get()
-        {
-            return *this->reg_;
-        }
-
-        uint16_t addr()
-        {
-            return this->addr_;
-        }
-
-    private:
-        uint8_t*    reg_;
-        uint16_t    addr_;
-    };
 
 public:
     MMU();
@@ -64,15 +42,12 @@ public:
     template<typename T> T read(uint16_t addr);
     template<typename T> void write(uint16_t addr, T value);
 
-# define X(Reg, Addr, Value)    \
-    Register Reg;
-# include "registers.hh"
-# undef X
-    Register IE;
-    STATProxy STAT;
-    LCDCProxy LCDC;
-    PaletteProxy BGP;
-    PaletteProxy OBP[2];
+# define X2(RegType, Reg, Addr, Value) RegType Reg;
+# define X1(Reg, Addr, Value) X2(RegisterProxy, Reg, Addr, Value)
+# include "registers.def"
+# undef X1
+# undef X2
+    RegisterProxy IE;
 
     bool            stopped;
     GBType          gb_type = GBType::GB;
