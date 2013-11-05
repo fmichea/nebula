@@ -106,14 +106,15 @@ uint32_t GPU::obp_to_color(uint8_t idx, uint8_t pal)
 void GPU::draw_line()
 {
     uint32_t line[WIDTH];
-    bool     bg_priority[WIDTH];
+    int8_t   bg_priority[WIDTH];
     uint8_t  real_y = this->mmu_.LY.get() + this->mmu_.SCY.get();
     uint8_t  scx = this->mmu_.SCX.get();
     uint8_t  ds = this->mmu_.LCDC.BGTMDS.get();
 
-    memset(line, 0, sizeof (line));
-    for (uint8_t x = 0; x < WIDTH; ++x)
-        bg_priority[x] = false;
+    for (uint8_t x = 0; x < WIDTH; ++x) {
+        bg_priority[x] = 0;
+        line[x] = this->bgcolors_[0];
+    }
 
     // Real background.
     if (this->mmu_.gb_type == GBType::CGB || this->mmu_.LCDC.BGD.get())
@@ -124,10 +125,12 @@ void GPU::draw_line()
             uint8_t real_x = scx + x;
             if (real_x % 8 == 0)
                 bg_tile = BGWTile(this->mmu_, real_x, real_y, ds);
-            line[x] = this->bgp_to_color(
-                bg_tile.color(real_x % 8), bg_tile.attribute.palette);
-            bg_priority[x] =
-                !this->mmu_.LCDC.BGD.get() && bg_tile.attribute.priority;
+            uint8_t col = bg_tile.color(real_x % 8);
+            line[x] = this->bgp_to_color(col, bg_tile.attribute.palette);
+            if (this->mmu_.gb_type == GBType::CGB && bg_tile.attribute.priority)
+                bg_priority[x] = 1;
+            if (col == 0 || !this->mmu_.LCDC.BGD.get())
+                bg_priority[x] = -1;
         }
     }
 
@@ -141,12 +144,13 @@ void GPU::draw_line()
         {
             if (x < 0) continue;
             BGWTile win_tile = BGWTile(this->mmu_, x - tmp, delta_y, ds);
-            if (!bg_priority[x]) {
-                line[x] = this->bgp_to_color(
-                    win_tile.color(x % 8), win_tile.attribute.palette);
-                bg_priority[x] =
-                    !this->mmu_.LCDC.BGD.get() && win_tile.attribute.priority;
-            }
+            uint8_t col = win_tile.color(x % 8);
+            line[x] = this->bgp_to_color(col, win_tile.attribute.palette);
+            if (this->mmu_.gb_type == GBType::CGB
+                    && win_tile.attribute.priority)
+                bg_priority[x] = 1;
+            if (col == 0 || !this->mmu_.LCDC.BGD.get())
+                bg_priority[x] = -1;
         }
     }
 
@@ -162,10 +166,12 @@ void GPU::draw_line()
             for (int it = 0; it < 8; ++it)
             {
                 uint8_t x = sprite->x_base() + it;
-                uint8_t col = sprite->color(it);
-                if (x < WIDTH && col > 0
-                    && (!bg_priority[x] && sprite->above_bg))
+                if (x < WIDTH) {
+                    uint8_t col = sprite->color(it);
+                    if (col > 0 && (bg_priority[x] == -1
+                            || (bg_priority[x] == 0 && sprite->above_bg)))
                         line[x] = obp_to_color(col, sprite->palette);
+                }
             }
             delete sprite;
         }
