@@ -26,7 +26,9 @@ public:
 private:
     SDL_Window*     window_;
     SDL_Renderer*   renderer_;
-    SDL_Rect        rect_;
+    SDL_Texture*    texture_;
+
+    uint32_t*       buffer_;
 };
 
 # endif // _DISPLAY_BACKEND == 0
