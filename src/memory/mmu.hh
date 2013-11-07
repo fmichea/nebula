@@ -18,15 +18,7 @@
 # include "mbcs/mbc5.hh"
 # include "mbcs/romonly.hh"
 
-# include "registers/lcdc.hh"
-# include "registers/nr10.hh"
-# include "registers/nrx1.hh"
-# include "registers/nrx2.hh"
-# include "registers/nrx4.hh"
-# include "registers/nr52.hh"
-# include "registers/palette.hh"
-# include "registers/register.hh"
-# include "registers/stat.hh"
+# include "registers/registers.hh"
 
 enum class GBType { GB, CGB, SGB };
 
