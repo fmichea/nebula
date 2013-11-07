@@ -14,7 +14,7 @@ int32_t Length::filter(int32_t frequency) {
     if (this->enabled_) {
         if (this->length_ != 0 && this->tick_.next()) {
             this->length_ -= 1;
-            logging::info("Length tick: %d", this->length_);
+            //logging::info("Length tick: %d", this->length_);
             this->nr52_.channel_on[this->num_ - 1].set((this->length_ ? 1 : 0));
         }
         if (this->length_ == 0)

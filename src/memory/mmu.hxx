@@ -124,9 +124,9 @@ void MMU::write(uint16_t addr, T value)
         if (addr == this->DIV.addr() || addr == this->LY.addr())
             value = 0;
         if (addr == this->NR52.addr()) {
-            logging::info("nr52 = %x (%x)", this->NR52.get(), value);
+            //logging::info("nr52 = %x (%x)", this->NR52.get(), value);
             this->NR52.sound_on.set((value >> 7) & 1);
-            logging::info("nr52 = %x", this->NR52.get());
+            //logging::info("nr52 = %x", this->NR52.get());
             if (!this->NR52.sound_on.get()) {
                 for (int it = 0xFF10; it < 0xFF26; ++it)
                     this->io_[it - 0xFF00] = 0;
@@ -134,10 +134,10 @@ void MMU::write(uint16_t addr, T value)
             ptr = nullptr;
         }
         if ((this->NR10.addr() <= addr && addr <= this->NR52.addr())) {
-            logging::info("Trying to write %x at %x. (%s)", value, addr,
-                          (this->NR52.sound_on.get() ? "ON" : "OFF"));
+            //logging::info("Trying to write %x at %x. (%s)", value, addr,
+                          //(this->NR52.sound_on.get() ? "ON" : "OFF"));
             if (!this->NR52.sound_on.get()) {
-                logging::info("Ignore write %x...", addr);
+                //logging::info("Ignore write %x...", addr);
                 ptr = nullptr;
             }
         }

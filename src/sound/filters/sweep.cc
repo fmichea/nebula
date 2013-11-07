@@ -10,12 +10,12 @@ int32_t FrequencySweep::filter(int32_t freq) {
         if (this->tick_.next() && (--this->counter_) == 0) {
             this->last_diff_ = this->diff_;
             this->diff_ *= (1 << this->sweep_shift_);
-            logging::info("Sweep: %d -> %d", this->last_diff_, this->diff_);
+            //logging::info("Sweep: %d -> %d", this->last_diff_, this->diff_);
         }
     }
     freq = this->compute_freq(freq);
     if (freq <= 0 || 2048 <= freq) {
-        logging::info("Disable sound channel %d.", this->num_);
+        //logging::info("Disable sound channel %d.", this->num_);
         this->nr52_.channel_on[this->num_ - 1].set(0);
     }
     return freq;
