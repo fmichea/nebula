@@ -9,9 +9,13 @@
 //# include "sound/channels/channel1.hh"
 //# include "sound/channels/channel2.hh"
 # include "filters/filter.hh"
+# include "filters/frequency.hh"
 # include "filters/length.hh"
+# include "filters/sweep.hh"
+# include "filters/timer.hh"
 # include "filters/volume.hh"
 # include "filters/wave.hh"
+
 # include "channels/channel.hh"
 # include "constants.hh"
 

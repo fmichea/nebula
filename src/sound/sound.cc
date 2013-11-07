@@ -9,15 +9,28 @@ Sound::Sound(MMU& mmu)
     for (int it = 0; it < NB_GB_CHANNELS; ++it)
         this->channels_[it] = nullptr;
     this->channels_[0] = new Channel(1, mmu.NR52, mmu.NR13, mmu.NR14, {
-        new WaveForm(mmu.NR11),
-        new Length(mmu.NR52, mmu.NR11, mmu.NR14),
+        new FrequencySweep(1, mmu.NR52, mmu.NR10),
+        //new nebula::sound::filters::Timer(),
+        new QuandrangularChannel(),
+        new WaveForm(mmu.NR11, mmu.NR13, mmu.NR14),
+        new Length(1, mmu.NR52, mmu.NR11, mmu.NR14),
         new VolumeEnvelop(mmu.NR12),
     });
     this->channels_[1] = new Channel(2, mmu.NR52, mmu.NR23, mmu.NR24, {
-        new WaveForm(mmu.NR21),
-        new Length(mmu.NR52, mmu.NR21, mmu.NR24),
+        //new nebula::sound::filters::Timer(),
+        new QuandrangularChannel(),
+        new WaveForm(mmu.NR21, mmu.NR23, mmu.NR24),
+        new Length(2, mmu.NR52, mmu.NR21, mmu.NR24),
         new VolumeEnvelop(mmu.NR22),
     });
+#if 0
+    this->channels_[2] = new Channel(3, mmu.NR52, mmu.NR33, mmu.NR34, {
+        new Length(3, mmu.NR52, mmu.NR31, mmu.NR34),
+    });
+    this->channels_[3] = new Channel(4, mmu.NR52, mmu.NR33, mmu.NR34, {
+        new Length(4, mmu.NR52, mmu.NR41, mmu.NR44),
+    });
+#endif
 
     // Initialize SDL.
     SDL_InitSubSystem(SDL_INIT_AUDIO);
@@ -50,14 +63,13 @@ void Sound::fill_stream(Uint8* stream, int _len) {
     // If sound is not ON, end there.
     if (this->mmu_.NR52.sound_on.get() == 0)
         return;
+    //logging::info("sound is ON!");
 
     for (int it = 0; it < NB_GB_CHANNELS; ++it) {
         channels[it] = new int16_t[len];
         memset(channels[it], 0, len * sizeof (int16_t));
         if (this->channels_[it] == nullptr)
             continue;
-//        if ((this->mmu_.NR52.get() & (1 << it)) == 0)
-//            continue;
         this->channels_[it]->fill_stream(channels[it], len);
     }
 
@@ -76,12 +88,13 @@ void Sound::fill_stream(Uint8* stream, int _len) {
             if (count != 0)
                 data /= count;
 
+            // Volume fix.
+            data *= this->mmu_.NR50.volume[chan].get();
+            data /= 7;
+
             // Avoid saturation.
             if (MAX_FREQ < data) data = MAX_FREQ;
             if (data < MIN_FREQ) data = MIN_FREQ;
-
-            // Volume fix.
-            //data = data / 100;
 
             // Add sound to outputs.
             stream_[it] = (Sint16) data;
