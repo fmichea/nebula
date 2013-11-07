@@ -63,7 +63,6 @@ ELSEIF(_DISPLAY_BACKEND MATCHES "SDL")
                         src/sound/filters/frequency.cc
                         src/sound/filters/length.cc
                         src/sound/filters/sweep.cc
-                        src/sound/filters/timer.cc
                         src/sound/filters/volume.cc
                         src/sound/filters/wave.cc
                         src/sound/sound.cc
