@@ -2,7 +2,10 @@
 
 Channel::Channel(int num, NR52Proxy& nr52, const RegisterProxy& nrx3, const NRX4Proxy& nrx4, const std::list<Filter*>& filters)
     : num_ (num), frequency_ (261), filters_ (filters), nr52_ (nr52), nrx3_ (nrx3), nrx4_ (nrx4)
-{}
+{
+    for (Filter* filter : this->filters_)
+        filter->reload();
+}
 
 Channel::~Channel()
 {
@@ -18,6 +21,9 @@ void Channel::fill_stream(int16_t* stream, unsigned int len) {
 
     this->update();
     for (unsigned int x = 0; x < len; ++x) {
+        if (!this->nr52_.channel_on[this->num_ - 1].get())
+            break;
+
         int32_t data = this->frequency_;
 
         for (it = this->filters_.begin(); it != this->filters_.end(); it++) {
@@ -34,8 +40,7 @@ void Channel::update() {
     if (this->nrx4_.restart.get()) { // Reload sound channel.
         // Reload sound frequency.
         freq = (this->nrx4_.freq_hi.get() << 8) | this->nrx3_.get();
-        this->frequency_ = 131072 / (2048 - freq);
-        logging::info("frequency: %d", this->frequency_);
+        this->frequency_ = freq;
 
         for (it = this->filters_.begin(); it != this->filters_.end(); it++) {
             (*it)->reload();
