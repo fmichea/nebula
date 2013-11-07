@@ -1,12 +1,11 @@
-#ifndef FREQUENCY_HH_
-# define FREQUENCY_HH_
+#ifndef CONVERTER_HH_
+# define CONVERTER_HH_
 
 # include <unistd.h>
 # include <stdint.h>
 # include <cmath>
 
 # include "../logging.hh"
-# include "constants.hh"
 
 class Converter {
 public:
@@ -23,4 +22,4 @@ private:
     unsigned int divider_;
 };
 
-#endif // !FREQUENCY_HH_
+#endif // !CONVERTER_HH_

@@ -1,4 +1,4 @@
-#include "frequency.hh"
+#include "converter.hh"
 
 Converter::Converter(unsigned int base_rate, unsigned int final_rate)
     : counter_ (0), base_rate_ (base_rate)
