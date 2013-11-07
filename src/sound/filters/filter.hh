@@ -1,6 +1,8 @@
 #ifndef FILTER_HH_
 # define FILTER_HH_
 
+# include <stdint.h>
+
 class Filter {
 public:
     Filter() : enabled_ (false) {}
