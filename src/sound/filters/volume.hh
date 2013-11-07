@@ -4,8 +4,9 @@
 # include <limits>
 
 # include "../../memory/registers/nrx2.hh"
+# include "../../utils/converter.hh"
 # include "../../utils/cycle.hh"
-# include "../frequency.hh"
+# include "../constants.hh"
 # include "filter.hh"
 
 typedef enum {

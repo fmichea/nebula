@@ -17,7 +17,7 @@ int32_t VolumeEnvelop::filter(int32_t freq) {
                     this->volume_--;
                 break;
             };
-            logging::info("volume sweep: %d", this->volume_);
+//            logging::info("volume sweep: %d", this->volume_);
         }
     }
     freq *= this->volume_;
@@ -26,11 +26,14 @@ int32_t VolumeEnvelop::filter(int32_t freq) {
 }
 
 void VolumeEnvelop::reload() {
+    this->tick_.reset();
+
     this->volume_ = this->nrx2_.volume.get();
     this->way_ = (this->nrx2_.envelop_way.get() ? VOLUMEENVELOP_INC : VOLUMEENVELOP_DEC);
 
     this->sweep_ = Cycle<unsigned int>(this->nrx2_.envelop_sweep.get());
     this->enabled_ = (this->sweep_.maximum() != 0);
-    logging::info("volume: %d", this->volume_);
-    logging::info("sweeps: %d (%s)", this->sweep_.maximum(), this->enabled_ ? "ON" : "OFF");
+//    logging::info("volume: %d", this->volume_);
+//    logging::info("volume sweeps: %d (%s)", this->sweep_.maximum(),
+//                  this->enabled_ ? "ON" : "OFF");
 }
