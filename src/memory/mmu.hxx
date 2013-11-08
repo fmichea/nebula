@@ -24,13 +24,13 @@ T MMU::read(uint16_t addr)
     else if (0x4000 <= addr && addr < 0x8000) // Bank 01 .. NN
         return this->mbc_->read<T>(addr);
     else if (0x8000 <= addr && addr < 0xA000) // VRAM
-        ptr = (T*) (this->vram_+ addr - 0x8000 + 0x2000 * this->VBK.get());
+        ptr = (T*) (this->vram_ + addr - 0x8000 + 0x2000 * this->VBK.get());
     else if (0xA000 <= addr && addr < 0xC000) // RAM
         return this->mbc_->read<T>(addr);
     else if (0xC000 <= addr && addr < 0xE000) { // WRAM
         if (this->gb_type == GBType::CGB && addr >= 0xD000
                 && (this->SVBK.get() >= 2)) // banked WRAM
-            ptr = (T*) (this->wram_ + (addr - 0xC000)
+            ptr = (T*) (this->wram_ + (addr - 0xD000)
                 + 0x1000 * this->SVBK.get());
         else
             ptr = (T*) (this->wram_ + addr - 0xC000);
@@ -79,7 +79,7 @@ void MMU::write(uint16_t addr, T value)
     else if (0xC000 <= addr && addr < 0xE000) { // WRAM
         if (this->gb_type == GBType::CGB && addr >= 0xD000
                 && (this->SVBK.get() >= 2)) // banked WRAM
-            ptr = (T*) (this->wram_ + (addr - 0xC000)
+            ptr = (T*) (this->wram_ + (addr - 0xD000)
                 + 0x1000 * this->SVBK.get());
         else
             ptr = (T*) (this->wram_ + addr - 0xC000);

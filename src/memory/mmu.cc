@@ -221,8 +221,8 @@ void MMU::do_hdma()
     if (this->hdma_index_ < this->hdma_length_) {
         uint16_t srcaddr = (this->HDMA1.get() << 8) | this->HDMA2.get();
         uint16_t dstaddr = (this->HDMA3.get() << 8) | this->HDMA4.get();
-        srcaddr &= 0xfc;
-        dstaddr = (dstaddr & 0x1ffc) | 0x8000; // ensure we are in VRAM
+        srcaddr &= 0xfff0;
+        dstaddr = (dstaddr & 0x1ff0) | 0x8000; // ensure we are in VRAM
 
         for (size_t i = 0; i < 0x10; ++i)
             this->write<uint8_t>(dstaddr + this->hdma_index_ + i,

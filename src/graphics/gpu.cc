@@ -75,7 +75,7 @@ uint32_t GPU::bgp_to_color(uint8_t idx, uint8_t pal)
 {
     if (this->mmu_.gb_type == GBType::GB)
         return this->bgcolors_[this->mmu_.BGP.C[idx].get()];
-    else {//TODO
+    else {
         uint16_t color = *(uint16_t*)(this->mmu_.cbgp_ + pal * 8 + idx * 2);
         return this->display_->getColor(
             correct_color(color & 0x1f),
