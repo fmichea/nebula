@@ -2,7 +2,7 @@
 # define MBC_HH_
 
 # include <stdint.h>
-# include <malloc.h>
+# include <stdlib.h>
 
 # include "../../logging.hh"
 
