@@ -1,6 +1,7 @@
 #ifndef ROMONLY_HH_
 # define ROMONLY_HH_
 
+# include "../../utils/utils.hh"
 # include "mbc.hh"
 
 class ROMOnly : public MBC

@@ -50,9 +50,7 @@ private:
 class KBHandler
 {
 public:
-    KBHandler(KBEventHandler* eventhandler) : eventhandler_ (eventhandler) {
-        (void) this->eventhandler_;
-    }
+    KBHandler(KBEventHandler* eventhandler) : eventhandler_ (eventhandler) {}
     virtual ~KBHandler() {}
 
 protected:

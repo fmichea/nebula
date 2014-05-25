@@ -105,7 +105,6 @@ bool MMU::load_rom(std::string filename)
 bool MMU::load_rom_size(uint8_t val)
 {
     // FIXME
-    (void) val;
     logging::info("ROM Size: %x.", val);
     return true;
 }
@@ -113,7 +112,6 @@ bool MMU::load_rom_size(uint8_t val)
 bool MMU::load_ram_size(uint8_t val)
 {
     // FIXME
-    (void) val;
     logging::info("RAM Size: %x.", val);
     return true;
 }

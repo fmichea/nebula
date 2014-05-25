@@ -49,10 +49,8 @@ void* MBC3::read_ram_address(uint16_t addr)
     return &this->rtc_reg_;
 }
 
-void* MBC3::write_rom_bank(uint16_t addr, uint16_t value)
+void* MBC3::write_rom_bank(uint16_t UNUSED(addr), uint16_t value)
 {
-    (void)addr;
-
     value &= 0x7F;
     if (value == 0)
         value += 0x1;
@@ -61,10 +59,8 @@ void* MBC3::write_rom_bank(uint16_t addr, uint16_t value)
     return NULL;
 }
 
-void* MBC3::write_extra_address(uint16_t addr, uint16_t value)
+void* MBC3::write_extra_address(uint16_t UNUSED(addr), uint16_t value)
 {
-    (void)addr;
-
     if (value == 1 && !this->latch_)
     {
         this->latch_ = true;

@@ -2,8 +2,9 @@
 # define Z___OPCODES_HH_
 
 # include "../memory/mmu.hh"
-# include "z80registers.hh"
+# include "../utils/utils.hh"
 # include "z80cbopcodes.hh"
+# include "z80registers.hh"
 
 uint16_t di(MMU& mmu, Z80Registers& regs);
 uint16_t rst_nn(MMU& mmu, Z80Registers& regs, uint16_t a);

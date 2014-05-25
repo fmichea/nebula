@@ -68,35 +68,26 @@ void* MBC::read_ram_address(uint16_t addr)
     return this->ram_ + addr - 0xa000 + 0x2000 * this->ram_bank_;
 }
 
-void* MBC::write_rom_bank(uint16_t addr, uint16_t value)
+void* MBC::write_rom_bank(uint16_t UNUSED(addr), uint16_t value)
 {
-    (void)addr;
-
     this->rom_bank_ = value;
     return NULL;
 }
 
-void* MBC::write_ram_bank(uint16_t addr, uint16_t value)
+void* MBC::write_ram_bank(uint16_t UNUSED(addr), uint16_t value)
 {
-    (void)addr;
-
     this->ram_bank_ = value;
     return NULL;
 }
 
 // used only by MBC1 and MBC3
-void* MBC::write_extra_address(uint16_t addr, uint16_t value)
+void* MBC::write_extra_address(uint16_t UNUSED(addr), uint16_t UNUSED(value))
 {
-    (void)addr;
-    (void)value;
-
     return NULL;
 }
 
 // different for every controller
-void* MBC::write_ram_address(uint16_t addr, uint16_t value)
+void* MBC::write_ram_address(uint16_t addr, uint16_t UNUSED(value))
 {
-    (void)value;
-
     return this->ram_ + addr - 0xa000 + this->ram_bank_ * 0x2000;
 }

@@ -17,10 +17,9 @@ T& Cycle<T>::operator++ () {
 }
 
 template <typename T>
-T Cycle<T>::operator++ (int unused) {
+T Cycle<T>::operator++ (int UNUSED(unused)) {
     T tmp(this->counter_);
 
-    (void) unused;
     operator++();
     return tmp;
 }
@@ -34,10 +33,9 @@ T& Cycle<T>::operator-- () {
 }
 
 template <typename T>
-T Cycle<T>::operator-- (int unused) {
+T Cycle<T>::operator-- (int UNUSED(unused)) {
     T tmp(this->counter_);
 
-    (void) unused;
     operator--();
     return tmp;
 }

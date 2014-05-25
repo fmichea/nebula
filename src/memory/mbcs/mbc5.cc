@@ -14,11 +14,8 @@ void* MBC5::write_rom_bank(uint16_t addr, uint16_t value)
     return NULL;
 }
 
-void* MBC5::write_ram_bank(uint16_t addr, uint16_t value)
+void* MBC5::write_ram_bank(uint16_t UNUSED(addr), uint16_t value)
 {
-    (void) addr;
-
     this->ram_bank_ = value & 0x0F;
-
     return NULL;
 }

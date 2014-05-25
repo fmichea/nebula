@@ -1,6 +1,8 @@
 #ifndef CYCLE_HH_
 # define CYCLE_HH_
 
+# include "utils.hh"
+
 template <typename T>
 class Cycle {
 public:

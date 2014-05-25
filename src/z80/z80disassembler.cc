@@ -5,52 +5,38 @@
 
 char    disass_line[DISASS_LINE_SIZE];
 
-void inc_reg(MMU& mmu, Z80Registers& regs, const char* reg)
+void inc_reg(MMU& UNUSED(mmu), Z80Registers& UNUSED(regs), const char* reg)
 {
-    (void) mmu;
-    (void) regs;
     sprintf(disass_line + HEADER_SIZE, "inc %s", reg);
 }
 
-void dec_reg(MMU& mmu, Z80Registers& regs, const char* reg)
+void dec_reg(MMU& UNUSED(mmu), Z80Registers& UNUSED(regs), const char* reg)
 {
-    (void) mmu;
-    (void) regs;
     sprintf(disass_line + HEADER_SIZE, "dec %s", reg);
 }
 
-void push_reg(MMU& mmu, Z80Registers& regs, const char* reg)
+void push_reg(MMU& UNUSED(mmu), Z80Registers& UNUSED(regs), const char* reg)
 {
-    (void) mmu;
-    (void) regs;
     sprintf(disass_line + HEADER_SIZE, "push %s", reg);
 }
 
-void pop_reg(MMU& mmu, Z80Registers& regs, const char* reg)
+void pop_reg(MMU& UNUSED(mmu), Z80Registers& UNUSED(regs), const char* reg)
 {
-    (void) mmu;
-    (void) regs;
     sprintf(disass_line + HEADER_SIZE, "pop %s", reg);
 }
 
-void ld_a_mreg(MMU& mmu, Z80Registers& regs, const char* reg)
+void ld_a_mreg(MMU& UNUSED(mmu), Z80Registers& UNUSED(regs), const char* reg)
 {
-    (void) mmu;
-    (void) regs;
     sprintf(disass_line + HEADER_SIZE, "ld %%a, (%s)", reg);
 }
 
-void ld_mreg_a(MMU& mmu, Z80Registers& regs, const char* reg)
+void ld_mreg_a(MMU& UNUSED(mmu), Z80Registers& UNUSED(regs), const char* reg)
 {
-    (void) mmu;
-    (void) regs;
     sprintf(disass_line + HEADER_SIZE, "ld (%s), a", reg);
 }
 
-void add_hl_reg(MMU& mmu, Z80Registers& regs, const char* reg)
+void add_hl_reg(MMU& UNUSED(mmu), Z80Registers& UNUSED(regs), const char* reg)
 {
-    (void) mmu;
-    (void) regs;
     sprintf(disass_line + HEADER_SIZE, "add %%hl, %s", reg);
 }
 
@@ -61,10 +47,8 @@ void ld_reg_val(MMU& mmu, Z80Registers& regs, const char* reg)
     sprintf(disass_line + HEADER_SIZE, "ld %s, $0x%X", reg, val);
 }
 
-void op_mhl(MMU& mmu, Z80Registers& regs, const char* op)
+void op_mhl(MMU& UNUSED(mmu), Z80Registers& UNUSED(regs), const char* op)
 {
-    (void) mmu;
-    (void) regs;
     sprintf(disass_line + HEADER_SIZE, "%s (%%hl)", op);
 }
 
@@ -74,10 +58,8 @@ void op_a_d8(MMU& mmu, Z80Registers& regs, const char* op)
     sprintf(disass_line + HEADER_SIZE, "%s %%a, $0x%02x", op, val);
 }
 
-void uniq_operation(MMU& mmu, Z80Registers& regs, const char* op)
+void uniq_operation(MMU& UNUSED(mmu), Z80Registers& UNUSED(regs), const char* op)
 {
-    (void) mmu;
-    (void) regs;
     sprintf(disass_line + HEADER_SIZE, "%s", op); // Opcode with no parameter.
 }
 
@@ -99,31 +81,23 @@ void jr_if_a16(MMU& mmu, Z80Registers& regs, const char* flag)
     sprintf(disass_line + HEADER_SIZE, "jr %s, $0x%02x ($%d)", flag, off, (int8_t) off);
 }
 
-void ret_if(MMU& mmu, Z80Registers& regs, const char* flag)
+void ret_if(MMU& UNUSED(mmu), Z80Registers& UNUSED(regs), const char* flag)
 {
-    (void) mmu;
-    (void) regs;
     sprintf(disass_line + HEADER_SIZE, "ret %s", flag);
 }
 
-void ld_reg_reg(MMU& mmu, Z80Registers& regs, const char* r1, const char* r2)
+void ld_reg_reg(MMU& UNUSED(mmu), Z80Registers& UNUSED(regs), const char* r1, const char* r2)
 {
-    (void) mmu;
-    (void) regs;
     sprintf(disass_line + HEADER_SIZE, "ld %s, %s", r1, r2);
 }
 
-void op_a_reg(MMU& mmu, Z80Registers& regs, const char* op, const char* reg)
+void op_a_reg(MMU& UNUSED(mmu), Z80Registers& UNUSED(regs), const char* op, const char* reg)
 {
-    (void) mmu;
-    (void) regs;
     sprintf(disass_line + HEADER_SIZE, "%s %%a, %s", op, reg);
 }
 
-void rst_nn(MMU& mmu, Z80Registers& regs, uint8_t nn)
+void rst_nn(MMU& UNUSED(mmu), Z80Registers& UNUSED(regs), uint8_t nn)
 {
-    (void) mmu;
-    (void) regs;
     sprintf(disass_line + HEADER_SIZE, "rst $0x%02d", nn);
 }
 
@@ -133,17 +107,13 @@ static void jump_a16(MMU& mmu, Z80Registers& regs)
     sprintf(disass_line + HEADER_SIZE, "jmp $0x%04x", addr);
 }
 
-static void ld_mc_a(MMU& mmu, Z80Registers& regs)
+static void ld_mc_a(MMU& UNUSED(mmu), Z80Registers& UNUSED(regs))
 {
-    (void) mmu;
-    (void) regs;
     sprintf(disass_line + HEADER_SIZE, "ld (%%c), %%a");
 }
 
-static void ld_a_mc(MMU& mmu, Z80Registers& regs)
+static void ld_a_mc(MMU& UNUSED(mmu), Z80Registers& UNUSED(regs))
 {
-    (void) mmu;
-    (void) regs;
     sprintf(disass_line + HEADER_SIZE, "ld %%a, (%%c)");
 }
 
@@ -173,15 +143,12 @@ static void ld_ma16_sp(MMU& mmu, Z80Registers& regs)
 
 static void ld_mhl_d8(MMU& mmu, Z80Registers& regs)
 {
-    (void) mmu;
     uint8_t val = mmu.read<uint8_t>(regs.PC + 1);
     sprintf(disass_line + HEADER_SIZE, "ld (%%hl), $0x%02x", val);
 }
 
-static void add_hl_sp(MMU& mmu, Z80Registers& regs)
+static void add_hl_sp(MMU& UNUSED(mmu), Z80Registers& UNUSED(regs))
 {
-    (void) mmu;
-    (void) regs;
     sprintf(disass_line + HEADER_SIZE, "add %%hl, %%sp");
 }
 
@@ -222,10 +189,8 @@ static void ld_hl_sppr8(MMU& mmu, Z80Registers& regs)
             (int8_t) r8);
 }
 
-static void ld_sp_hl(MMU& mmu, Z80Registers& regs)
+static void ld_sp_hl(MMU& UNUSED(mmu), Z80Registers& UNUSED(regs))
 {
-    (void) mmu;
-    (void) regs;
     sprintf(disass_line + HEADER_SIZE, "ld %%sp, %%hl");
 }
 
@@ -296,16 +261,14 @@ op OPCODES_DISASS[0x100] = {
     ld_sp_hl, ld_a_ma16, ei, 0, 0, cp_a_d8, rst_38h
 };
 
-void print_disassembly(MMU& mmu, Z80Registers& regs)
-{
 #if DISASSEMBLER
+void print_disassembly(MMU& mmu, Z80Registers& regs) {
     snprintf(disass_line, HEADER_SIZE + 1, "[%04x] Disass : ", regs.PC);
     op tmp = OPCODES_DISASS[mmu.read<uint8_t>(regs.PC)];
     if (tmp == 0) strncat(disass_line, "What?", DISASS_LINE_SIZE);
     else tmp(mmu, regs);
     logging::verbose("%s", disass_line);
-#else
-    (void) mmu;
-    (void) regs;
-#endif
 }
+#else
+void print_disassembly(MMU& UNUSED(mmu), Z80Registers& UNUSED(regs)) {}
+#endif
