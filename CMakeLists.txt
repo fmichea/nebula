@@ -82,8 +82,8 @@ SET(NEBULA_DEFINITIONS
 
 ADD_CUSTOM_COMMAND(
     OUTPUT ${NEBULA_DEFINITIONS}
-    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/src/z80/gen_opcodes.py
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/z80/gen_opcodes.py
+    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/build/gen_opcodes.py ${CMAKE_CURRENT_SOURCE_DIR}/src/z80
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/build/gen_opcodes.py
 )
 
 # Builds and links executable.

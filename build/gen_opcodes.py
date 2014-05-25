@@ -2,11 +2,18 @@
 
 import itertools
 import os
+import sys
 
 B_regs = list('ABCDEHL')
 W_regs = 'BC,DE,HL,SP'.split(',')
 ALL_regs = B_regs + W_regs
 flags = 'nzf,zf,ncy,cy'.split(',')
+
+if len(sys.argv) != 2:
+    sys.exit('usage: {} dirname'.format(sys.argv[0]))
+_ROOT = sys.argv[1]
+if not os.path.isdir(_ROOT):
+    sys.exit('Unknown directory to generate in: {}'.format(_ROOT))
 
 class DefMacro(object):
     MACROS = {
@@ -21,8 +28,9 @@ class DefMacro(object):
     }
 
     def __init__(self, name):
-        name = '{}.gdef'.format(name)
-        self.f = open(os.path.join(os.path.dirname(__file__), name), 'w')
+        name = os.path.join(_ROOT, '{}.gdef'.format(name))
+        print('Generating `{}` file.'.format(name))
+        self.f = open(name, 'w')
 
     def __del__(self):
         self.f.close()
