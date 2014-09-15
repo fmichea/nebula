@@ -19,7 +19,7 @@ typedef struct
 class BGWTile
 {
 public:
-    BGWTile(MMU& mmu, uint8_t x, uint8_t y, uint8_t data_select);
+    BGWTile(MMU* mmu, uint8_t x, uint8_t y, uint8_t data_select);
 
     uint8_t color(uint8_t x);
 

@@ -10,8 +10,7 @@
 # include "sprites.hh"
 # include "timer.hh"
 
-# include "displays/display.hh"
-# include "displays/sdldisplay.hh"
+# include "../frontends/abstractdisplay.hh"
 
 # define LCDC_MODE_0_CLKS   201
 # define LCDC_MODE_1_CLKS   4560
@@ -26,22 +25,22 @@
 class GPU
 {
 public:
-    GPU(MMU& mmu);
+    GPU(nebula::frontends::AbstractDisplay* display, MMU* mmu);
     ~GPU();
 
     void do_cycle(uint8_t cycles);
 
 private:
-    void     draw_line();
+    void draw_line();
     uint32_t bgp_to_color(uint8_t idx, uint8_t pal);
     uint32_t obp_to_color(uint8_t idx, uint8_t pal);
 
-    MMU&            mmu_;
-    Timer           timer_;
-    int16_t         wait_count;
+    MMU* mmu_;
+    Timer timer_;
+    int16_t wait_count;
 
-    Display*        display_;
-    uint32_t        bgcolors_[4];
+    nebula::frontends::AbstractDisplay* display_;
+    uint32_t bgcolors_[4];
 };
 
 #endif // !GPU_HH_

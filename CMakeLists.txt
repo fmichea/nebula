@@ -18,6 +18,7 @@ SET(NEBULA_LDFLAGS "")
 # List of all the files of the project.
 SET(NEBULA_SRCS
     src/commandline.cc
+    src/frontends/abstractmainwindow.cc
     src/graphics/bgwtile.cc
     src/graphics/gpu.cc
     src/graphics/sprites.cc
@@ -51,8 +52,8 @@ ELSEIF(_DISPLAY_BACKEND MATCHES "SDL")
     SET(NEBULA_LDFLAGS "-lpthread -l${SDL2_LIBRARIES}")
 
     SET(NEBULA_SRCS ${NEBULA_SRCS}
-                    src/graphics/displays/sdldisplay.cc
-                    src/keyboard/handlers/sdlkbhandler.cc
+                    src/frontends/sdl/mainwindow.cc
+                    src/frontends/sdl/sdldisplay.cc
     )
 
     # Sound guard, for development.

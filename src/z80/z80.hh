@@ -16,21 +16,18 @@
 class Z80
 {
 public:
-    Z80(std::string filename);
+    Z80(MMU* mmu, GPU* gpu, Keyboard* kb);
 
-    bool execute();
+    bool run();
 
 private:
-    std::string     filename_;
     Z80Registers    regs_;
-    MMU             mmu_;
-    GPU             gpu_;
     Interrupts      int_;
-    Keyboard        kb_;
 
-# ifdef _SOUND
-    Sound           sound_;
-# endif
+    // Components of the GameBoy which the z80 depends on.
+    GPU*            gpu_;
+    Keyboard*       kb_;
+    MMU*            mmu_;
 };
 
 #endif // !Z___HH_

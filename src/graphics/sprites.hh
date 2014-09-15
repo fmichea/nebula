@@ -5,7 +5,7 @@
 
 # include "../memory/mmu.hh"
 
-# define SPRITE_HEIGHT (mmu.LCDC.OBJSS.get() ? 16 : 8)
+# define SPRITE_HEIGHT(mmu) (mmu->LCDC.OBJSS.get() ? 16 : 8)
 
 typedef struct
 {
@@ -28,7 +28,7 @@ typedef struct
 class Sprite
 {
 public:
-    Sprite(MMU& mmu, s_sprite& sprite, uint8_t y);
+    Sprite(MMU* mmu, s_sprite& sprite, uint8_t y);
 
     uint8_t x_base() const;
     uint8_t color(uint8_t x) const;
@@ -45,7 +45,7 @@ private:
 class SpriteManager
 {
 public:
-    static std::list<Sprite*> get_sprites(MMU& mmu, uint8_t y);
+    static std::list<Sprite*> get_sprites(MMU* mmu, uint8_t y);
 };
 
 #endif // !SPRITES_HH_

@@ -8,28 +8,23 @@ static inline bool do_doublespeed_cycle(MMU& mmu, uint32_t count)
         || count % 2 == 0; // CGB in double speed and even frame
 }
 
-Z80::Z80(std::string filename)
-    : filename_(filename), gpu_ (mmu_), int_ (mmu_, regs_), kb_ (mmu_)
-#ifdef _SOUND
-      ,sound_ (mmu_) // FIXME
-#endif
+Z80::Z80(MMU* mmu, GPU* gpu, Keyboard* kb)
+    : int_ (mmu, regs_), gpu_ (gpu), kb_ (kb), mmu_ (mmu)
 {}
 
-bool Z80::execute()
+bool Z80::run()
 {
     uint32_t count = 0;
 
-    if (!this->mmu_.load_rom(filename_))
-        return false;
-    while (!this->mmu_.stopped)
+    while (!this->mmu_->stopped)
     {
         uint16_t res = 0x4;
         if (!this->regs_.halt_mode)
         {
-            uint8_t opcode = this->mmu_.read<uint8_t>(this->regs_.PC);
+            uint8_t opcode = this->mmu_->read<uint8_t>(this->regs_.PC);
             if (logging::isEnabledFor(logging::DEBUG)) {
-                uint8_t mem1 = this->mmu_.read<uint8_t>(this->regs_.PC + 1);
-                uint8_t mem2 = this->mmu_.read<uint8_t>(this->regs_.PC + 2);
+                uint8_t mem1 = this->mmu_->read<uint8_t>(this->regs_.PC + 1);
+                uint8_t mem2 = this->mmu_->read<uint8_t>(this->regs_.PC + 2);
                 logging::debug("PC: %04X | OPCODE: %02X | MEM: %02X%02X",
                                this->regs_.PC, opcode, mem1, mem2);
             }
@@ -37,16 +32,16 @@ bool Z80::execute()
                 logging::error("Unknown opcodes %02X...", opcode);
                 return false;
             }
-            res = OPCODES[opcode](this->mmu_, this->regs_);
+            res = OPCODES[opcode](*this->mmu_, this->regs_);
         }
 
         this->regs_.PC += (res >> 8) & 0xff;
 
         // double-speed mode ?
-        if (do_doublespeed_cycle(this->mmu_, count))
-            this->gpu_.do_cycle(res & 0xff);
+        if (do_doublespeed_cycle(*this->mmu_, count))
+            this->gpu_->do_cycle(res & 0xff);
 
-        this->kb_.do_cycle();
+        this->kb_->do_cycle();
         this->int_.manage_timer(res & 0xff);
         this->int_.manage_interrupts();
         count += 1;

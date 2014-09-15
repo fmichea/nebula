@@ -15,12 +15,12 @@
 class Interrupts
 {
 public:
-    Interrupts(MMU& mmu, Z80Registers& regs);
+    Interrupts(MMU* mmu, Z80Registers& regs);
     void manage_interrupts();
     void manage_timer(uint8_t cycles);
 
 private:
-    MMU&            mmu_;
+    MMU*            mmu_;
     Z80Registers&   regs_;
     int16_t         div_cycles_;
     int16_t         tima_cycles_;
