@@ -18,13 +18,13 @@
 
 class Sound {
 public:
-    Sound(MMU& mmu);
+    Sound(MMU* mmu);
     ~Sound();
 
     void fill_stream(Uint8* stream, int len);
 
 private:
-    MMU& mmu_;
+    MMU* mmu_;
     Channel* channels_[NB_GB_CHANNELS];
 
     // FIXME: move this soon.

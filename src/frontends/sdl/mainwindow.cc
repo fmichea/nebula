@@ -23,6 +23,9 @@ namespace nebula { namespace frontends { namespace sdl {
 
 MainWindow::MainWindow(const char* windowName)
     : AbstractMainWindow()
+#ifdef _SOUND
+    , sound_ (nullptr)
+#endif
 {
     SDL_InitSubSystem(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_EVENTS);
 
@@ -49,6 +52,10 @@ void MainWindow::run() {
     SDL_Event       event;
     s_kbh_event     ret;
 
+#ifdef _SOUND
+    this->sound_ = new Sound(this->mmu_);
+#endif
+
     while (!this->mmu_->stopped) {
         if (SDL_PollEvent(&event)) {
             if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) {
@@ -71,6 +78,10 @@ void MainWindow::run() {
         }
         this->display_->refresh();
     }
+
+#ifdef _SOUND
+    delete this->sound_;
+#endif
 }
 
 }}} /* !nebula::frontends::sdl */

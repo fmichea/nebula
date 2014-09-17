@@ -2,33 +2,33 @@
 
 static void sound_callback(void* userdata, Uint8* stream, int len);
 
-Sound::Sound(MMU& mmu)
+Sound::Sound(MMU* mmu)
     : mmu_ (mmu)
 {
     // Init channels.
     for (int it = 0; it < NB_GB_CHANNELS; ++it)
         this->channels_[it] = nullptr;
-    this->channels_[0] = new Channel(1, mmu.NR52, mmu.NR13, mmu.NR14, {
-        new FrequencySweep(1, mmu.NR52, mmu.NR10),
+    this->channels_[0] = new Channel(1, mmu_->NR52, mmu_->NR13, mmu_->NR14, {
+        new FrequencySweep(1, mmu_->NR52, mmu_->NR10),
         //new nebula::sound::filters::Timer(),
         new QuandrangularChannel(),
-        new WaveForm(mmu.NR11, mmu.NR13, mmu.NR14),
-        new Length(1, mmu.NR52, mmu.NR11, mmu.NR14),
-        new VolumeEnvelop(mmu.NR12),
+        new WaveForm(mmu_->NR11, mmu_->NR13, mmu_->NR14),
+        new Length(1, mmu_->NR52, mmu_->NR11, mmu_->NR14),
+        new VolumeEnvelop(mmu_->NR12),
     });
-    this->channels_[1] = new Channel(2, mmu.NR52, mmu.NR23, mmu.NR24, {
+    this->channels_[1] = new Channel(2, mmu_->NR52, mmu_->NR23, mmu_->NR24, {
         //new nebula::sound::filters::Timer(),
         new QuandrangularChannel(),
-        new WaveForm(mmu.NR21, mmu.NR23, mmu.NR24),
-        new Length(2, mmu.NR52, mmu.NR21, mmu.NR24),
-        new VolumeEnvelop(mmu.NR22),
+        new WaveForm(mmu_->NR21, mmu_->NR23, mmu_->NR24),
+        new Length(2, mmu_->NR52, mmu_->NR21, mmu_->NR24),
+        new VolumeEnvelop(mmu_->NR22),
     });
 #if 0
-    this->channels_[2] = new Channel(3, mmu.NR52, mmu.NR33, mmu.NR34, {
-        new Length(3, mmu.NR52, mmu.NR31, mmu.NR34),
+    this->channels_[2] = new Channel(3, mmu_->NR52, mmu_->NR33, mmu_->NR34, {
+        new Length(3, mmu_->NR52, mmu_->NR31, mmu_->NR34),
     });
-    this->channels_[3] = new Channel(4, mmu.NR52, mmu.NR33, mmu.NR34, {
-        new Length(4, mmu.NR52, mmu.NR41, mmu.NR44),
+    this->channels_[3] = new Channel(4, mmu_->NR52, mmu_->NR33, mmu_->NR34, {
+        new Length(4, mmu_->NR52, mmu_->NR41, mmu_->NR44),
     });
 #endif
 
@@ -61,7 +61,7 @@ void Sound::fill_stream(Uint8* stream, int _len) {
     memset(stream, 0, _len);
 
     // If sound is not ON, end there.
-    if (this->mmu_.NR52.sound_on.get() == 0)
+    if (this->mmu_->NR52.sound_on.get() == 0)
         return;
     //logging::info("sound is ON!");
 
@@ -78,7 +78,7 @@ void Sound::fill_stream(Uint8* stream, int _len) {
             // Fetch the frequency computed.
             data = 0, count = 0;
             for (int it_ = 0; it_ < NB_GB_CHANNELS; ++it_) {
-                if ((1 << (4 * chan + it_)) & this->mmu_.NR51.get()) {
+                if ((1 << (4 * chan + it_)) & this->mmu_->NR51.get()) {
                     if (channels[it_][it]) {
                         data += channels[it_][it];
                         count += 1;
@@ -89,7 +89,7 @@ void Sound::fill_stream(Uint8* stream, int _len) {
                 data /= count;
 
             // Volume fix.
-            data *= this->mmu_.NR50.volume[chan].get();
+            data *= this->mmu_->NR50.volume[chan].get();
             data /= 7;
 
             // Avoid saturation.

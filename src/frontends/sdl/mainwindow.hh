@@ -7,6 +7,10 @@
 # include "../abstractmainwindow.hh"
 # include "sdldisplay.hh"
 
+# ifdef _SOUND
+#  include "../../sound/sound.hh"
+# endif
+
 namespace nebula { namespace frontends { namespace sdl {
 
 class MainWindow : public AbstractMainWindow {
@@ -18,6 +22,10 @@ public:
 
 private:
     SDL_Window*     window_;
+
+#ifdef _SOUND
+    Sound* sound_;
+#endif
 };
 
 }}} /* !nebula::frontends::sdl */
