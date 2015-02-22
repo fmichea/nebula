@@ -18,8 +18,20 @@ And then you can execute a ROM with the following command:
 
     $ ./nebula --rom /path/to/rom
 
-Links
------
+Write your own emulator
+-----------------------
 
-* [Documentation](http://nocash.emubase.de/pandocs.htm)
-* [Test ROM](http://blargg.8bitalley.com/parodius/gb-tests/)
+Here are some good links to documentation that would help you understand the
+inner workings of a GameBoy and write your own emulator.
+
+ - General purpose documentation: [1][general_doc1]
+ - Sound system: [1][sound_doc1], [2][sound_doc2]
+
+Testing the thing:
+
+ - Test ROM: [1][test_roms1]
+
+
+[general_doc]: http://nocash.emubase.de/pandocs.htm
+[sound_doc1]: http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
+[test_roms1]: http://blargg.8bitalley.com/parodius/gb-tests/
