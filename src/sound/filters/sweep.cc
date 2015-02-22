@@ -9,8 +9,8 @@ int32_t FrequencySweep::filter(int32_t freq) {
     if (this->enabled_) {
         if (this->tick_.next() && (--this->counter_) == 0) {
             this->last_diff_ = this->diff_;
-            this->diff_ *= (1 << this->sweep_shift_);
-            //logging::info("Sweep: %d -> %d", this->last_diff_, this->diff_);
+            this->diff_ *= (1 << this->shift_);
+            logging::info("Sweep: %d -> %d", this->last_diff_, this->diff_);
         }
     }
     freq = this->compute_freq(freq);
@@ -24,11 +24,21 @@ int32_t FrequencySweep::filter(int32_t freq) {
 void FrequencySweep::reload() {
     this->tick_.reset();
 
-    this->counter_ = Cycle<unsigned int>(this->nr10_.sweep_time.get());
+    this->counter_ = Cycle<unsigned int>(this->nr10_.period.get());
     this->enabled_ = this->counter_.maximum() != 0;
 
-    this->sweep_shift_ = this->nr10_.sweep_shift.get();
-    this->way_ = (this->nr10_.sweep_way.get() ? FREQUENCYSWEEP_DEC : FREQUENCYSWEEP_INC);
+    this->shift_ = this->nr10_.shift.get();
+
+    // The negate flag decides if this sweep should increase or decrease the
+    // frequency of the sound wave.
+    switch (this->nr10_.negate.get()) {
+    case 0x1:
+        this->negate_ = FREQUENCYSWEEP_NEGATE_TRUE;
+        break;
+    case 0x0:
+        this->negate_ = FREQUENCYSWEEP_NEGATE_FALSE;
+        break;
+    };
 
     this->diff_ = 1;
     this->last_diff_ = 0;
@@ -37,12 +47,10 @@ void FrequencySweep::reload() {
 int32_t FrequencySweep::compute_freq(int32_t freq) {
     if (!this->enabled_ || this->last_diff_ == 0)
         return freq;
-    switch (this->way_) {
-    case FREQUENCYSWEEP_INC:
+    switch (this->negate_) {
+    case FREQUENCYSWEEP_NEGATE_FALSE:
         return freq / this->last_diff_ + freq / this->diff_;
-    case FREQUENCYSWEEP_DEC:
+    case FREQUENCYSWEEP_NEGATE_TRUE:
         return freq / this->last_diff_ - freq / this->diff_;
     };
-    logging::error("Sound sweep: WTF?");
-    return 0;
 }

@@ -8,15 +8,15 @@ Sound::Sound(MMU* mmu)
     // Init channels.
     for (int it = 0; it < NB_GB_CHANNELS; ++it)
         this->channels_[it] = nullptr;
-    this->channels_[0] = new Channel(1, mmu_->NR52, mmu_->NR13, mmu_->NR14, {
+    this->channels_[0] = new Channel(mmu, 1, mmu_->NR13, mmu_->NR14, {
         new FrequencySweep(1, mmu_->NR52, mmu_->NR10),
-        //new nebula::sound::filters::Timer(),
         new QuandrangularChannel(),
+        //new nebula::sound::filters::Timer(),
         new WaveForm(mmu_->NR11, mmu_->NR13, mmu_->NR14),
         new Length(1, mmu_->NR52, mmu_->NR11, mmu_->NR14),
         new VolumeEnvelop(mmu_->NR12),
     });
-    this->channels_[1] = new Channel(2, mmu_->NR52, mmu_->NR23, mmu_->NR24, {
+    this->channels_[1] = new Channel(mmu, 2, mmu_->NR23, mmu_->NR24, {
         //new nebula::sound::filters::Timer(),
         new QuandrangularChannel(),
         new WaveForm(mmu_->NR21, mmu_->NR23, mmu_->NR24),

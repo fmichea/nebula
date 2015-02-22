@@ -6,19 +6,19 @@
 
 # include "../../memory/mmu.hh"
 # include "../../memory/registers/nrx4.hh"
+# include "../../logging.hh"
 # include "../constants.hh"
 # include "../filters/filter.hh"
+# include "../../utils/utils.hh"
 
 class Channel {
 public:
-    Channel(int num, NR52Proxy& nr52, const RegisterProxy& nrx3,
+    Channel(MMU* mmu, int num, const RegisterProxy& nrx3,
             const NRX4Proxy& nrx4, const std::list<Filter*>& filters);
     virtual ~Channel();
 
+    void reload();
     void fill_stream(int16_t* stream, unsigned int len);
-
-protected:
-    void update();
 
 protected:
     int num_;

@@ -9,9 +9,9 @@
 # include "filter.hh"
 
 typedef enum {
-    FREQUENCYSWEEP_INC,
-    FREQUENCYSWEEP_DEC,
-} frequencysweep_way;
+    FREQUENCYSWEEP_NEGATE_TRUE,
+    FREQUENCYSWEEP_NEGATE_FALSE,
+} frequencysweep_negate;
 
 class FrequencySweep : public Filter {
 public:
@@ -31,8 +31,8 @@ private:
     Converter tick_;
     Cycle<unsigned int> counter_;
 
-    frequencysweep_way way_;
-    int32_t sweep_shift_;
+    frequencysweep_negate negate_;
+    int32_t shift_;
 
     int32_t diff_;
     int32_t last_diff_;

@@ -2,6 +2,7 @@
 # define MMU_HH_
 
 # include <fcntl.h>
+# include <list>
 # include <string.h>
 # include <string>
 # include <sys/mman.h>
@@ -20,25 +21,33 @@
 
 # include "registers/registers.hh"
 
+# define GB_ADDR_SPACE 0x10000
+
 enum class GBType { GB, CGB, SGB };
+enum class WatchType { RO, WO, RW };
 
-class MMU
-{
+typedef void (*WatchHook)(void*, uint16_t);
 
+class MMU {
 public:
     MMU();
     ~MMU();
 
     bool load_rom(std::string filename);
     void do_hdma();
-    template<typename T> T read(uint16_t addr);
-    template<typename T> void write(uint16_t addr, T value);
+
+    template<typename T> T read(uint16_t addr, bool twe=true);
+    template<typename T> void write(uint16_t addr, T value, bool twe=true);
+
+    void subscribe(uint16_t addr, WatchType type, WatchHook hook, void* data);
+    void unsubscribe(uint16_t addr, WatchHook hook);
 
 # define X2(RegType, Reg, Addr, Value) RegType Reg;
 # define X1(Reg, Addr, Value) X2(RegisterProxy, Reg, Addr, Value)
 # include "registers.def"
 # undef X1
 # undef X2
+
     RegisterProxy IE;
 
     bool            stopped;
@@ -63,6 +72,35 @@ private:
     uint8_t*        Name;
 # include "mmap.def"
 # undef X
+
+    // Type to store hooks on events, this is used to keep track of them and
+    // allow easy subscribe/unsubscribe. Note that subscribe/unsubscribe are
+    // not optimized for being fast yet.
+    typedef struct {
+        WatchType type;
+        WatchHook hook;
+        void* data;
+    } WatchRef;
+
+    class WatchRefFinder {
+    public:
+        WatchRefFinder(WatchHook hook)
+            : hook_ (hook)
+        {}
+
+        bool operator () (const WatchRef* ref) {
+            return ref->hook == this->hook_;
+        }
+
+    private:
+        WatchHook hook_;
+    };
+
+    typedef std::list<WatchRef*> WatchRefList;
+
+    WatchRefList watchref_lists_[GB_ADDR_SPACE];
+
+    void trigger_watch_event(bool twe, uint16_t addr, WatchType type);
 
     // GPU needs to access video memory directly
     friend class GPU;

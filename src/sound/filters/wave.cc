@@ -1,8 +1,12 @@
 #include "wave.hh"
 
 WaveForm::WaveForm(const NRX1Proxy& nrx1, const RegisterProxy& nrx3, const NRX4Proxy& nrx4)
-    : frame_ (SAMPLE_RATE), nrx1_ (nrx1), nrx3_ (nrx3), nrx4_ (nrx4),
-      duty_tick_ (SAMPLE_RATE, 1), duty_phase_ (8)
+    : frame_ (SAMPLE_RATE)
+    , nrx1_ (nrx1)
+    , nrx3_ (nrx3)
+    , nrx4_ (nrx4)
+    , duty_tick_ (SAMPLE_RATE, 1)
+    , duty_phase_ (8)
 {}
 
 void WaveForm::reload() {

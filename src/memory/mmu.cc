@@ -11,6 +11,10 @@ MMU::MMU()
     memset(this->title_, 0, 0x18);
     memset(this->cbgp_, 0xff, 0x40);
     memset(this->cobp_, 0xff, 0x40);
+
+    for (uint32_t idx = 0; idx < GB_ADDR_SPACE; ++idx) {
+        this->watchref_lists_[idx] = MMU::WatchRefList();
+    }
 }
 
 MMU::~MMU() {
@@ -22,6 +26,12 @@ MMU::~MMU() {
     delete[] this->Name;
 #include "mmap.def"
 #undef X
+    for (uint32_t idx = 0; idx < GB_ADDR_SPACE; ++idx) {
+        for (MMU::WatchRef* ref : this->watchref_lists_[idx]) {
+            delete ref;
+        }
+        this->watchref_lists_[idx].clear();
+    }
 }
 
 bool MMU::load_rom(std::string filename) {
@@ -212,6 +222,34 @@ bool MMU::reset_registers()
     return true;
 }
 
+void MMU::subscribe(uint16_t addr, WatchType type, WatchHook hook, void* data) {
+    // Create the watch ref and fill all the fields.
+    MMU::WatchRef* ref = new MMU::WatchRef;
+    ref->type = type;
+    ref->hook = hook;
+    ref->data = data;
+    // Add that watch to the ref list and .
+    this->watchref_lists_[addr].push_back(ref);
+}
+
+
+void MMU::unsubscribe(uint16_t addr, WatchHook hook) {
+    MMU::WatchRefFinder finder(hook);
+
+    this->watchref_lists_[addr].remove_if(finder);
+}
+
+void MMU::trigger_watch_event(bool trigger, uint16_t addr, WatchType type) {
+    if (!trigger)
+        return;
+
+    for (const MMU::WatchRef* ref : this->watchref_lists_[addr]) {
+        if (ref->type == type || ref->type == WatchType::RW) {
+            ref->hook(ref->data, addr);
+        }
+    }
+}
+
 void MMU::do_hdma() {
     if (this->hdma_index_ < this->hdma_length_) {
         uint16_t srcaddr = (this->HDMA1.get() << 8) | this->HDMA2.get();
@@ -234,14 +272,16 @@ void MMU::do_hdma() {
 }
 
 template<>
-uint16_t MMU::read<uint16_t>(uint16_t addr) {
-    uint16_t res = this->read<uint8_t>(addr);
-    res |= ((uint16_t) this->read<uint8_t>(addr + 1)) << 8;
+uint16_t MMU::read<uint16_t>(uint16_t addr, bool twe) {
+    uint16_t res = this->read<uint8_t>(addr, false);
+    res |= ((uint16_t) this->read<uint8_t>(addr + 1, false)) << 8;
+    this->trigger_watch_event(twe, addr, WatchType::RO);
     return res;
 }
 
 template<>
-void MMU::write<uint16_t>(uint16_t addr, uint16_t value) {
-    this->write<uint8_t>(addr, value & 0xff);
-    this->write<uint8_t>(addr + 1, (value >> 8) & 0xff);
+void MMU::write<uint16_t>(uint16_t addr, uint16_t value, bool twe) {
+    this->write<uint8_t>(addr, value & 0xff, false);
+    this->write<uint8_t>(addr + 1, (value >> 8) & 0xff, false);
+    this->trigger_watch_event(twe, addr, WatchType::WO);
 }

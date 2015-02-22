@@ -11,14 +11,14 @@ public:
     NR10Proxy(uint8_t* reg, uint16_t addr)
         : RegisterProxy(reg, addr)
     {
-        this->sweep_time = BitProxy(reg, 4, 0x7);
-        this->sweep_way = BitProxy(reg, 3, 0x1);
-        this->sweep_shift = BitProxy(reg, 0, 0x7);
+        this->period = BitProxy(reg, 4, 0x7);
+        this->negate = BitProxy(reg, 3, 0x1);
+        this->shift = BitProxy(reg, 0, 0x7);
     }
 
-    BitProxy sweep_time;
-    BitProxy sweep_way;
-    BitProxy sweep_shift;
+    BitProxy period;
+    BitProxy negate;
+    BitProxy shift;
 };
 
 #endif // !NR10_HH_

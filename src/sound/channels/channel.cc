@@ -1,8 +1,11 @@
 #include "channel.hh"
 
-Channel::Channel(int num, NR52Proxy& nr52, const RegisterProxy& nrx3, const NRX4Proxy& nrx4, const std::list<Filter*>& filters)
-    : num_ (num), frequency_ (261), filters_ (filters), nr52_ (nr52), nrx3_ (nrx3), nrx4_ (nrx4)
+static void _reload_channel_callback(void* data, uint16_t addr);
+
+Channel::Channel(MMU* mmu, int num, const RegisterProxy& nrx3, const NRX4Proxy& nrx4, const std::list<Filter*>& filters)
+    : num_ (num), frequency_ (261), filters_ (filters), nr52_ (mmu->NR52), nrx3_ (nrx3), nrx4_ (nrx4)
 {
+    mmu->subscribe(nrx4.addr(), WatchType::WO, _reload_channel_callback, this);
     for (Filter* filter : this->filters_)
         filter->reload();
 }
@@ -18,7 +21,6 @@ Channel::~Channel() {
 void Channel::fill_stream(int16_t* stream, unsigned int len) {
     std::list<Filter*>::const_iterator it;
 
-    this->update();
     for (unsigned int x = 0; x < len; ++x) {
         if (!this->nr52_.channel_on[this->num_ - 1].get())
             break;
@@ -32,7 +34,7 @@ void Channel::fill_stream(int16_t* stream, unsigned int len) {
     }
 }
 
-void Channel::update() {
+void Channel::reload() {
     uint16_t freq;
     std::list<Filter*>::const_iterator it;
 
@@ -46,4 +48,9 @@ void Channel::update() {
         }
         this->nr52_.channel_on[this->num_ - 1].set(1);
     }
+}
+
+static void _reload_channel_callback(void* data, uint16_t UNUSED(addr)) {
+    Channel* channel = static_cast<Channel*>(data);
+    channel->reload();
 }

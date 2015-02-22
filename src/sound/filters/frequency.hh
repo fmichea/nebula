@@ -1,6 +1,7 @@
 #ifndef FREQUENCY_HH_
 # define FREQUENCY_HH_
 
+# include "../../logging.hh"
 # include "filter.hh"
 
 class QuandrangularChannel : public Filter {

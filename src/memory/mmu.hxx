@@ -15,19 +15,21 @@ static const uint8_t _nr_masks[32] = {
 };
 
 template<typename T>
-T MMU::read(uint16_t addr)
-{
+T MMU::read(uint16_t addr, bool twe) {
     T* ptr = 0;
 
-    if (addr < 0x4000) // Bank 00
+    if (addr < 0x4000) { // Bank 00
+        this->trigger_watch_event(twe, addr, WatchType::RO);
         return this->mbc_->read<T>(addr);
-    else if (0x4000 <= addr && addr < 0x8000) // Bank 01 .. NN
+    } else if (0x4000 <= addr && addr < 0x8000) { // Bank 01 .. NN
+        this->trigger_watch_event(twe, addr, WatchType::RO);
         return this->mbc_->read<T>(addr);
-    else if (0x8000 <= addr && addr < 0xA000) // VRAM
+    } else if (0x8000 <= addr && addr < 0xA000) { // VRAM
         ptr = (T*) (this->vram_ + addr - 0x8000 + 0x2000 * this->VBK.get());
-    else if (0xA000 <= addr && addr < 0xC000) // RAM
+    } else if (0xA000 <= addr && addr < 0xC000) { // RAM
+        this->trigger_watch_event(twe, addr, WatchType::RO);
         return this->mbc_->read<T>(addr);
-    else if (0xC000 <= addr && addr < 0xE000) { // WRAM
+    } else if (0xC000 <= addr && addr < 0xE000) { // WRAM
         if (this->gb_type == GBType::CGB && addr >= 0xD000
                 && (this->SVBK.get() >= 2)) // banked WRAM
             ptr = (T*) (this->wram_ + (addr - 0xD000)
@@ -58,14 +60,15 @@ T MMU::read(uint16_t addr)
             uint8_t* tmp = (uint8_t*) &res;
             *tmp |= _nr_masks[addr - this->NR10.addr()];
         }
+        this->trigger_watch_event(twe, addr, WatchType::RO);
         return res;
     }
+    this->trigger_watch_event(twe, addr, WatchType::RO);
     return this->mbc_->read<T>(addr);
 }
 
 template<typename T>
-void MMU::write(uint16_t addr, T value)
-{
+void MMU::write(uint16_t addr, T value, bool twe) {
     T* ptr = 0;
 
     if (addr < 0x4000) // Bank 00
@@ -95,6 +98,7 @@ void MMU::write(uint16_t addr, T value)
         if (addr == this->STAT.addr()) { // First three bits are read-only.
             //logging::info("stat: %x", value);
             *ptr = (*ptr & 0x07) | (value & 0xf8);
+            this->trigger_watch_event(twe, addr, WatchType::WO);
             return;
         }
         if (addr == this->BGPD.addr()) {
@@ -186,11 +190,13 @@ void MMU::write(uint16_t addr, T value)
             }
         }
     }
-    if (ptr != 0)
+    if (ptr != 0) {
         *ptr = value;
+        this->trigger_watch_event(twe, addr, WatchType::WO);
+    }
 }
 
-template<> uint16_t MMU::read<uint16_t>(uint16_t addr);
-template<> void MMU::write<uint16_t>(uint16_t addr, uint16_t value);
+template<> uint16_t MMU::read<uint16_t>(uint16_t addr, bool twe);
+template<> void MMU::write<uint16_t>(uint16_t addr, uint16_t value, bool twe);
 
 #endif // !MMU_HXX_
