@@ -1,8 +1,7 @@
 #ifndef REGISTER_HH_
 # define REGISTER_HH_
 
-class RegisterProxy
-{
+class RegisterProxy {
 public:
     RegisterProxy() : reg_ (nullptr), addr_ (0) {}
 

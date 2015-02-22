@@ -7,8 +7,7 @@ Channel::Channel(int num, NR52Proxy& nr52, const RegisterProxy& nrx3, const NRX4
         filter->reload();
 }
 
-Channel::~Channel()
-{
+Channel::~Channel() {
     std::list<Filter*>::const_iterator it;
 
     for (it = this->filters_.begin(); it != this->filters_.end(); it++) {

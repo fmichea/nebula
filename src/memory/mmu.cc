@@ -13,8 +13,7 @@ MMU::MMU()
     memset(this->cobp_, 0xff, 0x40);
 }
 
-MMU::~MMU()
-{
+MMU::~MMU() {
     if (this->mbc_ != 0)
         delete this->mbc_;
     if (this->fd_ != 0)
@@ -25,8 +24,7 @@ MMU::~MMU()
 #undef X
 }
 
-bool MMU::load_rom(std::string filename)
-{
+bool MMU::load_rom(std::string filename) {
     struct stat stat;
 
     // Opening and mapping file.
@@ -214,8 +212,7 @@ bool MMU::reset_registers()
     return true;
 }
 
-void MMU::do_hdma()
-{
+void MMU::do_hdma() {
     if (this->hdma_index_ < this->hdma_length_) {
         uint16_t srcaddr = (this->HDMA1.get() << 8) | this->HDMA2.get();
         uint16_t dstaddr = (this->HDMA3.get() << 8) | this->HDMA4.get();
