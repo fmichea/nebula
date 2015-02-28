@@ -1,7 +1,12 @@
 #include "length.hh"
 
 Length::Length(int num, NR52Proxy& nr52, const NRX1Proxy& nrx1, const NRX4Proxy& nrx4)
-    : Filter(), tick_ (SAMPLE_RATE, 128), num_ (num), nr52_ (nr52), nrx1_ (nrx1), nrx4_ (nrx4)
+    : Filter()
+    , tick_ (SAMPLE_RATE, 128)
+    , num_ (num)
+    , nr52_ (nr52)
+    , nrx1_ (nrx1)
+    , nrx4_ (nrx4)
 {}
 
 void Length::reload() {

@@ -1,8 +1,12 @@
 #include "sweep.hh"
 
 FrequencySweep::FrequencySweep(int num, NR52Proxy& nr52, const NR10Proxy& nr10)
-    : Filter(), num_ (num), nr52_ (nr52), nr10_ (nr10),
-      tick_ (SAMPLE_RATE, 128), counter_ (0)
+    : Filter()
+    , num_ (num)
+    , nr52_ (nr52)
+    , nr10_ (nr10)
+    , tick_ (SAMPLE_RATE, 128)
+    , counter_ (0)
 {}
 
 int32_t FrequencySweep::filter(int32_t freq) {
