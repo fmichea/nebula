@@ -11,24 +11,20 @@ Channel::Channel(MMU* mmu, int num, const RegisterProxy& nrx3, const NRX4Proxy& 
 }
 
 Channel::~Channel() {
-    std::list<Filter*>::const_iterator it;
-
-    for (it = this->filters_.begin(); it != this->filters_.end(); it++) {
-        delete (*it);
+    for (Filter* filter : this->filters_) {
+        delete filter;
     }
 }
 
 void Channel::fill_stream(int16_t* stream, unsigned int len) {
-    std::list<Filter*>::const_iterator it;
-
     for (unsigned int x = 0; x < len; ++x) {
         if (!this->nr52_.channel_on[this->num_ - 1].get())
             break;
 
         int32_t data = this->frequency_;
 
-        for (it = this->filters_.begin(); it != this->filters_.end(); it++) {
-            data = (*it)->filter(data);
+        for (Filter* filter : this->filters_) {
+            data = filter->filter(data);
         }
         stream[x] = static_cast<int16_t>(data);
     }
