@@ -4,12 +4,12 @@
 # include <list>
 # include <cmath>
 
-# include "../../memory/mmu.hh"
-# include "../../memory/registers/nrx4.hh"
-# include "../../logging.hh"
-# include "../constants.hh"
-# include "../filters/filter.hh"
-# include "../../utils/utils.hh"
+# include "../memory/mmu.hh"
+# include "../memory/registers/nrx4.hh"
+# include "../logging.hh"
+# include "constants.hh"
+# include "filters/filter.hh"
+# include "../utils/utils.hh"
 
 class Channel {
 public:

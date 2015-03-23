@@ -13,7 +13,7 @@
 # include "filters/volume.hh"
 # include "filters/wave.hh"
 
-# include "channels/channel.hh"
+# include "channel.hh"
 # include "constants.hh"
 
 class Sound {
