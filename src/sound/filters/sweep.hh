@@ -21,9 +21,6 @@ public:
     int32_t filter(int32_t freq);
 
 private:
-    int32_t compute_freq(int32_t freq);
-
-private:
     int num_;
     NR52Proxy& nr52_;
 
@@ -35,7 +32,6 @@ private:
     int32_t shift_;
 
     int32_t diff_;
-    int32_t last_diff_;
 };
 
 #endif /* !SWEEP_HH_ */
