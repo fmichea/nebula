@@ -9,7 +9,7 @@ Sound::Sound(MMU* mmu)
     for (int it = 0; it < NB_GB_CHANNELS; ++it)
         this->channels_[it] = nullptr;
     this->channels_[0] = new Channel(mmu, 1, mmu_->NR13, mmu_->NR14, {
-        new FrequencySweep(1, mmu_->NR52, mmu_->NR10),
+        new Sweep(1, mmu_->NR52, mmu_->NR10),
         new QuandrangularChannel(),
         //new nebula::sound::filters::Timer(),
         new WaveForm(mmu_->NR11, mmu_->NR13, mmu_->NR14),

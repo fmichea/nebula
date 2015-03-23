@@ -13,9 +13,9 @@ typedef enum {
     FREQUENCYSWEEP_NEGATE_FALSE,
 } frequencysweep_negate;
 
-class FrequencySweep : public Filter {
+class Sweep : public Filter {
 public:
-    FrequencySweep(int num, NR52Proxy& nr52, const NR10Proxy& nr10);
+    Sweep(int num, NR52Proxy& nr52, const NR10Proxy& nr10);
 
     void reload();
     int32_t filter(int32_t freq);

@@ -1,6 +1,6 @@
 #include "sweep.hh"
 
-FrequencySweep::FrequencySweep(int num, NR52Proxy& nr52, const NR10Proxy& nr10)
+Sweep::Sweep(int num, NR52Proxy& nr52, const NR10Proxy& nr10)
     : Filter()
     , num_ (num)
     , nr52_ (nr52)
@@ -9,7 +9,7 @@ FrequencySweep::FrequencySweep(int num, NR52Proxy& nr52, const NR10Proxy& nr10)
     , counter_ (0)
 {}
 
-int32_t FrequencySweep::filter(int32_t freq) {
+int32_t Sweep::filter(int32_t freq) {
     int32_t diff = 0;
 
     if (this->enabled_) {
@@ -28,7 +28,7 @@ int32_t FrequencySweep::filter(int32_t freq) {
     return freq;
 }
 
-void FrequencySweep::reload() {
+void Sweep::reload() {
     this->tick_.reset();
 
     this->shift_ = this->nr10_.shift.get();
