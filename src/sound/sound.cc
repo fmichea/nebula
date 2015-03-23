@@ -74,7 +74,7 @@ void Sound::fill_stream(Uint8* stream, int _len) {
     }
 
     for (int chan = 0; chan < NB_CHANNELS; ++chan) {
-        for (int it = chan; it < len; it += 2) {
+        for (int it = chan; it < len; it += NB_CHANNELS) {
             // Fetch the frequency computed.
             data = 0, count = 0;
             for (int it_ = 0; it_ < NB_GB_CHANNELS; ++it_) {
