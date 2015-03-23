@@ -6,8 +6,8 @@
 # include "../logging.hh"
 # include "../memory/mmu.hh"
 
+# include "filters/channels/square.hh"
 # include "filters/filter.hh"
-# include "filters/frequency.hh"
 # include "filters/length.hh"
 # include "filters/sweep.hh"
 # include "filters/volume.hh"

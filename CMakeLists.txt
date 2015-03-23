@@ -61,7 +61,7 @@ ELSEIF(_DISPLAY_BACKEND MATCHES "SDL")
         SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_SOUND=${_SOUND}")
         SET(NEBULA_SRCS ${NEBULA_SRCS}
                         src/sound/channel.cc
-                        src/sound/filters/frequency.cc
+                        src/sound/filters/channels/square.cc
                         src/sound/filters/length.cc
                         src/sound/filters/sweep.cc
                         src/sound/filters/volume.cc
