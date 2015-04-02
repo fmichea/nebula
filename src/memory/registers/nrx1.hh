@@ -1,5 +1,5 @@
-#ifndef NRX1_HH_
-# define NRX1_HH_
+#ifndef NEBULA_MEMORY_REGISTERS_NRX1_HH_
+# define NEBULA_MEMORY_REGISTERS_NRX1_HH_
 
 # include "bitproxy.hh"
 # include "register.hh"
@@ -19,4 +19,4 @@ public:
     BitProxy sound_length;
 };
 
-#endif // !NRX1_HH_
+#endif // !NEBULA_MEMORY_REGISTERS_NRX1_HH_

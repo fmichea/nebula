@@ -1,5 +1,5 @@
-#ifndef MAINWINDOW_HH_
-# define MAINWINDOW_HH_
+#ifndef NEBULA_FRONTENDS_QT_MAINWINDOW_HH_
+# define NEBULA_FRONTENDS_QT_MAINWINDOW_HH_
 
 # include <QMainWindow>
 
@@ -16,4 +16,4 @@ private:
 
 }}} /* namespaces nebula::frontends::qt */
 
-#endif /* !MAINWINDOW_HH_ */
+#endif /* !NEBULA_FRONTENDS_QT_MAINWINDOW_HH_ */

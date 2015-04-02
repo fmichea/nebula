@@ -1,5 +1,5 @@
-#ifndef TIMER_HH_
-# define TIMER_HH_
+#ifndef NEBULA_GRAPHICS_TIMER_HH_
+# define NEBULA_GRAPHICS_TIMER_HH_
 
 # include <stdint.h>
 # include <unistd.h>
@@ -26,4 +26,4 @@ private:
     uint64_t last_;
 };
 
-#endif // !TIMER_HH_
+#endif // !NEBULA_GRAPHICS_TIMER_HH_

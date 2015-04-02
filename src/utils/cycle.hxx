@@ -1,5 +1,5 @@
-#ifndef CYCLER_HXX_
-# define CYCLER_HXX_
+#ifndef NEBULA_UTILS_CYCLE_HXX_
+# define NEBULA_UTILS_CYCLE_HXX_
 
 # include "cycle.hh"
 
@@ -55,4 +55,4 @@ T Cycle<T>::maximum() {
     return this->maximum_;
 }
 
-#endif // !CYCLE_HXX_
+#endif // !NEBULA_UTILS_CYCLE_HXX_

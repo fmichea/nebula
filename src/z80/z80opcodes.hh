@@ -1,5 +1,5 @@
-#ifndef Z___OPCODES_HH_
-# define Z___OPCODES_HH_
+#ifndef NEBULA_Z80_Z80OPCODES_HH_
+# define NEBULA_Z80_Z80OPCODES_HH_
 
 # include "../memory/mmu.hh"
 # include "../utils/utils.hh"
@@ -11,4 +11,4 @@ uint16_t rst_nn(MMU& mmu, Z80Registers& regs, uint16_t a);
 
 extern op OPCODES[0x100];
 
-#endif // !Z___OPCODES_HH_
+#endif // !NEBULA_Z80_Z80OPCODES_HH_

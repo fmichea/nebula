@@ -1,9 +1,9 @@
-#ifndef Z__DISASSEMBLER_HH_
-# define Z__DISASSEMBLER_HH_
+#ifndef NEBULA_Z80_Z80DISASSEMBLER_HH_
+# define NEBULA_Z80_Z80DISASSEMBLER_HH_
 
 # include "../memory/mmu.hh"
 # include "z80registers.hh"
 
 void print_disassembly(MMU& mmu, Z80Registers& regs);
 
-#endif // !Z__DISASSEMBLER_HH_
+#endif // !NEBULA_Z80_Z80DISASSEMBLER_HH_

@@ -1,5 +1,5 @@
-#ifndef SPRITES_HH_
-# define SPRITES_HH_
+#ifndef NEBULA_GRAPHICS_SPRITES_HH_
+# define NEBULA_GRAPHICS_SPRITES_HH_
 
 # include <list>
 
@@ -48,4 +48,4 @@ public:
     static std::list<Sprite*> get_sprites(MMU* mmu, uint8_t y);
 };
 
-#endif // !SPRITES_HH_
+#endif // !NEBULA_GRAPHICS_SPRITES_HH_

@@ -1,5 +1,5 @@
-#ifndef VOLUME_HH_
-# define VOLUME_HH_
+#ifndef NEBULA_SOUND_FILTERS_VOLUME_HH_
+# define NEBULA_SOUND_FILTERS_VOLUME_HH_
 
 # include <limits>
 
@@ -30,4 +30,4 @@ private:
     Cycle<unsigned int> sweep_;
 };
 
-#endif // !VOLUME_HH_
+#endif // !NEBULA_SOUND_FILTERS_VOLUME_HH_

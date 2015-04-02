@@ -1,5 +1,5 @@
-#ifndef MBC5_HH_
-# define MBC5_HH_
+#ifndef NEBULA_MEMORY_MBCS_MBC5_HH_
+# define NEBULA_MEMORY_MBCS_MBC5_HH_
 
 # include "mbc.hh"
 
@@ -13,4 +13,4 @@ private:
     void* write_ram_bank(uint16_t addr, uint16_t value);
 };
 
-#endif // !MBC5_HH_
+#endif // !NEBULA_MEMORY_MBCS_MBC5_HH_

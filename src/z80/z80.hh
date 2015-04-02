@@ -1,5 +1,5 @@
-#ifndef Z___HH_
-# define Z___HH_
+#ifndef NEBULA_Z80_Z80_HH_
+# define NEBULA_Z80_Z80_HH_
 
 # include <stdio.h>
 
@@ -30,4 +30,4 @@ private:
     MMU*            mmu_;
 };
 
-#endif // !Z___HH_
+#endif // !NEBULA_Z80_Z80_HH_

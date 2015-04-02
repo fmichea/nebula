@@ -1,5 +1,5 @@
-#ifndef MBC1_HH_
-# define MBC1_HH_
+#ifndef NEBULA_MEMORY_MBCS_MBC1_HH_
+# define NEBULA_MEMORY_MBCS_MBC1_HH_
 
 # include "mbc.hh"
 
@@ -26,4 +26,4 @@ private:
     e_mbc1_mode  mbc_mode_;
 };
 
-#endif // !MBC1_HH_
+#endif // !NEBULA_MEMORY_MBCS_MBC1_HH_

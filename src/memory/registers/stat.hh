@@ -1,5 +1,5 @@
-#ifndef STAT_HH_
-# define STAT_HH_
+#ifndef NEBULA_MEMORY_REGISTERS_STAT_HH_
+# define NEBULA_MEMORY_REGISTERS_STAT_HH_
 
 # include "bitproxy.hh"
 # include "register.hh"
@@ -27,4 +27,4 @@ public:
     BitProxy mode; // Mode Flag (H-Blank, V-Blank, OAM, ...)
 };
 
-#endif // !STAT_HH_
+#endif // !NEBULA_MEMORY_REGISTERS_STAT_HH_

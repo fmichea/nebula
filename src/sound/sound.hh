@@ -1,5 +1,5 @@
-#ifndef SOUND_HH_
-# define SOUND_HH_
+#ifndef NEBULA_SOUND_SOUND_HH_
+# define NEBULA_SOUND_SOUND_HH_
 
 # include <SDL.h>
 
@@ -31,4 +31,4 @@ private:
     SDL_AudioSpec   spec_;
 };
 
-#endif // !SOUND_HH_
+#endif // !NEBULA_SOUND_SOUND_HH_

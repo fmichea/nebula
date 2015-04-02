@@ -1,5 +1,5 @@
-#ifndef NR52_HH_
-# define NR52_HH_
+#ifndef NEBULA_MEMORY_REGISTERS_NR52_HH_
+# define NEBULA_MEMORY_REGISTERS_NR52_HH_
 
 # include "bitproxy.hh"
 # include "register.hh"
@@ -22,4 +22,4 @@ public:
     BitProxy channel_on[NB_GB_CHANNELS];
 };
 
-#endif // !NR52_HH_
+#endif // !NEBULA_MEMORY_REGISTERS_NR52_HH_

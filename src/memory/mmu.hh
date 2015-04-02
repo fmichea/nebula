@@ -1,5 +1,5 @@
-#ifndef MMU_HH_
-# define MMU_HH_
+#ifndef NEBULA_MEMORY_MMU_HH_
+# define NEBULA_MEMORY_MMU_HH_
 
 # include <fcntl.h>
 # include <list>
@@ -108,4 +108,4 @@ private:
 
 # include "mmu.hxx"
 
-#endif // !MMU_HH_
+#endif // !NEBULA_MEMORY_MMU_HH_

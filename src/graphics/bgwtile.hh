@@ -1,5 +1,5 @@
-#ifndef BGTILE_HH_
-# define BGTILE_HH_
+#ifndef NEBULA_GRAPHICS_BGWTILE_HH_
+# define NEBULA_GRAPHICS_BGWTILE_HH_
 
 # include "../memory/mmu.hh"
 
@@ -29,4 +29,4 @@ private:
     uint8_t colors_[8];
 };
 
-#endif // !BGTILE_HH_
+#endif // !NEBULA_GRAPHICS_BGWTILE_HH_

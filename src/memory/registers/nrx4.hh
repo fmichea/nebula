@@ -1,5 +1,5 @@
-#ifndef NRX4_HH_
-# define NRX4_HH_
+#ifndef NEBULA_MEMORY_REGISTERS_NRX4_HH_
+# define NEBULA_MEMORY_REGISTERS_NRX4_HH_
 
 # include "bitproxy.hh"
 # include "register.hh"
@@ -21,4 +21,4 @@ public:
     BitProxy freq_hi;
 };
 
-#endif // !NRX4_HH_
+#endif // !NEBULA_MEMORY_REGISTERS_NRX4_HH_

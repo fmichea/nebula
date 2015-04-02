@@ -1,5 +1,5 @@
-#ifndef ROMONLY_HH_
-# define ROMONLY_HH_
+#ifndef NEBULA_MEMORY_MBCS_ROMONLY_HH_
+# define NEBULA_MEMORY_MBCS_ROMONLY_HH_
 
 # include "../../utils/utils.hh"
 # include "mbc.hh"
@@ -14,4 +14,4 @@ protected:
     void* write_address(uint16_t addr, uint16_t value);
 };
 
-#endif // !ROMONLY_HH_
+#endif // !NEBULA_MEMORY_MBCS_ROMONLY_HH_

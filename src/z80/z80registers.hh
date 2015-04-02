@@ -1,5 +1,5 @@
-#ifndef Z__REGISTERS_HH_
-# define Z__REGISTERS_HH_
+#ifndef NEBULA_Z80_Z80REGISTERS_HH_
+# define NEBULA_Z80_Z80REGISTERS_HH_
 
 # include <stdint.h>
 
@@ -96,4 +96,4 @@ private:
     uint8_t flags_;
 };
 
-#endif // !Z__REGISTERS_HH_
+#endif // !NEBULA_Z80_Z80REGISTERS_HH_

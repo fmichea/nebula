@@ -1,5 +1,5 @@
-#ifndef COMMANDLINE_HH_
-# define COMMANDLINE_HH_
+#ifndef NEBULA_COMMANDLINE_HH_
+# define NEBULA_COMMANDLINE_HH_
 
 # include <string>
 # include <stdio.h>
@@ -10,4 +10,4 @@ namespace cmdline {
     bool parse(std::string& rom, int argc, const char** argv);
 }
 
-#endif // !COMMANDLINE_HH_
+#endif // !NEBULA_COMMANDLINE_HH_

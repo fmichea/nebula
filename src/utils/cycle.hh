@@ -1,5 +1,5 @@
-#ifndef CYCLE_HH_
-# define CYCLE_HH_
+#ifndef NEBULA_UTILS_CYCLE_HH_
+# define NEBULA_UTILS_CYCLE_HH_
 
 # include "utils.hh"
 
@@ -26,4 +26,4 @@ private:
 
 # include "cycle.hxx"
 
-#endif // !CYCLE_HH_
+#endif // !NEBULA_UTILS_CYCLE_HH_

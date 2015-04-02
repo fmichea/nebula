@@ -1,5 +1,5 @@
-#ifndef CHANNEL_HH_
-# define CHANNEL_HH_
+#ifndef NEBULA_SOUND_CHANNEL_HH_
+# define NEBULA_SOUND_CHANNEL_HH_
 
 # include <list>
 # include <cmath>
@@ -30,4 +30,4 @@ protected:
     const NRX4Proxy& nrx4_;
 };
 
-#endif // !CHANNEL_HH_
+#endif // !NEBULA_SOUND_CHANNEL_HH_

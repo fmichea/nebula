@@ -1,6 +1,6 @@
-#ifndef UTILS_HH_
-# define UTILS_HH_
+#ifndef NEBULA_UTILS_UTILS_HH_
+# define NEBULA_UTILS_UTILS_HH_
 
 # define UNUSED(X)
 
-#endif /* !UTILS_HH_ */
+#endif // !NEBULA_UTILS_UTILS_HH_

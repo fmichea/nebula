@@ -1,5 +1,5 @@
-#ifndef REGISTER_HH_
-# define REGISTER_HH_
+#ifndef NEBULA_MEMORY_REGISTERS_REGISTER_HH_
+# define NEBULA_MEMORY_REGISTERS_REGISTER_HH_
 
 class RegisterProxy {
 public:
@@ -28,4 +28,4 @@ private:
     uint16_t    addr_;
 };
 
-#endif // !REGISTER_HH_
+#endif // !NEBULA_MEMORY_REGISTERS_REGISTER_HH_

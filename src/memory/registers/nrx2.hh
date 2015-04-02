@@ -1,5 +1,5 @@
-#ifndef NRX2_HH_
-# define NRX2_HH_
+#ifndef NEBULA_MEMORY_REGISTERS_NRX2_HH_
+# define NEBULA_MEMORY_REGISTERS_NRX2_HH_
 
 # include "bitproxy.hh"
 # include "register.hh"
@@ -21,4 +21,4 @@ public:
     BitProxy envelop_sweep;
 };
 
-#endif // !NRX2_HH_
+#endif // !NEBULA_MEMORY_REGISTERS_NRX2_HH_

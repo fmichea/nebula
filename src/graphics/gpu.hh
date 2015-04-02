@@ -1,5 +1,5 @@
-#ifndef GPU_HH_
-# define GPU_HH_
+#ifndef NEBULA_GRAPHICS_GPU_HH_
+# define NEBULA_GRAPHICS_GPU_HH_
 
 # include <list>
 # include <string.h>
@@ -43,4 +43,4 @@ private:
     uint32_t bgcolors_[4];
 };
 
-#endif // !GPU_HH_
+#endif // !NEBULA_GRAPHICS_GPU_HH_

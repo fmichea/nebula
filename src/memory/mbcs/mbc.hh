@@ -1,5 +1,5 @@
-#ifndef MBC_HH_
-# define MBC_HH_
+#ifndef NEBULA_MEMORY_MBCS_MBC_HH_
+# define NEBULA_MEMORY_MBCS_MBC_HH_
 
 # include <stdint.h>
 # include <stdlib.h>
@@ -36,4 +36,4 @@ protected:
 
 # include "mbc.hxx"
 
-#endif // !MBC_HH_
+#endif // !NEBULA_MEMORY_MBCS_MBC_HH_

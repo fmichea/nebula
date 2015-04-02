@@ -1,5 +1,5 @@
-#ifndef LCDC_HH_
-# define LCDC_HH_
+#ifndef NEBULA_MEMORY_REGISTERS_LCDC_HH_
+# define NEBULA_MEMORY_REGISTERS_LCDC_HH_
 
 # include <stdint.h>
 
@@ -33,4 +33,4 @@ public:
     BitProxy BGD; // BG Display
 };
 
-#endif // !LCDC_HH_
+#endif // !NEBULA_MEMORY_REGISTERS_LCDC_HH_

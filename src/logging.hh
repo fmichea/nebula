@@ -1,5 +1,5 @@
-#ifndef LOGGING_HH_
-# define LOGGING_HH_
+#ifndef NEBULA_LOGGING_HH_
+# define NEBULA_LOGGING_HH_
 
 # include <stdarg.h>
 # include <stdio.h>
@@ -26,4 +26,4 @@ namespace logging {
     int verbose(const char* format, ...);
 }
 
-#endif // !LOGGING_HH_
+#endif // !NEBULA_LOGGING_HH_

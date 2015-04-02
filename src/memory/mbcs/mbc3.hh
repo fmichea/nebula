@@ -1,5 +1,5 @@
-#ifndef MBC3_HH_
-# define MBC3_HH_
+#ifndef NEBULA_MEMORY_MBCS_MBC3_HH_
+# define NEBULA_MEMORY_MBCS_MBC3_HH_
 
 # include <time.h>
 
@@ -25,4 +25,4 @@ private:
     uint64_t    substracted_time_;
 };
 
-#endif // !MBC3_HH_
+#endif // !NEBULA_MEMORY_MBCS_MBC3_HH_

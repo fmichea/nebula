@@ -1,5 +1,5 @@
-#ifndef INTERRUPTS_HH_
-# define INTERRUPTS_HH_
+#ifndef NEBULA_Z80_INTERRUPTS_HH_
+# define NEBULA_Z80_INTERRUPTS_HH_
 
 # include "../memory/mmu.hh"
 # include "../memory/registers/bitproxy.hh"
@@ -26,4 +26,4 @@ private:
     int16_t         tima_cycles_;
 };
 
-#endif // !INTERRUPTS_HH_
+#endif // !NEBULA_Z80_INTERRUPTS_HH_

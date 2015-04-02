@@ -1,5 +1,5 @@
-#ifndef NR10_HH_
-# define NR10_HH_
+#ifndef NEBULA_MEMORY_REGISTERS_NR10_HH_
+# define NEBULA_MEMORY_REGISTERS_NR10_HH_
 
 # include "bitproxy.hh"
 # include "register.hh"
@@ -21,4 +21,4 @@ public:
     BitProxy shift;
 };
 
-#endif // !NR10_HH_
+#endif // !NEBULA_MEMORY_REGISTERS_NR10_HH_

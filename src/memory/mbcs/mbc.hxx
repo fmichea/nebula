@@ -1,5 +1,5 @@
-#ifndef MBC_HXX_
-# define MBC_HXX_
+#ifndef NEBULA_MEMORY_MBCS_MBC_HXX_
+# define NEBULA_MEMORY_MBCS_MBC_HXX_
 
 # include "mbc.hh"
 
@@ -22,4 +22,4 @@ void MBC::write(uint16_t addr, T value)
     *mem = value;
 }
 
-#endif // !MBC_HXX_
+#endif // !NEBULA_MEMORY_MBCS_MBC_HXX_

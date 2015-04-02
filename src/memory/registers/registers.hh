@@ -1,5 +1,5 @@
-#ifndef REGISTERS_HH_
-# define REGISTERS_HH_
+#ifndef NEBULA_MEMORY_REGISTERS_REGISTERS_HH_
+# define NEBULA_MEMORY_REGISTERS_REGISTERS_HH_
 
 # include "lcdc.hh"
 # include "nr10.hh"
@@ -12,4 +12,4 @@
 # include "register.hh"
 # include "stat.hh"
 
-#endif /* !REGISTERS_HH_ */
+#endif /* !NEBULA_MEMORY_REGISTERS_REGISTERS_HH_ */

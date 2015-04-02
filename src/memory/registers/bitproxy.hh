@@ -1,5 +1,5 @@
-#ifndef BITPROXY_HH_
-# define BITPROXY_HH_
+#ifndef NEBULA_MEMORY_REGISTERS_BITPROXY_HH_
+# define NEBULA_MEMORY_REGISTERS_BITPROXY_HH_
 
 # include <stdint.h>
 
@@ -37,4 +37,4 @@ private:
     uint8_t     mask_;
 };
 
-#endif // !BITPROXY_HH_
+#endif // !NEBULA_MEMORY_REGISTERS_BITPROXY_HH_

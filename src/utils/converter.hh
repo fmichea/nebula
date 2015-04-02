@@ -1,5 +1,5 @@
-#ifndef CONVERTER_HH_
-# define CONVERTER_HH_
+#ifndef NEBULA_UTILS_CONVERTER_HH_
+# define NEBULA_UTILS_CONVERTER_HH_
 
 # include <unistd.h>
 # include <stdint.h>
@@ -22,4 +22,4 @@ private:
     unsigned int divider_;
 };
 
-#endif // !CONVERTER_HH_
+#endif // !NEBULA_UTILS_CONVERTER_HH_

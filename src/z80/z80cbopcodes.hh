@@ -1,5 +1,5 @@
-#ifndef Z__CBOPCODES_HH_
-# define Z__CBOPCODES_HH_
+#ifndef NEBULA_Z80_Z80CBOPCODES_HH_
+# define NEBULA_Z80_Z80CBOPCODES_HH_
 
 # include <stdint.h>
 
@@ -12,4 +12,4 @@ typedef uint16_t (*op) (MMU&, Z80Registers&);
 
 extern op CBOPCODES[0x100];
 
-#endif // !Z__CBOPCODES_HH_
+#endif // !NEBULA_Z80_Z80CBOPCODES_HH_

@@ -1,5 +1,5 @@
-#ifndef CONSTANTS_HH_
-# define CONSTANTS_HH_
+#ifndef NEBULA_SOUND_CONSTANTS_HH_
+# define NEBULA_SOUND_CONSTANTS_HH_
 
 # define PI 3.14159265
 
@@ -14,4 +14,4 @@
 # define MAX_FREQ (1 << (BITS - 1)) - 1
 # define MIN_FREQ -(1 << (BITS - 1))
 
-#endif // !CONSTANTS_HH_
+#endif // !NEBULA_SOUND_CONSTANTS_HH_

@@ -1,5 +1,5 @@
-#ifndef SWEEP_HH_
-# define SWEEP_HH_
+#ifndef NEBULA_SOUND_FILTERS_SWEEP_HH_
+# define NEBULA_SOUND_FILTERS_SWEEP_HH_
 
 # include "../../memory/registers/nr10.hh"
 # include "../../memory/registers/nr52.hh"
@@ -34,4 +34,4 @@ private:
     int32_t diff_;
 };
 
-#endif /* !SWEEP_HH_ */
+#endif /* !NEBULA_SOUND_FILTERS_SWEEP_HH_ */

@@ -1,5 +1,5 @@
-#ifndef BGPPROXY_HH_
-# define BGPPROXY_HH_
+#ifndef NEBULA_MEMORY_REGISTERS_PALETTE_HH_
+# define NEBULA_MEMORY_REGISTERS_PALETTE_HH_
 
 # include "bitproxy.hh"
 # include "register.hh"
@@ -20,4 +20,4 @@ public:
     BitProxy C[_NB_COLORS];
 };
 
-#endif // !BGPPROXY_HH_
+#endif // !NEBULA_MEMORY_REGISTERS_PALETTE_HH_

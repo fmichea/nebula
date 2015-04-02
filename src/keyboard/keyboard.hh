@@ -1,5 +1,5 @@
-#ifndef KEYBOARD_HH_
-# define KEYBOARD_HH_
+#ifndef NEBULA_KEYBOARD_KEYBOARD_HH_
+# define NEBULA_KEYBOARD_KEYBOARD_HH_
 
 # include "../memory/mmu.hh"
 # include "../memory/registers/bitproxy.hh"
@@ -58,4 +58,4 @@ private:
     bool trigger_int_;
 };
 
-#endif // !KEYBOARD_HH_
+#endif // !NEBULA_KEYBOARD_KEYBOARD_HH_

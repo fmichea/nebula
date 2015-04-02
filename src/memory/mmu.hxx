@@ -1,5 +1,5 @@
-#ifndef MMU_HXX_
-# define MMU_HXX_
+#ifndef NEBULA_MEMORY_MMU_HXX_
+# define NEBULA_MEMORY_MMU_HXX_
 
 # include "mmu.hh"
 
@@ -199,4 +199,4 @@ void MMU::write(uint16_t addr, T value, bool twe) {
 template<> uint16_t MMU::read<uint16_t>(uint16_t addr, bool twe);
 template<> void MMU::write<uint16_t>(uint16_t addr, uint16_t value, bool twe);
 
-#endif // !MMU_HXX_
+#endif // !NEBULA_MEMORY_MMU_HXX_

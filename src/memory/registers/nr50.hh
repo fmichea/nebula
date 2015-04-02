@@ -1,5 +1,5 @@
-#ifndef NR50_HH_
-# define NR50_HH_
+#ifndef NEBULA_MEMORY_REGISTERS_NR50_HH_
+# define NEBULA_MEMORY_REGISTERS_NR50_HH_
 
 # include "bitproxy.hh"
 # include "register.hh"
@@ -20,4 +20,4 @@ public:
     BitProxy volume[NB_CHANNELS];
 };
 
-#endif /* !NR50_HH_ */
+#endif /* !NEBULA_MEMORY_REGISTERS_NR50_HH_ */
