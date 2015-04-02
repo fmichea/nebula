@@ -24,8 +24,8 @@ Write your own emulator
 Here are some good links to documentation that would help you understand the
 inner workings of a GameBoy and write your own emulator.
 
- - General purpose documentation: [1][general_doc1]
- - Sound system: [1][sound_doc1], [2][sound_doc2]
+ - General purpose documentation: [1][general_doc]
+ - Sound system: [1][sound_doc1]
 
 Testing the thing:
 
