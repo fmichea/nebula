@@ -12,7 +12,7 @@ Channel::Channel(MMU* mmu, int num, const RegisterProxy& nrx3, const NRX4Proxy& 
 {
     mmu->subscribe(nrx4.addr(), WatchType::WO, _reload_channel_callback, this);
     for (Filter* filter : this->filters_)
-        filter->reload();
+        filter->reload(0);
 }
 
 Channel::~Channel() {
@@ -45,7 +45,7 @@ void Channel::reload() {
         this->frequency_ = freq;
 
         for (it = this->filters_.begin(); it != this->filters_.end(); it++) {
-            (*it)->reload();
+            (*it)->reload(freq);
         }
         this->nr52_.channel_on[this->num_ - 1].set(1);
     }

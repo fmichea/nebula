@@ -4,7 +4,7 @@ namespace nebula { namespace sound { namespace filters { namespace channels {
 
 Square::Square() : Filter() {}
 
-void Square::reload() {}
+void Square::reload(int32_t UNUSED(freq)) {}
 
 int32_t Square::filter(int32_t freq) {
     if (0 <= freq && freq < 2048)

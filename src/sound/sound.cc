@@ -8,24 +8,23 @@ Sound::Sound(MMU* mmu)
     // Init channels.
     for (int it = 0; it < NB_GB_CHANNELS; ++it)
         this->channels_[it] = nullptr;
-    this->channels_[0] = new Channel(mmu, 1, mmu_->NR13, mmu_->NR14, {
+    this->channels_[0] = new Channel(mmu_, 1, mmu_->NR13, mmu_->NR14, {
         new Sweep(1, mmu_->NR52, mmu_->NR10),
         new nebula::sound::filters::channels::Square(),
-        //new nebula::sound::filters::Timer(),
-        new WaveForm(mmu_->NR11, mmu_->NR13, mmu_->NR14),
-        new Length(1, mmu_->NR52, mmu_->NR11, mmu_->NR14),
+        new Duty(mmu_->NR11),
+        new Length(1, mmu_, mmu_->NR52, mmu_->NR11, mmu_->NR14),
         new VolumeEnvelop(mmu_->NR12),
     });
-    this->channels_[1] = new Channel(mmu, 2, mmu_->NR23, mmu_->NR24, {
-        //new nebula::sound::filters::Timer(),
+    this->channels_[1] = new Channel(mmu_, 2, mmu_->NR23, mmu_->NR24, {
         new nebula::sound::filters::channels::Square(),
-        new WaveForm(mmu_->NR21, mmu_->NR23, mmu_->NR24),
-        new Length(2, mmu_->NR52, mmu_->NR21, mmu_->NR24),
+        new Duty(mmu_->NR21),
+        new Length(2, mmu_, mmu_->NR52, mmu_->NR21, mmu_->NR24),
         new VolumeEnvelop(mmu_->NR22),
     });
 #if 0
-    this->channels_[2] = new Channel(3, mmu_->NR52, mmu_->NR33, mmu_->NR34, {
-        new Length(3, mmu_->NR52, mmu_->NR31, mmu_->NR34),
+    this->channels_[2] = new Channel(mmu_, 3, mmu_->NR33, mmu_->NR34, {
+        new nebula::sound::filters::channels::Wave(mmu_),
+        new Length(3, mmu_, mmu_->NR52, mmu_->NR31, mmu_->NR34),
     });
     this->channels_[3] = new Channel(4, mmu_->NR52, mmu_->NR33, mmu_->NR34, {
         new Length(4, mmu_->NR52, mmu_->NR41, mmu_->NR44),
@@ -52,18 +51,17 @@ Sound::Sound(MMU* mmu)
 }
 
 void Sound::fill_stream(Uint8* stream, int _len) {
-    int         len = _len / sizeof (Sint16);
-    int16_t*    channels[NB_GB_CHANNELS];
-    int16_t*    stream_ = new int16_t[len];
-    int32_t     data, count;
+    int len = _len / sizeof (Sint16);
+    int16_t* channels[NB_GB_CHANNELS];
+    int16_t* stream_ = new int16_t[len];
+    int32_t data, count;
 
     // Buffer is not initialized by default.
     memset(stream, 0, _len);
 
-    // If sound is not ON, end there.
+    // If sound is OFF, end there.
     if (this->mmu_->NR52.sound_on.get() == 0)
         return;
-    //logging::info("sound is ON!");
 
     for (int it = 0; it < NB_GB_CHANNELS; ++it) {
         channels[it] = new int16_t[len];

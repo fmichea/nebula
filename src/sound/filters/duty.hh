@@ -1,5 +1,5 @@
-#ifndef WAVE_HH_
-# define WAVE_HH_
+#ifndef NEBULA_SOUND_FILTERS_DUTY_HH_
+# define NEBULA_SOUND_FILTERS_DUTY_HH_
 
 # include <math.h>
 # include <stdint.h>
@@ -13,23 +13,22 @@
 # include "../constants.hh"
 # include "filter.hh"
 
-class WaveForm : public Filter {
+class Duty : public Filter {
 public:
-    WaveForm(const NRX1Proxy& nrx1, const RegisterProxy& nrx3, const NRX4Proxy& nrx4);
+    Duty(const NRX1Proxy& nrx1);
 
-    void reload();
+    void reload(int32_t freq);
     int32_t filter(int32_t frequency);
 
 private:
-    Cycle<unsigned int> frame_;
     const NRX1Proxy& nrx1_;
-    const RegisterProxy& nrx3_;
-    const NRX4Proxy& nrx4_;
 
-    Converter duty_tick_;
-    Cycle<unsigned int> duty_phase_;
-    bool duty_reload_;
-    unsigned int duty_pattern_;
+    Cycle<unsigned int> frame_;
+    Cycle<unsigned int> phase_;
+
+    Converter timer_tick_;
+
+    unsigned int pattern_;
 };
 
-#endif // !WAVE_HH_
+#endif // !NEBULA_SOUND_FILTERS_DUTY_HH_

@@ -18,7 +18,7 @@ class VolumeEnvelop : public Filter {
 public:
     VolumeEnvelop(const NRX2Proxy& nrx2);
 
-    void reload();
+    void reload(int32_t freq);
     int32_t filter(int32_t freq);
 
 private:

@@ -14,7 +14,7 @@ int32_t Sweep::filter(int32_t freq) {
 
     if (this->enabled_) {
         if (this->tick_.next() && (--this->counter_) == 0) {
-            diff = (freq >> this->shift_);
+            diff = (this->shadow_freq_ >> this->shift_);
             if (this->negate_ == FREQUENCYSWEEP_NEGATE_TRUE) {
                 diff *= -1;
             }
@@ -28,7 +28,9 @@ int32_t Sweep::filter(int32_t freq) {
     return freq;
 }
 
-void Sweep::reload() {
+void Sweep::reload(int32_t freq) {
+    this->shadow_freq_ = freq;
+
     this->tick_.reset();
 
     this->shift_ = this->nr10_.shift.get();

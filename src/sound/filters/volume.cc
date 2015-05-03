@@ -25,7 +25,7 @@ int32_t VolumeEnvelop::filter(int32_t freq) {
     return freq;
 }
 
-void VolumeEnvelop::reload() {
+void VolumeEnvelop::reload(int32_t UNUSED(freq)) {
     this->tick_.reset();
 
     this->volume_ = this->nrx2_.volume.get();

@@ -7,11 +7,12 @@
 # include "../memory/mmu.hh"
 
 # include "filters/channels/square.hh"
+# include "filters/channels/wave.hh"
+# include "filters/duty.hh"
 # include "filters/filter.hh"
 # include "filters/length.hh"
 # include "filters/sweep.hh"
 # include "filters/volume.hh"
-# include "filters/wave.hh"
 
 # include "channel.hh"
 # include "constants.hh"

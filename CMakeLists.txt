@@ -62,10 +62,11 @@ ELSEIF(_DISPLAY_BACKEND MATCHES "SDL")
         SET(NEBULA_SRCS ${NEBULA_SRCS}
                         src/sound/channel.cc
                         src/sound/filters/channels/square.cc
+                        src/sound/filters/channels/wave.cc
+                        src/sound/filters/duty.cc
                         src/sound/filters/length.cc
                         src/sound/filters/sweep.cc
                         src/sound/filters/volume.cc
-                        src/sound/filters/wave.cc
                         src/sound/sound.cc
                         src/utils/converter.cc
         )
