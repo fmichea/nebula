@@ -3,7 +3,12 @@
 static void _reload_channel_callback(void* data, uint16_t addr);
 
 Channel::Channel(MMU* mmu, int num, const RegisterProxy& nrx3, const NRX4Proxy& nrx4, const std::list<Filter*>& filters)
-    : num_ (num), frequency_ (261), filters_ (filters), nr52_ (mmu->NR52), nrx3_ (nrx3), nrx4_ (nrx4)
+    : num_ (num)
+    , frequency_ (261)
+    , filters_ (filters)
+    , nr52_ (mmu->NR52)
+    , nrx3_ (nrx3)
+    , nrx4_ (nrx4)
 {
     mmu->subscribe(nrx4.addr(), WatchType::WO, _reload_channel_callback, this);
     for (Filter* filter : this->filters_)
