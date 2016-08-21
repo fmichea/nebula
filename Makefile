@@ -23,7 +23,7 @@ ifeq ($(BUILD_DIR),build-nebula)
 $(error Build directory cannot be named "build-nebula" per convention)
 endif
 
-.PHONY: all build-nebula start
+.PHONY: all build-nebula start debug
 
 all: build-nebula
 
@@ -36,6 +36,9 @@ build-nebula: $(BUILD_DIR)
 
 start: build-nebula
 	$(BUILD_DIR)/nebula $(NEBULA_ARGS) --rom "$(ROM)"
+
+debug: build-nebula
+	PATH=/usr/bin:$$PATH lldb -- $(BUILD_DIR)/nebula $(NEBULA_ARGS) --rom "$(ROM)"
 
 $(BUILD_DIR):
 	mkdir -p $@
