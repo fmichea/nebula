@@ -35,7 +35,7 @@ build-nebula: $(BUILD_DIR)
 	make -C $(BUILD_DIR)
 
 start: build-nebula
-	$(BUILD_DIR)/nebula --rom $(ROM)
+	$(BUILD_DIR)/nebula $(NEBULA_ARGS) --rom "$(ROM)"
 
 $(BUILD_DIR):
 	mkdir -p $@
