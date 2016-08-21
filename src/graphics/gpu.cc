@@ -153,7 +153,6 @@ void GPU::draw_line()
     {
         std::list<Sprite*> sprites = SpriteManager::get_sprites(
             this->mmu_, this->mmu_->LY.get());
-        logging::debug("List size : %zu", sprites.size());
         for (auto it_ = sprites.begin(); it_ != sprites.end(); ++it_)
         {
             Sprite* sprite = *it_;
