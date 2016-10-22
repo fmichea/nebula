@@ -6,14 +6,13 @@
 # define TILE_BY_LINE 32
 # define TILE_SZ 16
 
-typedef struct
-{
-    uint8_t palette : 3;
-    uint8_t bank : 1;
-    uint8_t      : 1;
-    uint8_t h_flip : 1;
-    uint8_t v_flip : 1;
-    uint8_t priority : 1;
+typedef struct {
+    uint8_t palette     : 3;
+    uint8_t bank        : 1;
+    uint8_t             : 1;
+    uint8_t h_flip      : 1;
+    uint8_t v_flip      : 1;
+    uint8_t priority    : 1;
 } __attribute__ ((packed)) s_bgmap_attr;
 
 class BGWTile

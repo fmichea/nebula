@@ -25,8 +25,7 @@ typedef struct
     s_sprite_flags  flags;
 } __attribute__ ((packed)) s_sprite;
 
-class Sprite
-{
+class Sprite {
 public:
     Sprite(MMU* mmu, s_sprite& sprite, uint8_t y);
 
@@ -42,8 +41,7 @@ private:
     uint8_t     line_[8];
 };
 
-class SpriteManager
-{
+class SpriteManager {
 public:
     static std::list<Sprite*> get_sprites(MMU* mmu, uint8_t y);
 };

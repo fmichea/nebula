@@ -18,20 +18,23 @@ bool Z80::run()
 
     while (!this->mmu_->stopped)
     {
-        uint16_t res = 0x4;
-        if (!this->regs_.halt_mode)
-        {
+        uint16_t res = 0x4; // FIXME: magic number to explain.
+
+        if (!this->regs_.halt_mode) {
             uint8_t opcode = this->mmu_->read<uint8_t>(this->regs_.PC);
+
             if (logging::isEnabledFor(logging::DEBUG)) {
                 uint8_t mem1 = this->mmu_->read<uint8_t>(this->regs_.PC + 1);
                 uint8_t mem2 = this->mmu_->read<uint8_t>(this->regs_.PC + 2);
                 logging::debug("PC: %04X | OPCODE: %02X | MEM: %02X%02X",
                                this->regs_.PC, opcode, mem1, mem2);
             }
+
             if (OPCODES[opcode] == 0) {
                 logging::error("Unknown opcodes %02X...", opcode);
                 return false;
             }
+
             res = OPCODES[opcode](*this->mmu_, this->regs_);
         }
 

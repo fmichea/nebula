@@ -96,7 +96,6 @@ uint32_t GPU::obp_to_color(uint8_t idx, uint8_t pal)
     }
 }
 
-
 void GPU::draw_line()
 {
     uint32_t line[WIDTH];
@@ -149,16 +148,16 @@ void GPU::draw_line()
     }
 
     // Draw objects.
-    if (this->mmu_->LCDC.OBJSDE.get())
-    {
+    if (this->mmu_->LCDC.OBJSDE.get()) {
         std::list<Sprite*> sprites = SpriteManager::get_sprites(
             this->mmu_, this->mmu_->LY.get());
-        for (auto it_ = sprites.begin(); it_ != sprites.end(); ++it_)
-        {
+
+        for (auto it_ = sprites.begin(); it_ != sprites.end(); ++it_) {
             Sprite* sprite = *it_;
-            for (int it = 0; it < 8; ++it)
-            {
+
+            for (int it = 0; it < 8; ++it) {
                 uint8_t x = sprite->x_base() + it;
+
                 if (x < WIDTH) {
                     uint8_t col = sprite->color(it);
                     if (col > 0 && (bg_priority[x] == -1

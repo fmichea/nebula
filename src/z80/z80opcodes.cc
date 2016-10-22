@@ -322,8 +322,7 @@ uint16_t jump_mhl(MMU& UNUSED(mmu), Z80Registers& regs) {
 }
 
 uint16_t jr_if(MMU& mmu, Z80Registers& regs, uint8_t val) {
-    if (val)
-    {
+    if (val) {
         regs.PC += (int8_t) mmu.read<uint8_t>(regs.PC + 1);
         return P(2, 12);
     }
@@ -586,8 +585,8 @@ uint16_t sub_a_d8(MMU& mmu, Z80Registers& regs) {
     regs.A = tmp;
     regs.F.zf.set(regs.A == 0 ? 0x1 : 0x0);
     regs.F.n.set(1);
-    regs.F.h.set((0xf & tmp_) ^ tmp_ ? 0x1 : 0x0);
-    regs.F.cy.set(tmp ^ (tmp & 0xff) ? 0x1 : 0x0);
+    regs.F.h.set(tmp_ & 0xf0 ? 0x1 : 0x0);
+    regs.F.cy.set(tmp & 0xff00 ? 0x1 : 0x0);
     return P(2, 8);
 }
 
@@ -660,7 +659,7 @@ uint16_t ld_hl_sppr8(MMU& mmu, Z80Registers& regs) {
     int8_t val = mmu.read<uint8_t>(regs.PC + 1);
     uint16_t res = regs.SP + val;
 
-    regs.F.set(0);
+    regs.F.set(0); // sets Z and N to 0.
     regs.F.h.set((res & 0xf) < (regs.SP & 0xf) ? 0x1 : 0x0);
     regs.F.cy.set((res & 0xff) < (regs.SP & 0xff) ? 0x1 : 0x0);
     regs.HL.set(res);
