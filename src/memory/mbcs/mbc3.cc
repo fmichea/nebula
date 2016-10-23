@@ -1,31 +1,37 @@
 #include "mbc3.hh"
 
-MBC3::MBC3(void* rom)
-    : MBC(rom), latch_ (true), latched_(false), halted_(false)
+namespace nms = nebula::memory::segments;
+
+MBC3::MBC3()
+    : MBC()
+    , latch_ (true)
+    , latched_ (false)
+    , halted_ (false)
 {
     this->substracted_time_ = time(NULL);
 }
 
-void* MBC3::read_ram_address(uint16_t addr)
+uint8_t* MBC3::read_ram_address(uint16_t addr)
 {
     uint64_t tmp;
 
     // RAM bank
-    if (this->ram_bank_ <= 0x3)
-        return this->ram_ + addr - 0xa000 + 0x2000 * this->ram_bank_;
-    if (this->ram_bank_ > 0x03 && this->ram_bank_ < 0x08)
-        return this->ram_ + addr - 0xa000;
+    if (nms::ERAM.bank() <= 0x3) {
+        return nms::ERAM.ptr(addr);
+    } if (nms::ERAM.bank() > 0x03 && nms::ERAM.bank() < 0x08) {
+        return nms::ERAM.ptr(addr, 0);
+    }
 
     // RTC register
-    if (this->latched_)
+    if (this->latched_) {
         tmp = this->latch_time_;
-    else if (this->halted_)
+    } else if (this->halted_) {
         tmp = this->halted_time_;
-    else
+    } else {
         tmp = time(NULL) - this->substracted_time_;
+    }
 
-    switch (this->ram_bank_)
-    {
+    switch (nms::ERAM.bank()) {
     case 0x08: // seconds
         this->rtc_reg_ = tmp % 60;
         break;
@@ -49,46 +55,39 @@ void* MBC3::read_ram_address(uint16_t addr)
     return &this->rtc_reg_;
 }
 
-void* MBC3::write_rom_bank(uint16_t UNUSED(addr), uint16_t value)
-{
+void MBC3::bank_selector_zone1(uint16_t UNUSED(addr), uint8_t value) {
     value &= 0x7F;
     if (value == 0)
         value += 0x1;
-    this->rom_bank_ = value;
-
-    return NULL;
+    nms::ROM.select_bank(value);
 }
 
-void* MBC3::write_extra_address(uint16_t UNUSED(addr), uint16_t value)
-{
-    if (value == 1 && !this->latch_)
-    {
+void MBC3::bank_mode_select(uint8_t value) {
+    if (value == 1 && !this->latch_) {
         this->latch_ = true;
         this->latched_ = !this->latched_;
 
-        if (this->latched_)
+        if (this->latched_) {
             this->latch_time_ = time(NULL) - this->substracted_time_;
-    }
-    else
+        }
+    } else {
         this->latch_ = false;
-
-    return NULL;
+    }
 }
 
-void* MBC3::write_ram_address(uint16_t addr, uint16_t value)
-{
-    if (this->ram_bank_ <= 0x3)
-        return this->ram_ + addr - 0xa000 + this->ram_bank_ * 0x2000;
-
-    if (this->ram_bank_ == 0x0C && (value & 0x20) != this->halted_)
-    {
-        this->halted_ = !this->halted_;
-
-        if (this->halted_) // STOP... HALT TIME
-            this->halted_time_ = time(NULL);
-        else // wake-up
-            this->substracted_time_ += time(NULL) - this->halted_time_;
+uint8_t* MBC3::write_ram_address(uint16_t addr, uint8_t value) {
+    if (nms::ERAM.bank() <= 0x3) {
+        return nms::ERAM.ptr(addr);
     }
 
-    return NULL;
+    if (nms::ERAM.bank() == 0x0C && (value & 0x20) != this->halted_) {
+        this->halted_ = !this->halted_;
+
+        if (this->halted_) { // STOP... HALT TIME
+            this->halted_time_ = time(NULL);
+        } else { // wake-up
+            this->substracted_time_ += time(NULL) - this->halted_time_;
+        }
+    }
+    return nullptr;
 }

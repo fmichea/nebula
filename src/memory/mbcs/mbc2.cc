@@ -1,17 +1,17 @@
 #include "mbc2.hh"
 
-MBC2::MBC2(void* rom)
-    : MBC(rom)
-{}
+namespace nms = nebula::memory::segments;
 
-void* MBC2::write_rom_bank(uint16_t UNUSED(addr), uint16_t value)
-{
-    this->rom_bank_ = value & 0x0F;
-    return NULL;
+MBC2::MBC2() : MBC() {}
+
+void MBC2::bank_selector_zone1(uint16_t UNUSED(addr), uint8_t value) {
+    value &= 0x0F;
+    if (value == 0) {
+        value = 1;
+    }
+    nms::ROM.select_bank(value);
 }
 
-void* MBC2::write_ram_bank(uint16_t UNUSED(addr), uint16_t UNUSED(value))
-{
-    // oh no, you are not changing that RAM bank number !
-    return NULL;
+void MBC2::bank_selector_zone2(uint8_t UNUSED(value)) {
+    // oh no, you are not changing that RAM bank number!
 }

@@ -1,57 +1,59 @@
 #include "mbc1.hh"
 
-MBC1::MBC1(void* rom)
-    : MBC(rom), mbc_mode_ (MBC1_MODE_16_8)
+namespace nms = nebula::memory::segments;
+
+MBC1::MBC1()
+    : MBC()
+    , _mode (MBC1Mode::ROM_BANKING_MODE)
 {}
 
-void* MBC1::read_rom_address(uint16_t addr)
-{
-    return this->rom_ + addr + 0x4000 * (this->rom_bank_ - 1);
+MBC1Mode MBC1::mode() const {
+    return this->_mode;
 }
 
-void* MBC1::read_ram_address(uint16_t addr)
-{
-    if (this->mbc_mode_ == MBC1_MODE_4_32)
-        return this->ram_ + addr - 0xa000 + 0x2000 * this->ram_bank_;
-    return this->ram_ + addr - 0xa000;
-}
+void MBC1::bank_selector_zone1(uint16_t UNUSED(addr), uint8_t value) {
+    uint8_t rom_bank = 0;
 
-void* MBC1::write_rom_bank(uint16_t UNUSED(addr), uint16_t value)
-{
-    if (this->mbc_mode_ == MBC1_MODE_16_8)
-        this->rom_bank_ &= ~0x1F;
-    else
-        this->rom_bank_ = 0;
-    value &= 0x1F;
-    if (value == 0) // ROM select 0x00, 0x20, 0x40, 0x60.
-        value += 1;
-    this->rom_bank_ |= value;
-    return NULL;
-}
-
-void* MBC1::write_ram_bank(uint16_t UNUSED(addr), uint16_t value)
-{
-    if (this->mbc_mode_ == MBC1_MODE_16_8) {
-        this->rom_bank_ &= 0x1F;
-        this->rom_bank_ |= (value & 0x3) << 5;
-    } else {
-        this->ram_bank_ = value & 0x3;
+    // In ROM banking, the upper 2 bits of the 7 bit selector are controlled
+    // separately so we need to keep them here. Otherwise they are set to 0.
+    if (this->_mode == MBC1Mode::ROM_BANKING_MODE) {
+        rom_bank = nms::ROM.bank() & ~0x1F;
     }
-    return NULL;
+
+    value &= 0x1F;
+    if (value == 0) { // ROM select 0x00, 0x20, 0x40, 0x60.
+        value += 1;
+    }
+
+    nms::ROM.select_bank(rom_bank | value);
 }
 
-void* MBC1::write_extra_address(uint16_t UNUSED(addr), uint16_t value)
-{
-    // Mode select
-    this->mbc_mode_ = (value & 0x1) ? MBC1_MODE_4_32 : MBC1_MODE_16_8;
+void MBC1::bank_selector_zone2(uint8_t value) {
+    uint8_t rom_bank = 0;
 
-    return NULL;
+    switch (this->_mode) {
+    case MBC1Mode::ROM_BANKING_MODE:
+        rom_bank = nms::ROM.bank() & 0x1F;
+        rom_bank |= (value & 0x3) << 5;
+        nms::ROM.select_bank(rom_bank);
+        break;
+
+    case MBC1Mode::RAM_BANKING_MODE:
+        nms::ERAM.select_bank(value & 0x3);
+        break;
+    }
 }
 
-void* MBC1::write_ram_address(uint16_t addr, uint16_t UNUSED(value))
-{
-    if (this->mbc_mode_ == MBC1_MODE_4_32)
-        return this->ram_ + addr - 0xa000 + this->ram_bank_ * 0x2000;
-    else
-        return this->ram_ + addr - 0xa000;
+void MBC1::bank_mode_select(uint8_t value) {
+    switch (value & 1) {
+    case 1:
+        this->_mode = MBC1Mode::RAM_BANKING_MODE;
+        nms::ROM.select_bank(nms::ROM.bank() & 0x1f);
+        break;
+
+    default:
+        this->_mode = MBC1Mode::ROM_BANKING_MODE;
+        nms::ERAM.select_bank(0);
+        break;
+    };
 }

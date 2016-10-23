@@ -1,15 +1,18 @@
 #include "romonly.hh"
 
-ROMOnly::ROMOnly(void* rom)
-    : MBC(rom)
-{}
+namespace nms = nebula::memory::segments;
 
-void* ROMOnly::read_address(uint16_t addr)
-{
-    return this->rom_ + addr;
-}
+ROMOnly::ROMOnly() : MBC() {}
 
-void* ROMOnly::write_address(uint16_t addr, uint16_t UNUSED(value))
-{
-    return this->rom_ + addr;
+uint8_t* ROMOnly::real_byte_ptr(AccessType type, uint16_t addr, uint8_t UNUSED(value)) {
+    switch (type) {
+    case AccessType::READ:
+        if (nms::ROM.contains_address(addr)) {
+            return nms::ROM.ptr(addr);
+        }
+        return nullptr;
+
+    case AccessType::WRITE:
+        return nullptr;
+    };
 }

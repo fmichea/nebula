@@ -8,13 +8,14 @@
 class MBC3 : public MBC
 {
 public:
-    MBC3(void* memory);
+    MBC3();
 
 private:
-    void* read_ram_address(uint16_t addr);
-    void* write_rom_bank(uint16_t addr, uint16_t value);
-    void* write_extra_address(uint16_t addr, uint16_t value);
-    void* write_ram_address(uint16_t addr, uint16_t value);
+    uint8_t* read_ram_address(uint16_t addr);
+    uint8_t* write_ram_address(uint16_t addr, uint8_t value);
+
+    void bank_selector_zone1(uint16_t addr, uint8_t value);
+    void bank_mode_select(uint8_t value);
 
     uint8_t     rtc_reg_;
     bool        latch_;

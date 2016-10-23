@@ -15,7 +15,10 @@ BGWTile::BGWTile(MMU* mmu, uint8_t x, uint8_t y, uint8_t data_select)
 
     if (mmu->gb_type == GBType::CGB) {
         mmu->write<uint8_t>(0xff4f, 1);
-        this->attribute = mmu->read<s_bgmap_attr>(base);
+
+        static_assert(sizeof (s_bgmap_attr) == sizeof (uint8_t));
+        uint8_t tmp = mmu->read<uint8_t>(base);
+        this->attribute = *(reinterpret_cast<s_bgmap_attr*>(&tmp));
     }
 
     if (mmu->gb_type == GBType::CGB)

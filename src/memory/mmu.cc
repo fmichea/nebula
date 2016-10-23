@@ -1,41 +1,258 @@
 #include "mmu.hh"
 
-MMU::MMU()
-    : stopped(false), fd_ (0), mbc_ (0)
-{
-#define X(Name, Size)                   \
-    this->Name = new uint8_t[Size];     \
-    memset(this->Name, 0, Size);
-#include "mmap.def"
-#undef X
-    memset(this->title_, 0, 0x18);
-    memset(this->cbgp_, 0xff, 0x40);
-    memset(this->cobp_, 0xff, 0x40);
+static const uint8_t _nr_masks[32] = {
+    /*          NRx0 | NRx1 | NRx2 | NRx3 | NRx4 */
+    /* NR1x */  0x80,  0x3F,  0x00,  0xFF,  0xBF,
+    /* NR2x */  0xFF,  0x3F,  0x00,  0xFF,  0xBF,
+    /* NR3x */  0x7F,  0xFF,  0x9F,  0xFF,  0xBF,
+    /* NR4x */  0xFF,  0xFF,  0x00,  0x00,  0xBF,
+    /* NR5x */  0x00,  0x00,  0x70,
+    /* WTF: */  0xFF,  0xFF,  0xFF,  0xFF,  0xFF,
+                0xFF,  0xFF,  0xFF,  0xFF
+};
 
-    for (uint32_t idx = 0; idx < GB_ADDR_SPACE; ++idx) {
-        this->watchref_lists_[idx] = MMU::WatchRefList();
-    }
+MMU::MMU()
+    : stopped (false)
+    , _watch ()
+    , fd_ (0)
+    , mbc_ (0)
+{
+#define X(Type, Name, Size, InitVal)    \
+    this->Name = new Type[Size];        \
+    memset(this->Name, InitVal, Size);
+#include "mmaps.def"
+#undef X
 }
 
 MMU::~MMU() {
-    if (this->mbc_ != 0)
-        delete this->mbc_;
-    if (this->fd_ != 0)
+    delete this->mbc_;
+    if (this->fd_ != 0) {
         close(this->fd_);
-#define X(Name, Size)               \
-    delete[] this->Name;
-#include "mmap.def"
-#undef X
-    for (uint32_t idx = 0; idx < GB_ADDR_SPACE; ++idx) {
-        for (MMU::WatchRef* ref : this->watchref_lists_[idx]) {
-            delete ref;
-        }
-        this->watchref_lists_[idx].clear();
     }
+
+#define X(Type, Name, Size, InitVal)  \
+    delete[] this->Name;
+#include "mmaps.def"
+#undef X
+}
+
+void MMU::subscribe(uint16_t addr, WatchType type, WatchHook hook, void* data) {
+    this->_watch.subscribe(addr, type, hook, data);
+}
+
+void MMU::unsubscribe(uint16_t addr, WatchHook hook) {
+    this->_watch.unsubscribe(addr, hook);
+}
+
+namespace nms = nebula::memory::segments;
+
+nms::Segment* MMU::_get_segment(uint16_t addr) {
+    // Segments provided by the GameBoy directly.
+    for (nms::Segment* seg : nms::SEGMENTS) {
+        if (seg->contains_address(addr)) {
+            return seg;
+        }
+    }
+    return nullptr;
+}
+
+/**
+ * This function returns a pointer to the real memory address to read from
+ * based on a "virtual" GameBoy address, or null.
+ *
+ * It is always safe to read a byte if pointer is not null. For any other size,
+ * it is expected that the read will not be across multiple zones. This
+ * assumption is not checked.
+ */
+uint8_t* MMU::_real_byte_ptr(AccessType type, uint16_t addr, uint8_t value) {
+    // Special GameBoy Color registers.
+    if (addr == this->BGPD.addr()) {
+        return this->cbgp_ + (this->BGPI.get() & 0x3f);
+    } else if (addr == this->OBPD.addr()) {
+        return this->cobp_ + (this->OBPI.get() & 0x3f);
+    }
+
+    nms::Segment* seg = this->_get_segment(addr);
+
+    if (seg == nullptr) {
+        return nullptr;
+    }
+
+    if (seg->mbc() && this->mbc_ != nullptr) {
+        return this->mbc_->real_byte_ptr(type, addr, value);
+    }
+    return seg->ptr(addr);
+}
+
+uint8_t MMU::_read_byte_masking(uint16_t addr, uint8_t value) {
+    if (this->NR10.addr() <= addr && addr <= 0xFF2F) {
+        value |= _nr_masks[addr - this->NR10.addr()];
+    }
+    return value;
+}
+
+uint8_t MMU::_read_byte(uint16_t addr) {
+    uint8_t* ptr = this->_real_byte_ptr(AccessType::READ, addr, 0);
+
+    if (ptr != 0) {
+        uint8_t res = this->_read_byte_masking(addr, *ptr);
+        this->_watch.create_event(AccessType::READ, addr)->set_values(0, res);
+        return res;
+    }
+
+    // FIXME: If we get here, something bad happened.
+    return 0;
+}
+
+uint8_t* MMU::_write_byte_ptr(uint16_t addr, uint8_t value) {
+    // All of these registers are read-only.
+    if (nms::IO_PORTS.contains_address(addr)) {
+        if (addr == this->UNDOC76.addr()) {
+            return nullptr;
+        }
+
+        if (addr == this->UNDOC77.addr()) {
+            return nullptr;
+        }
+
+        if (addr == this->NR52.addr()) {
+            return nullptr;
+        }
+
+        if ((this->NR10.addr() <= addr && addr < this->NR52.addr())) {
+#if 0
+            logging::info("Trying to write %x at %x. (%s)", value, addr,
+                          (this->NR52.sound_on.get() ? "ON" : "OFF"));
+#endif
+            if (!this->NR52.sound_on.get()) {
+                //logging::info("Ignore write %x...", addr);
+                return nullptr;
+            }
+        }
+    }
+
+    if (addr == this->DMA.addr()) {
+        uint16_t srcaddr = (uint16_t) value << 8;
+        this->memcpy(nms::OAM.buffer(), srcaddr, nms::OAM.size());
+        return nullptr;
+    }
+
+    if (addr == this->NR52.addr()) {
+        logging::info("nr52 = %x (%x)", this->NR52.get(), value);
+        uint8_t sound_on = (value >> 7) & 1;
+        if (!sound_on) {
+            this->NR52.sound_on.set(1);
+            for (int it = 0xFF10; it <= 0xFF26; ++it) {
+                this->write<uint8_t>(it, 0);
+            }
+        }
+        this->NR52.sound_on.set(sound_on);
+        logging::info("nr52 = %x", this->NR52.get());
+        return nullptr;
+    }
+
+    return this->_real_byte_ptr(AccessType::WRITE, addr, value);
+}
+
+uint8_t MMU::_write_byte_masking(uint16_t addr, uint8_t* ptr, uint8_t value) {
+    if (nms::IO_PORTS.contains_address(addr)) {
+        if (addr == this->STAT.addr()) { // First three bits are read-only.
+            value = (*ptr & 0x07) | (value & 0xf8);
+        } else if (addr == this->BGPD.addr() && this->BGPI.get() >> 7) { // auto-increment
+            uint8_t tmp = ((this->BGPI.get() & 0x3f) + 1) & 0x3f;
+            this->BGPI.set(1 << 7 | tmp);
+        } else if (addr == this->OBPD.addr() && this->OBPI.get() >> 7) { // auto-increment
+            uint8_t tmp = ((this->OBPI.get() & 0x3f) + 1) & 0x3f;
+            this->OBPI.set(1 << 7 | tmp);
+        } else if (addr == this->VBK.addr()) {
+            value &= this->gb_type == GBType::CGB ? 0x01 : 0x00;
+            nms::VRAM.select_bank(value);
+        } else if (addr == this->SVBK.addr()) {
+            value &= this->gb_type == GBType::CGB ? 0x07 : 0x00;
+            if (this->gb_type == GBType::CGB && 1 < value) {
+                nms::WRAM.select_bank(value - 1);
+            }
+        } else if (addr == this->KEY1.addr()) {
+            value = (value & 0x1) | (this->KEY1.get() & 0x80);
+        } else if (addr == this->UNDOC6C.addr()) {
+            value |= 0xfe;
+        } else if (addr == this->UNDOC75.addr()) {
+            value |= 0x8f; // why, why, why...
+        } else if (addr == this->DIV.addr() || addr == this->LY.addr()) {
+            value = 0;
+        }
+    }
+
+    // HDMA start
+    if (this->gb_type == GBType::CGB && addr == this->HDMA5.addr()) {
+        // stop current HDMA
+        if (this->hdma_active && (this->HDMA5.get() >> 7) == 0) {
+            this->hdma_active = false;
+            this->HDMA5.set(0xff);
+        } else {
+            uint16_t srcaddr = (this->HDMA1.get() << 8) | this->HDMA2.get();
+            uint16_t dstaddr = (this->HDMA3.get() << 8) | this->HDMA4.get();
+            uint16_t length = ((this->HDMA5.get() & 0x7f) + 1) * 0x10;
+
+            srcaddr &= 0xfff0;
+            dstaddr = (dstaddr & 0x1ff0) | 0x8000; // ensure we are in VRAM
+
+            this->hdma_active = false;
+            // invalid address
+            if (!((srcaddr >= 0x0000 && srcaddr <= 0x7ff0)
+                    || (srcaddr >= 0xa000 && srcaddr <= 0xdf00)))
+                return value;
+            // start general purpose DMA
+            if ((this->HDMA5.get() >> 7) == 0) {
+                while (length > 0) {
+                    this->_write_byte(dstaddr++, this->_read_byte(srcaddr++));
+                    --length;
+                }
+                value = 0xff;
+            } else { // start H-blank DMA
+                this->hdma_active = true;
+                this->hdma_index_ = 0;
+                this->hdma_length_ = length;
+                value = 0x00;
+            }
+        }
+    }
+
+    return value;
+}
+
+void MMU::_write_byte(uint16_t addr, uint8_t value) {
+    uint8_t* ptr = this->_write_byte_ptr(addr, value);
+
+    if (ptr != 0) {
+        uint8_t old_val = this->_read_byte_masking(addr, *ptr);
+
+        value = this->_write_byte_masking(addr, ptr, value);
+        this->_watch.create_event(AccessType::WRITE, addr)->set_values(old_val, value);
+        *ptr = value;
+    }
+}
+
+bool MMU::memcpy(uint8_t* dst, uint16_t srcaddr, uint16_t size) {
+    nms::Segment* seg = this->_get_segment(srcaddr);
+
+    if (seg == nullptr) {
+        return false;
+    }
+
+    if (!seg->contains_address(srcaddr + size - 1)) {
+        return false;
+    }
+
+    std::memcpy(dst, seg->ptr(srcaddr), size);
+    return true;
 }
 
 bool MMU::load_rom(std::string filename) {
     struct stat stat;
+
+    // Reset all registers.
+    this->reset_registers();
 
     // Opening and mapping file.
     this->fd_ = open(filename.c_str(), O_RDONLY);
@@ -43,75 +260,84 @@ bool MMU::load_rom(std::string filename) {
         return false;
     fstat(this->fd_, &stat);
     this->size_ = stat.st_size;
-    char* mapped = (char*) mmap(0, stat.st_size, PROT_READ, MAP_PRIVATE,
-                                this->fd_, 0);
-    if (this->rom_ == MAP_FAILED) {
+
+    char* mapped = (char*) mmap(0, stat.st_size, PROT_READ, MAP_PRIVATE, this->fd_, 0);
+    if (mapped == MAP_FAILED) {
         logging::error("ROM mapping failed.");
         return false;
     }
-    memcpy(this->rom_, mapped, stat.st_size);
+
+    // ROM Banks are all stored in ROM.
+    std::memcpy(nms::ROM.buffer(), mapped, stat.st_size);
+
+    // Do not need the mapped file anymore.
     munmap(mapped, stat.st_size);
 
     // ROM type
-    this->gb_type = (this->rom_[0x143] == 0x80 || this->rom_[0x143] == 0xC0)
-        ? GBType::CGB : GBType::GB;
+    uint8_t cgb_flag = this->read<uint8_t>(0x143);
+    if (cgb_flag == 0x80 || cgb_flag == 0xC0) {
+        this->gb_type = GBType::CGB;
+    } else {
+        this->gb_type = GBType::GB;
+    }
 
     // Checking that ROM was correctly loaded.
-    static const char nintendo_logo[] =
-        "\xce\xed\x66\x66\xcc\x0d\x00\x0b\x03\x73\x00\x83\x00\x0c\x00\x0d"
-        "\x00\x08\x11\x1f\x88\x89\x00\x0e\xdc\xcc\x6e\xe6\xdd\xdd\xd9\x99"
-        "\xbb\xbb\x67\x63\x6e\x0e\xec\xcc\xdd\xdc\x99\x9f\xbb\xb9\x33\x3e";
-    if (memcmp(nintendo_logo, this->rom_ + 0x104,
-        this->gb_type == GBType::CGB ? 0x18 : 0x30))
-    {
+    char nl[NINTENDO_LOGO_SIZE];
+
+    if (!this->memcpy((uint8_t*) nl, 0x104, NINTENDO_LOGO_SIZE)) {
+        logging::error("Failed to copy nintendo logo from ROM.");
+        return false;
+    }
+
+    if (std::memcmp(NINTENDO_LOGO, nl, this->gb_type == GBType::CGB ? 0x18 : NINTENDO_LOGO_SIZE)) {
         logging::error("Nintendo logo doesn't match!");
         return false;
     }
 
     // ROM Title
-    strncpy(this->title_, (const char*) (this->rom_ + 0x134),
-        this->gb_type == GBType::CGB ? 15 : 16);
+    uint8_t title_length = this->gb_type == GBType::CGB ? 15 : 16;
+    if (!this->memcpy((uint8_t*) this->title_, 0x134, title_length)) {
+        logging::error("Failed to copy cartridge title.");
+        return false;
+    }
     logging::info("ROM Title: %s.", this->title_);
 
     // Cartridge Type
-    if (!this->load_mbc(this->rom_[0x147]))
+    if (!this->load_mbc(this->read<uint8_t>(0x147))) {
         return false;
+    }
 
     // ROM Size
-    if (!this->load_rom_size(this->rom_[0x148]))
+    if (!this->load_rom_size(this->read<uint8_t>(0x148))) {
         return false;
+    }
 
     // RAM Size
-    if (!this->load_ram_size(this->rom_[0x149]))
+    if (!this->load_ram_size(this->read<uint8_t>(0x149))) {
         return false;
+    }
 
     // Target country
-    this->target_ = this->rom_[0x14a] ? "Non-Japanese" : "Japanese";
+    this->target_ = this->read<uint8_t>(0x14a) ? "Non-Japanese" : "Japanese";
     logging::info("Target: %s", this->target_.c_str());
 
     // Header checksum
-    uint8_t x = 0;
-    for (int it = 0x134; it < 0x14d; ++it)
-    {
-        x = x - this->rom_[it] - 1;
+    uint8_t checksum = 0;
+    for (int it = 0x134; it <= 0x14d; ++it) {
+        checksum -= (this->read<uint8_t>(it) + 1);
     }
-    if (this->rom_[0x14d] != x)
-    {
-        logging::error("Cartridge header checksum failure: %x (expected %x).",
-                       x, this->rom_[0x14d]);
+    if (checksum != 0xff) {
+        logging::error("Cartridge header checksum failure.");
         return false;
     }
 
     // Global checksum.
     // Not done: GameBoy doesn't do it either...
 
-    // Reset all registers.
-    this->reset_registers();
     return true;
 }
 
-bool MMU::load_rom_size(uint8_t val)
-{
+bool MMU::load_rom_size(uint8_t val) {
     // FIXME
     logging::info("ROM Size: %x.", val);
     return true;
@@ -149,23 +375,23 @@ bool MMU::load_mbc(uint8_t val)
     switch (val)
     {
     case 0x00:
-        this->mbc_ = new ROMOnly(this->rom_);
+        this->mbc_ = new ROMOnly();
         break;
     case 0x01:
     case 0x02:
     case 0x03:
-        this->mbc_ = new MBC1(this->rom_);
+        this->mbc_ = new MBC1();
         break;
     case 0x05:
     case 0x06:
-        this->mbc_ = new MBC2(this->rom_);
+        this->mbc_ = new MBC2();
         break;
     case 0x0F:
     case 0x10:
     case 0x11:
     case 0x12:
     case 0x13:
-        this->mbc_ = new MBC3(this->rom_);
+        this->mbc_ = new MBC3();
         break;
     case 0x19:
     case 0x1A:
@@ -173,7 +399,7 @@ bool MMU::load_mbc(uint8_t val)
     case 0x1C:
     case 0x1D:
     case 0x1E:
-        this->mbc_ = new MBC5(this->rom_);
+        this->mbc_ = new MBC5();
         break;
     };
 
@@ -210,10 +436,10 @@ bool MMU::load_mbc(uint8_t val)
 
 bool MMU::reset_registers()
 {
-    this->IE = RegisterProxy(this->hram_ + 0xffff - 0xff80, 0xffff);
+    this->IE = RegisterProxy(nms::HRAM.ptr(0xffff), 0xffff);
     this->IE.set(0x00);
 #define X2(RegType, Reg, Addr, Value)                           \
-    this->Reg = RegType(this->io_ + (Addr - 0xff00), Addr);     \
+    this->Reg = RegType(nms::IO_PORTS.ptr(Addr), Addr);     \
     this->Reg.set(Value);
 #define X1(Reg, Addr, Value) X2(RegisterProxy, Reg, Addr, Value)
 #include "registers.def"
@@ -222,66 +448,56 @@ bool MMU::reset_registers()
     return true;
 }
 
-void MMU::subscribe(uint16_t addr, WatchType type, WatchHook hook, void* data) {
-    // Create the watch ref and fill all the fields.
-    MMU::WatchRef* ref = new MMU::WatchRef;
-    ref->type = type;
-    ref->hook = hook;
-    ref->data = data;
-    // Add that watch to the ref list and .
-    this->watchref_lists_[addr].push_back(ref);
-}
-
-
-void MMU::unsubscribe(uint16_t addr, WatchHook hook) {
-    MMU::WatchRefFinder finder(hook);
-
-    this->watchref_lists_[addr].remove_if(finder);
-}
-
-void MMU::trigger_watch_event(bool trigger, uint16_t addr, WatchType type) {
-    if (!trigger)
-        return;
-
-    for (const MMU::WatchRef* ref : this->watchref_lists_[addr]) {
-        if (ref->type == type || ref->type == WatchType::RW) {
-            ref->hook(ref->data, addr);
-        }
-    }
-}
-
 void MMU::do_hdma() {
     if (this->hdma_index_ < this->hdma_length_) {
         uint16_t srcaddr = (this->HDMA1.get() << 8) | this->HDMA2.get();
         uint16_t dstaddr = (this->HDMA3.get() << 8) | this->HDMA4.get();
+
         srcaddr &= 0xfff0;
         dstaddr = (dstaddr & 0x1ff0) | 0x8000; // ensure we are in VRAM
 
-        for (size_t i = 0; i < 0x10; ++i)
-            this->write<uint8_t>(dstaddr + this->hdma_index_ + i,
-                this->read<uint8_t>(srcaddr + this->hdma_index_ + i));
+        for (size_t i = 0; i < 0x10; ++i) {
+            uint16_t dstaddr_i = dstaddr + this->hdma_index_ + i;
+            uint16_t srcaddr_i = srcaddr + this->hdma_index_ + i;
+
+            this->write<uint8_t>(dstaddr_i, this->read<uint8_t>(srcaddr_i));
+        }
 
         this->hdma_index_ += 0x10;
         this->HDMA5.set((this->hdma_length_ - this->hdma_index_) / 0x10 - 1);
-    }
-    // HDMA finished
-    else {
+    } else { // HDMA finished
         this->hdma_active = false;
         this->HDMA5.set(0xff);
     }
 }
 
 template<>
-uint16_t MMU::read<uint16_t>(uint16_t addr, bool twe) {
-    uint16_t res = this->read<uint8_t>(addr, false);
-    res |= ((uint16_t) this->read<uint8_t>(addr + 1, false)) << 8;
-    this->trigger_watch_event(twe, addr, WatchType::RO);
+uint8_t MMU::read<uint8_t>(uint16_t addr) {
+    uint8_t res = this->_read_byte(addr);
+    this->_watch.trigger_all_events();
     return res;
 }
 
 template<>
-void MMU::write<uint16_t>(uint16_t addr, uint16_t value, bool twe) {
-    this->write<uint8_t>(addr, value & 0xff, false);
-    this->write<uint8_t>(addr + 1, (value >> 8) & 0xff, false);
-    this->trigger_watch_event(twe, addr, WatchType::WO);
+uint16_t MMU::read<uint16_t>(uint16_t addr) {
+    uint16_t result;
+
+    result = static_cast<uint16_t>(this->_read_byte(addr + 1)) << 8;
+    result |= this->_read_byte(addr);
+
+    this->_watch.trigger_all_events();
+    return result;
+}
+
+template<>
+void MMU::write<uint8_t>(uint16_t addr, uint8_t value) {
+    this->_write_byte(addr, value);
+    this->_watch.trigger_all_events();
+}
+
+template<>
+void MMU::write<uint16_t>(uint16_t addr, uint16_t value) {
+    this->_write_byte(addr, value & 0xff);
+    this->_write_byte(addr + 1, (value >> 8) & 0xff);
+    this->_watch.trigger_all_events();
 }

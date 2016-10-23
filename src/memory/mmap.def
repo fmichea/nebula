@@ -1,8 +1,0 @@
-X(rom_,     0x2000000)
-X(vram_,    0x4000)
-X(wram_,    0x8000)
-X(oam_,     0xA0)
-X(io_,      0x80)
-X(hram_,    0x80)
-X(cbgp_,    0x40)
-X(cobp_,    0x40)

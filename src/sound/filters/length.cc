@@ -1,6 +1,6 @@
 #include "length.hh"
 
-static void _reload_length_counter(void* data, uint16_t addr);
+static void _reload_length_counter(void* data, const WatchEvent* event);
 
 Length::Length(int num, MMU* mmu, NR52Proxy& nr52, const NRX1Proxy& nrx1, const NRX4Proxy& nrx4)
     : Filter()
@@ -12,7 +12,7 @@ Length::Length(int num, MMU* mmu, NR52Proxy& nr52, const NRX1Proxy& nrx1, const 
 {
     // In addition to the standard trigger event, the length counter can be
     // reloaded any time by writing to NRx1.
-    mmu->subscribe(nrx1.addr(), WatchType::RO, _reload_length_counter, this);
+    mmu->subscribe(nrx1.addr(), WatchType::WRITE_ONLY, _reload_length_counter, this);
 }
 
 void Length::reload(int32_t UNUSED(freq)) {
@@ -41,7 +41,7 @@ int32_t Length::filter(int32_t freq) {
     return freq;
 }
 
-static void _reload_length_counter(void* data, uint16_t UNUSED(addr)) {
+static void _reload_length_counter(void* data, const WatchEvent* UNUSED(event)) {
     Length* length = static_cast<Length*>(data);
     length->reload_counter();
 }

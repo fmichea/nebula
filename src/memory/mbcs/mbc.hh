@@ -4,36 +4,25 @@
 # include <stdint.h>
 # include <stdlib.h>
 
+# include "../segments.hh"
+# include "../watch.hh"
 # include "../../logging.hh"
 # include "../../utils/utils.hh"
 
-class MBC
-{
+class MBC {
 public:
-    MBC(void* rom);
+    MBC();
     virtual ~MBC();
 
-    template<typename T> T read(uint16_t addr);
-    template<typename T> void write(uint16_t addr, T value);
+    virtual uint8_t* real_byte_ptr(AccessType type, uint16_t addr, uint8_t value);
 
 protected:
-    virtual void* read_address(uint16_t addr);
-    virtual void* write_address(uint16_t addr, uint16_t value);
+    virtual uint8_t* read_ram_address(uint16_t addr);
+    virtual uint8_t* write_ram_address(uint16_t addr, uint8_t value);
 
-    virtual void* read_rom_address(uint16_t addr);
-    virtual void* read_ram_address(uint16_t addr);
-    virtual void* write_rom_bank(uint16_t addr, uint16_t value);
-    virtual void* write_ram_bank(uint16_t addr, uint16_t value);
-    virtual void* write_extra_address(uint16_t addr, uint16_t value);
-    virtual void* write_ram_address(uint16_t addr, uint16_t value);
-
-    char* rom_;
-    char* ram_;
-
-    uint16_t    rom_bank_;
-    uint8_t     ram_bank_;
+    virtual void bank_selector_zone1(uint16_t addr, uint8_t value);
+    virtual void bank_selector_zone2(uint8_t value);
+    virtual void bank_mode_select(uint8_t value);
 };
-
-# include "mbc.hxx"
 
 #endif // !NEBULA_MEMORY_MBCS_MBC_HH_

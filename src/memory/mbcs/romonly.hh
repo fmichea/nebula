@@ -4,14 +4,11 @@
 # include "../../utils/utils.hh"
 # include "mbc.hh"
 
-class ROMOnly : public MBC
-{
+class ROMOnly : public MBC {
 public:
-    ROMOnly(void* rom);
+    ROMOnly();
 
-protected:
-    void* read_address(uint16_t addr);
-    void* write_address(uint16_t addr, uint16_t value);
+    uint8_t* real_byte_ptr(AccessType type, uint16_t addr, uint8_t value);
 };
 
 #endif // !NEBULA_MEMORY_MBCS_ROMONLY_HH_

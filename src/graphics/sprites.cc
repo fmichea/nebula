@@ -52,9 +52,12 @@ uint8_t Sprite::x_base() const {
 std::list<Sprite*> SpriteManager::get_sprites(MMU* mmu, uint8_t y) {
     std::list<Sprite*> res;
 
+    s_sprite sprites[0xA0];
+    mmu->memcpy(reinterpret_cast<uint8_t*>(sprites), 0xFE00, 0xA0);
+
     for (uint8_t it = 0; it < 40; ++it) {
-        uint16_t addr = 0xFE00 + it * 4;
-        s_sprite sprite = mmu->read<s_sprite>(addr);
+        s_sprite& sprite = sprites[it];
+
         if (sprite.x == 0 || 168 <= sprite.x)
             continue;
         if (sprite.y == 0 || 160 <= sprite.y)

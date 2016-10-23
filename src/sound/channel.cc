@@ -1,6 +1,6 @@
 #include "channel.hh"
 
-static void _reload_channel_callback(void* data, uint16_t addr);
+static void _reload_channel_callback(void* data, const WatchEvent* event);
 
 Channel::Channel(MMU* mmu, int num, const RegisterProxy& nrx3, const NRX4Proxy& nrx4, const std::list<Filter*>& filters)
     : num_ (num)
@@ -10,7 +10,7 @@ Channel::Channel(MMU* mmu, int num, const RegisterProxy& nrx3, const NRX4Proxy& 
     , nrx3_ (nrx3)
     , nrx4_ (nrx4)
 {
-    mmu->subscribe(nrx4.addr(), WatchType::WO, _reload_channel_callback, this);
+    mmu->subscribe(nrx4.addr(), WatchType::WRITE_ONLY, _reload_channel_callback, this);
     for (Filter* filter : this->filters_)
         filter->reload(0);
 }
@@ -51,7 +51,7 @@ void Channel::reload() {
     }
 }
 
-static void _reload_channel_callback(void* data, uint16_t UNUSED(addr)) {
+static void _reload_channel_callback(void* data, const WatchEvent* UNUSED(event)) {
     Channel* channel = static_cast<Channel*>(data);
     channel->reload();
 }

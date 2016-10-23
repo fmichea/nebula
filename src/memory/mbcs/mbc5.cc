@@ -1,21 +1,21 @@
 #include "mbc5.hh"
 
-MBC5::MBC5(void* rom)
-    : MBC(rom)
-{}
+namespace nms = nebula::memory::segments;
 
-void* MBC5::write_rom_bank(uint16_t addr, uint16_t value)
-{
-    if (addr < 0x3000)
-        this->rom_bank_ = (this->rom_bank_ & 0x100) | (value & 0xFF);
-    else
-        this->rom_bank_ = (this->rom_bank_ & 0xFF) | ((value & 0x1) << 8);
+MBC5::MBC5() : MBC() {}
 
-    return NULL;
+void MBC5::bank_selector_zone1(uint16_t addr, uint8_t value) {
+    // FIXME: why does this take a 16b value when writes are with 8b values?
+    if (addr < 0x3000) {
+        nms::ROM.select_bank((nms::ROM.bank() & 0x100) | value);
+    } else {
+        uint16_t bank = value & 0x1;
+        bank <<= 8;
+        bank |= nms::ROM.bank() & 0xFF;
+        nms::ROM.select_bank(bank);
+    }
 }
 
-void* MBC5::write_ram_bank(uint16_t UNUSED(addr), uint16_t value)
-{
-    this->ram_bank_ = value & 0x0F;
-    return NULL;
+void MBC5::bank_selector_zone2(uint8_t value) {
+    nms::ERAM.select_bank(value & 0x0F);
 }

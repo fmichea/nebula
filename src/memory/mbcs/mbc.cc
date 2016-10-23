@@ -1,93 +1,66 @@
 #include "mbc.hh"
 
-MBC::MBC(void* rom)
-    : rom_bank_ (1), ram_bank_ (0)
-{
-    this->rom_ = (char*) rom;
-    this->ram_ = (char*) malloc(0x20000 * sizeof (char));
+namespace nms = nebula::memory::segments;
+
+MBC::MBC() {}
+MBC::~MBC() {}
+
+uint8_t* MBC::real_byte_ptr(AccessType type, uint16_t addr, uint8_t value) {
+    switch (type) {
+    case AccessType::READ:
+        if (nms::ROM.contains_address(addr)) {
+            return nms::ROM.ptr(addr);
+        } else if (nms::ERAM.contains_address(addr)) {
+            return this->read_ram_address(addr);
+        }
+        break;
+
+    case AccessType::WRITE:
+        // External RAM is writeable, we return a pointer to it.
+        if (nms::ERAM.contains_address(addr)) {
+            return this->write_ram_address(addr, value);
+        }
+
+        /*
+        ** Bank Selector:
+        **   Writing to the ROM is used to controller the MBC behavior.
+        **
+        ** Zones:
+        **   0000h-1FFFh: RAM Enable, used to protect the RAM during
+        **                power-down, useless in an emulator.
+        **   2000h-3FFFh: ROM Bank Selector, different for every controller.
+        **   4000h-5FFFh: ROM/RAM Bank Selector, different for every controller.
+        **   6000h-7FFFh: MBC mode controller, for MBC1 and MBC3.
+        */
+        if (0x2000 <= addr && addr <= 0x3fff) {
+            this->bank_selector_zone1(addr, value);
+        } else if (0x4000 <= addr && addr <= 0x5fff) {
+            this->bank_selector_zone2(value);
+        } else if (0x6000 <= addr && addr <= 0x7fff) {
+            this->bank_mode_select(value);
+        }
+        break;
+    };
+    return nullptr;
 }
 
-MBC::~MBC()
-{
-    free(this->ram_);
+// Used by MBC3.
+uint8_t* MBC::read_ram_address(uint16_t addr) {
+    return nms::ERAM.ptr(addr);
 }
 
-void* MBC::read_address(uint16_t addr)
-{
-    // ROM Bank 00
-    if (addr <= 0x3fff)
-        return this->rom_ + addr;
-
-    // ROM Bank 01 - 7F
-    if (0x4000 <= addr && addr <= 0x7fff)
-        return this->read_rom_address(addr);
-
-    // RAM Bank 00 - 03
-    if (0xa000 <= addr && addr <= 0xbfff)
-        return this->read_ram_address(addr);
-
-    // Other cases, we just return rom.
-    return this->rom_ + addr;
+void MBC::bank_selector_zone1(uint16_t UNUSED(addr), uint8_t value) {
+    nms::ROM.select_bank(value);
 }
 
-void* MBC::write_address(uint16_t addr, uint16_t value)
-{
-    // RAM Enable
-    if (addr <= 0x1fff)
-        // used to protect the RAM during power-down, useless in an emulator
-        return NULL;
-
-    // ROM Bank Select, different for every controller
-    if (0x2000 <= addr && addr <= 0x3fff)
-        return this->write_rom_bank(addr, value);
-
-    // ROM/RAM Bank Select, different for every controller
-    if (0x4000 <= addr && addr <= 0x5fff)
-        return this->write_ram_bank(addr, value);
-
-    // Extra write
-    if (0x6000 <= addr && addr <= 0x7fff)
-        return this->write_extra_address(addr, value);
-
-    // RAM Write
-    if (0xa000 <= addr && addr <= 0xbfff)
-        return this->write_ram_address(addr, value);
-
-    return NULL;
+void MBC::bank_selector_zone2(uint8_t value) {
+    nms::ERAM.select_bank(value);
 }
 
-// different for every controller
-void* MBC::read_rom_address(uint16_t addr)
-{
-    return this->rom_ + addr - 0x4000 + 0x4000 * this->rom_bank_;
-}
+// used by MBC1 and MBC3
+void MBC::bank_mode_select(uint8_t UNUSED(value)) {}
 
-// different for every controller
-void* MBC::read_ram_address(uint16_t addr)
-{
-    return this->ram_ + addr - 0xa000 + 0x2000 * this->ram_bank_;
-}
-
-void* MBC::write_rom_bank(uint16_t UNUSED(addr), uint16_t value)
-{
-    this->rom_bank_ = value;
-    return NULL;
-}
-
-void* MBC::write_ram_bank(uint16_t UNUSED(addr), uint16_t value)
-{
-    this->ram_bank_ = value;
-    return NULL;
-}
-
-// used only by MBC1 and MBC3
-void* MBC::write_extra_address(uint16_t UNUSED(addr), uint16_t UNUSED(value))
-{
-    return NULL;
-}
-
-// different for every controller
-void* MBC::write_ram_address(uint16_t addr, uint16_t UNUSED(value))
-{
-    return this->ram_ + addr - 0xa000 + this->ram_bank_ * 0x2000;
+// Used by MBC3
+uint8_t* MBC::write_ram_address(uint16_t addr, uint8_t UNUSED(value)) {
+    return nms::ERAM.ptr(addr);
 }

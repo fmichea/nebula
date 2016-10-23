@@ -3,14 +3,13 @@
 
 # include "mbc.hh"
 
-class MBC5 : public MBC
-{
+class MBC5 : public MBC {
 public:
-    MBC5(void* memory);
+    MBC5();
 
 private:
-    void* write_rom_bank(uint16_t addr, uint16_t value);
-    void* write_ram_bank(uint16_t addr, uint16_t value);
+    void bank_selector_zone1(uint16_t addr, uint8_t value);
+    void bank_selector_zone2(uint8_t value);
 };
 
 #endif // !NEBULA_MEMORY_MBCS_MBC5_HH_
