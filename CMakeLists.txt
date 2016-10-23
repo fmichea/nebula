@@ -7,7 +7,7 @@ INCLUDE(FindPkgConfig)
 SET(CMAKE_CXX_COMPILER "clang++")
 
 # CXXFLAGS used by compiler.
-SET(CMAKE_CXX_FLAGS "-Wall -Wextra -std=c++11 -D_GNU_SOURCE=1 -D_REENTRANT")
+SET(CMAKE_CXX_FLAGS "-Wall -Wextra -std=c++1z -D_GNU_SOURCE=1 -D_REENTRANT")
 
 SET(CMAKE_CXX_FLAGS_RELEASE "-O3 -DRELEASE")
 SET(CMAKE_CXX_FLAGS_DEBUG "-g3 -DDISASSEMBLER")
@@ -16,7 +16,7 @@ SET(CMAKE_CXX_FLAGS_DEBUG "-g3 -DDISASSEMBLER")
 SET(NEBULA_LDFLAGS "")
 
 # List of all the files of the project.
-SET(NEBULA_SRCS
+SET(NEBULA_COMMON_SRCS
     src/commandline.cc
     src/frontends/abstractmainwindow.cc
     src/graphics/bgwtile.cc
@@ -25,7 +25,6 @@ SET(NEBULA_SRCS
     src/graphics/timer.cc
     src/keyboard/keyboard.cc
     src/logging.cc
-    src/main.cc
     src/memory/mbcs/mbc.cc
     src/memory/mbcs/mbc1.cc
     src/memory/mbcs/mbc2.cc
@@ -33,6 +32,8 @@ SET(NEBULA_SRCS
     src/memory/mbcs/mbc5.cc
     src/memory/mbcs/romonly.cc
     src/memory/mmu.cc
+    src/memory/segments.cc
+    src/memory/watch.cc
     src/z80/interrupts.cc
     src/z80/z80.cc
     src/z80/z80cbopcodes.cc
@@ -54,24 +55,26 @@ ELSEIF(_DISPLAY_BACKEND MATCHES "SDL")
     STRING(REPLACE ";" " " SDL2_LDFLAGS_S "${SDL2_LDFLAGS}")
     SET(NEBULA_LDFLAGS "-lpthread ${SDL2_LDFLAGS_S}")
 
-    SET(NEBULA_SRCS ${NEBULA_SRCS}
-                    src/frontends/sdl/mainwindow.cc
-                    src/frontends/sdl/sdldisplay.cc
+    SET(NEBULA_COMMON_SRCS
+        ${NEBULA_COMMON_SRCS}
+        src/frontends/sdl/mainwindow.cc
+        src/frontends/sdl/sdldisplay.cc
     )
 
     # Sound guard, for development.
     IF(DEFINED _SOUND)
         SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_SOUND=${_SOUND}")
-        SET(NEBULA_SRCS ${NEBULA_SRCS}
-                        src/sound/channel.cc
-                        src/sound/filters/channels/square.cc
-                        src/sound/filters/channels/wave.cc
-                        src/sound/filters/duty.cc
-                        src/sound/filters/length.cc
-                        src/sound/filters/sweep.cc
-                        src/sound/filters/volume.cc
-                        src/sound/sound.cc
-                        src/utils/converter.cc
+        SET(NEBULA_COMMON_SRCS
+            ${NEBULA_COMMON_SRCS}
+            src/sound/channel.cc
+            src/sound/filters/channels/square.cc
+            src/sound/filters/channels/wave.cc
+            src/sound/filters/duty.cc
+            src/sound/filters/length.cc
+            src/sound/filters/sweep.cc
+            src/sound/filters/volume.cc
+            src/sound/sound.cc
+            src/utils/converter.cc
         )
     ENDIF()
 ELSE()
@@ -91,6 +94,51 @@ ADD_CUSTOM_COMMAND(
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tools/gen_opcodes.py
 )
 
+SET(NEBULA_DEPENDENCIES "")
+
 # Builds and links executable.
-ADD_EXECUTABLE(nebula ${NEBULA_SRCS} ${NEBULA_DEFINITIONS})
-TARGET_LINK_LIBRARIES(nebula ${NEBULA_LDFLAGS})
+SET(NEBULA_SRCS ${NEBULA_COMMON_SRCS} ${NEBULA_DEFINITIONS})
+SET(NEBULA_EXE_NAME "nebula")
+
+# Build and links executable.
+IF (TESTING EQUAL 1)
+    # Add rules to install Google Test.
+    INCLUDE(ExternalProject)
+
+    ExternalProject_Add(gtest
+        URL https://github.com/google/googletest/archive/release-1.7.0.zip
+        PREFIX ${CMAKE_CURRENT_BINARY_DIR}/gtest
+        DOWNLOAD_NO_PROGRESS 1
+        INSTALL_COMMAND ""
+    )
+
+    ExternalProject_Get_Property(gtest source_dir binary_dir)
+    SET(GTEST_INCLUDE_DIRS "${source_dir}/include")
+    SET(GTEST_LIBRARIES "${binary_dir}/libgtest.a")
+
+    # Add GTest to include directories.
+    INCLUDE_DIRECTORIES(${GTEST_INCLUDE_DIRS})
+    INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/src")
+
+    # Testing source files and executable name.
+    SET(NEBULA_TEST_SRCS
+        tests/memory/segments.cc
+        tests/memory/mbcs/mbc1.cc
+        tests/memory/mbcs/mbc2.cc
+    )
+
+    SET(NEBULA_SRCS ${NEBULA_SRCS} ${NEBULA_TEST_SRCS} tests/main.cc)
+    SET(NEBULA_EXE_NAME "test-nebula")
+
+    # Build the test binary.
+    SET(NEBULA_DEPENDENCIES ${NEBULA_DEPENDENCIES} gtest)
+    SET(NEBULA_LDFLAGS ${NEBULA_LDFLAGS} ${GTEST_LIBRARIES})
+ELSE ()
+    SET(NEBULA_SRCS ${NEBULA_SRCS} src/main.cc)
+ENDIF ()
+
+ADD_EXECUTABLE(${NEBULA_EXE_NAME} ${NEBULA_SRCS})
+IF (NOT "${NEBULA_DEPENDENCIES}" STREQUAL "")
+    ADD_DEPENDENCIES(${NEBULA_EXE_NAME} ${NEBULA_DEPENDENCIES})
+ENDIF ()
+TARGET_LINK_LIBRARIES(${NEBULA_EXE_NAME} ${NEBULA_LDFLAGS})

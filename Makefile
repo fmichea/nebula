@@ -5,7 +5,8 @@ BUILD_TYPE ?= release
 ROM              ?=  ./tests/cpu_instrs/cpu_instrs.gb
 DISPLAY_BACKEND  ?=  SDL
 
-CMAKE_BASE_OPTIONS := -D_DISPLAY_BACKEND=$(DISPLAY_BACKEND)
+CMAKE_BASE_OPTIONS ?=
+CMAKE_BASE_OPTIONS := $(CMAKE_BASE_OPTIONS) -D_DISPLAY_BACKEND=$(DISPLAY_BACKEND)
 
 # Depending on the build type, we want to set a number of variables.
 ifeq ($(BUILD_TYPE),release)
@@ -13,6 +14,10 @@ BUILD_DIR ?= build
 else ifeq ($(BUILD_TYPE),debug)
 BUILD_DIR ?= build-dev
 CMAKE_BASE_OPTIONS := $(CMAKE_BASE_OPTIONS) -DCMAKE_BUILD_TYPE=Debug
+else ifeq ($(BUILD_TYPE),test)
+BINARY_NAME := test-nebula
+BUILD_DIR ?= build-test
+CMAKE_BASE_OPTIONS := $(CMAKE_BASE_OPTIONS) -DCMAKE_BUILD_TYPE=Debug -DTESTING=1
 else
 $(error Build type "$(BUILD_TYPE)" not recognized)
 endif
@@ -21,6 +26,13 @@ endif
 # the name of the build directory. Let's just forbid that name, it's OK.
 ifeq ($(BUILD_DIR),build-nebula)
 $(error Build directory cannot be named "build-nebula" per convention)
+endif
+
+BINARY_NAME ?= nebula
+
+NEBULA_CMD := $(BUILD_DIR)/$(BINARY_NAME) $(NEBULA_ARGS)
+ifneq ($(BUILD_TYPE),test)
+NEBULA_CMD := $(NEBULA_CMD) --rom "$(ROM)"
 endif
 
 .PHONY: all build-nebula start debug
@@ -35,10 +47,13 @@ build-nebula: $(BUILD_DIR)
 	make -C $(BUILD_DIR)
 
 start: build-nebula
-	$(BUILD_DIR)/nebula $(NEBULA_ARGS) --rom "$(ROM)"
+	$(NEBULA_CMD)
 
 debug: build-nebula
-	PATH=/usr/bin:$$PATH lldb -- $(BUILD_DIR)/nebula $(NEBULA_ARGS) --rom "$(ROM)"
+	PATH=/usr/bin:$$PATH lldb -- $(NEBULA_CMD)
+
+profile: build-nebula
+	valgrind --tool=callgrind -- $(NEBULA_CMD)
 
 $(BUILD_DIR):
 	mkdir -p $@
